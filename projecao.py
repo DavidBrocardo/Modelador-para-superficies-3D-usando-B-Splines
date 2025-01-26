@@ -114,23 +114,37 @@ def Axometrica(vertices, VRP, P, Y, dp, windows,viewport):
     objeto_projetado = calcula_Mult_Matriz(matriz_SRT, vertices)
 
     print(objeto_projetado)
-
+    return objeto_projetado
 #GPTzada so pra ver o resultado 
+
 def draw_projection(vertices):
-    """
-    Função para desenhar os pontos projetados em uma janela Tkinter.
-    """
     # Criar a janela Tkinter
     root = tk.Tk()
     root.title("Projeção Axonométrica")
     canvas = tk.Canvas(root, width=500, height=500, bg="white")
     canvas.pack()
-    
-    # Desenhar os pontos projetados
-    for x, y in vertices:
-        canvas.create_oval(x + 250 - 3, y + 250 - 3, x + 250 + 3, y + 250 + 3, fill="blue")
+
+    # Configurar escala e deslocamento
+    scale = 0.5  # Ajuste conforme necessário
+    offset_x = 250  # Centro do Canvas no eixo X
+    offset_y = 250  # Centro do Canvas no eixo Y
+
+    # Verificar todos os pontos e desenhá-los
+    for i in range(len(vertices[0])):
+        x = vertices[0][i] * scale + offset_x  # Coordenada x escalada e deslocada
+        y = vertices[1][i] * scale + offset_y  # Coordenada y escalada e deslocada
+
+        # Desenhar o ponto
+        canvas.create_oval(
+            x - 3, y - 3,  # Ponto superior esquerdo
+            x + 3, y + 3,  # Ponto inferior direito
+            fill="blue"
+        )
     
     root.mainloop()
+
+
+    
 def main():
     vertices = [
         [21.2, 34.1, 18.8, 5.9, 20],
