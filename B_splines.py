@@ -6,6 +6,7 @@
 
 import math
 import numpy as np
+import tkinter as tk
 
 class bSlines:
 
@@ -48,11 +49,13 @@ class bSlines:
             resultado = self.calcula_Mult_Matriz(self.coordenadas, matriz_T)
             matriz_Bsline[T].append(resultado)
             print( T , " : ", matriz_Bsline[T])
-            T = T + self.acrescimo       
+            T = T + self.acrescimo
+        return matriz_Bsline      
             
-        
+   
     def main(self):
-            self.curvas()
+            curvas = self.curvas()
+            
             
 if __name__ == "__main__":
     vertices = [
