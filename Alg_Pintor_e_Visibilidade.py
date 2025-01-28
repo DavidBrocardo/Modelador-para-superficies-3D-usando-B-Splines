@@ -27,6 +27,14 @@ class PintoreVisibilidade:
         centroide_z = soma_z / v
     
         return centroide_x, centroide_y, centroide_z
+    
+    def Calcular_distancia_VRP_Face(self, VRP, centroide):
+
+        #Formula da distancia euclidiana
+        dist = math.sqrt((VRP[0] - centroide[0])**2 + (VRP[1] - centroide[1])**2 + (VRP[2] - centroide[2])**2)
+
+        return dist
+
 
 
 if __name__ == "__main__":
@@ -36,11 +44,14 @@ if __name__ == "__main__":
                 [42.3, 27.2, 14.6, 29.7,31.6],
                 [  1,   1 ,   1,     1,  1]]
     
-    indice_face = [0,1,4]  #Os vertices de cada face, ex: Face ABE(Face 014)
+    indice_face = [1,2,4]  #Os vertices de cada face, ex: Face ABE(Face 014)
         
     VRP = [25, 15, 80, 1]   
 
     pintor = PintoreVisibilidade(vertices, VRP) #instancia da classe, só funfa assim
 
     centroide = pintor.calcular_centroide_face(vertices, indice_face)
-    print(f"Centroide da face: {centroide}") 
+    distancia = pintor.Calcular_distancia_VRP_Face(VRP, centroide)
+
+    print(f"\nCentroide da face: {centroide}\n") 
+    print(f"Distância da Face até o VRP: {distancia}\n")
