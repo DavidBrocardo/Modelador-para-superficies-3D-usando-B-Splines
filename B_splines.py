@@ -11,13 +11,14 @@ import tkinter as tk
 class bSlines:
 
     def __init__(self, acrescimo, coordenadas):
+       #Inicializa as variaveis
        self.acrescimo = acrescimo
        self.coordenadas = coordenadas
 
+    #Recebe duas matrizes e as multiplica
     def calcula_Mult_Matriz(self,A, B):
         if len(A[0]) != len(B):
             raise ValueError("Número de colunas de A deve ser igual ao número de linhas de B.")
-        
         m = len(A)  
         n = len(B) 
         p = len(B[0]) 
@@ -30,10 +31,13 @@ class bSlines:
         #print(resultado)
         return resultado
 
+    #Realiza os calculo da B_Splines
     def curvas(self):
         T = 0
         matriz_Bsline = {}
+        #Percore de 0 a 1 aumentando T a cada rodada
         while T <= 1:
+            #Calculos da Taxa 
             T = round(float(T), 3) 
             Tcubo = pow(T,3)
             Tquadrado = pow(T,2)
@@ -45,7 +49,7 @@ class bSlines:
                 ] 
             if T not in matriz_Bsline:
                     matriz_Bsline[T] = []
-
+            
             resultado = self.calcula_Mult_Matriz(self.coordenadas, matriz_T)
             matriz_Bsline[T].append(resultado)
             print( T , " : ", matriz_Bsline[T])

@@ -5,6 +5,7 @@ import numpy as np
 class ProjecaoAxonometrica:
    
     def __init__(self, vertices, VRP, P, Y, dp, windows, viewport):
+        # Inicializando variaveis
         self.vertices = vertices
         self.VRP = VRP
         self.P = P
@@ -13,13 +14,14 @@ class ProjecaoAxonometrica:
         self.windows = windows
         self.viewport = viewport
 
-
+    # Recebe um vetor e o retorna o unitario
     def Unitario (self, Vetor , Vetor_normalizado):    
         unitario = [0] * 3
         for i in range(3):
             unitario[i] = Vetor[i] / Vetor_normalizado 
         return unitario
 
+    # Recebe dois vetores e retorna o produto vetorial
     def calcular_produto_vetorial(self, v, n):        
         matriz = [
             ["i", "j", "k"],
@@ -33,6 +35,7 @@ class ProjecaoAxonometrica:
         u[2] = v[0] * n[1] - v[1] * n[0]  
         return u
 
+    # Recebe duas matrizes e as multiplica
     def calcula_Mult_Matriz(self,A, B):
         if len(A[0]) != len(B):
             raise ValueError("Número de colunas de A deve ser igual ao número de linhas de B.")
@@ -47,22 +50,22 @@ class ProjecaoAxonometrica:
                     resultado[i][j] += A[i][k] * B[k][j]
 
         return resultado
-
+    
+    #Realiza todo o processo de transformação de um objeto 3D para uma projecao axometrica em 2D
     def Axometrica(self):
         N = [0] * (3)
         n_quadrado = 0
-
-        #N = VRP -P
+        
+        #Calculo realizado abaixo : N = VRP -P
         for i in range(3):
             N[i] = self.VRP[i] - P[i]
             n_quadrado += N[i] **2
 
-        #n = N/|N|
+        #Calculo realizado abaixo : n = N/|N|
         n_quadrado = math.sqrt(n_quadrado)
         n_unitario = self.Unitario(N, n_quadrado )
         
-
-        #V = Y - (Y.n).n
+        #Calculo realizado abaixo : V = Y - (Y.n).n
         mult_YN = 0
         v_quadrado= 0
         for i in range(3):
@@ -71,65 +74,56 @@ class ProjecaoAxonometrica:
         for i in range(3):
             V[i] =  self.Y[i] - mult_YN*n_unitario[i]
             v_quadrado += V[i] **2
-
         v_quadrado = math.sqrt(v_quadrado)
         v_unitario = self.Unitario(V, v_quadrado )    
         
-        # u =  v x n 
+        #Calculo realizado abaixo : u =  v x n 
         u = self.calcular_produto_vetorial(v_unitario, n_unitario)
 
-        #M(SRU, SRC) = R.T
-        
+        #Calculo realizado abaixo : M(SRU, SRC) = R.T        
         matriz_R = [
             u + [0],
             v_unitario + [0],
             n_unitario + [0],
             [0, 0, 0, 1]
-        ]
-        
+        ]        
         matriz_T = [
             [1, 0 , 0] + [-self.VRP[0]],
             [0, 1 , 0] + [-self.VRP[1]],
             [0, 0 , 1] + [-self.VRP[2]],
             [0, 0 , 0, 1]
         ]
-
         matriz_SRU = self.calcula_Mult_Matriz(matriz_R,matriz_T)
         
-        #PROJEÇÃO AXONOMÉTRICA
-
+        #Ultima etapa da PROJEÇÃO AXONOMÉTRICA
         M_proj = [
             [1, 0 , 0, 0],
             [0, 1 , 0, 0],
             [0, 0 , 1, 0],
             [0, 0 , 0, 1]
-        ]
-        
+        ]        
         M_jp = [
         [((self.viewport[2]-self.viewport[0])/(self.windows[2]-self.windows[0])), 0	,0,	(-self.windows[0] *(self.viewport[2]-self.viewport[0])/(self.windows[2]-self.windows[0]) + self.viewport[0])],
         [0,	((self.viewport[1]-self.viewport[3])/(self.windows[3]-self.windows[1])), 0, (self.windows[1] * (self.viewport[3]-self.viewport[1])/(self.windows[3]-self.windows[1]) + self.viewport[3]) ],
         [0,	0,	1,	0],
         [0,	0,	0,	1]
         ]
-        for i in range(len(M_jp)):
-            print(M_jp[i])
-        print("\n")
-        
+
+        #Calculo realizado abaixo : matriz_SRTSRU =  M_jp * (M_proj*matriz_SRU)
         matriz_SRT = self.calcula_Mult_Matriz(M_jp, self.calcula_Mult_Matriz(M_proj,matriz_SRU))  
-        for i in range(len(matriz_SRT)):
-            print(matriz_SRT[i])
-        print("\n")
+        
         #Objeto em projeção axonométrica
+        #Calculo realizado abaixo : objeto_projetado =  matriz_SRT * vertices
         objeto_projetado = self.calcula_Mult_Matriz(matriz_SRT, vertices)
 
-        
+        #Print bonito
         for i in range(len(objeto_projetado)):
             print(objeto_projetado[i])
         return objeto_projetado
         
 
     #GPTzada so pra ver o resultado 
-
+    #Gera um canva e plota os pontos
     def draw_projection(self, vertices):
         # Criar a janela Tkinter
         root = tk.Tk()
