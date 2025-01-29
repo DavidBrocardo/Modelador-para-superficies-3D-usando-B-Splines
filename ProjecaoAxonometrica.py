@@ -125,6 +125,7 @@ class ProjecaoAxonometrica:
     #GPTzada so pra ver o resultado 
     #Gera um canva e plota os pontos
     def draw_projection(self, vertices):
+
         # Criar a janela Tkinter
         root = tk.Tk()
         root.title("Projeção Axonométrica")
