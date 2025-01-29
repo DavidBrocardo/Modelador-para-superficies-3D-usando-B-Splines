@@ -58,7 +58,7 @@ class ProjecaoAxonometrica:
         
         #Calculo realizado abaixo : N = VRP -P
         for i in range(3):
-            N[i] = self.VRP[i] - P[i]
+            N[i] = self.VRP[i] - self.P[i]
             n_quadrado += N[i] **2
 
         #Calculo realizado abaixo : n = N/|N|
@@ -69,7 +69,7 @@ class ProjecaoAxonometrica:
         mult_YN = 0
         v_quadrado= 0
         for i in range(3):
-            mult_YN += Y[i]*n_unitario[i]
+            mult_YN += self.Y[i]*n_unitario[i]
         V = [0] * 3   
         for i in range(3):
             V[i] =  self.Y[i] - mult_YN*n_unitario[i]
@@ -114,11 +114,11 @@ class ProjecaoAxonometrica:
         
         #Objeto em projeção axonométrica
         #Calculo realizado abaixo : objeto_projetado =  matriz_SRT * vertices
-        objeto_projetado = self.calcula_Mult_Matriz(matriz_SRT, vertices)
+        objeto_projetado = self.calcula_Mult_Matriz(matriz_SRT, self.vertices)
 
         #Print bonito
-        for i in range(len(objeto_projetado)):
-            print(objeto_projetado[i])
+        '''for i in range(len(objeto_projetado)):
+            print(objeto_projetado[i])'''
         return objeto_projetado
         
 
@@ -158,14 +158,12 @@ class ProjecaoAxonometrica:
             self.draw_projection(projecao_axometrica)
     
 
-if __name__ == "__main__":
-    vertices = [
-            [21.2, 34.1, 18.8, 5.9, 20],
-            [0.7,  3.4,  5.6,  2.9, 20.9],
-            [42.3, 27.2, 14.6, 29.7,31.6],
-            [1,     1 ,   1,   1,  1]
-        ]
-        
+'''if __name__ == "__main__":
+    vertices = [[5.5, 8.500000000000002, 11.5, 11.5, 13.541666666666668, 12.833333333333332],
+                [1.1666666666666665, 3.5208333333333335, 5.999999999999999, 5.999999999999999, 6.270833333333334, 5.166666666666667],
+                [8.666666666666668, 4.145833333333333, 0.5000000000000002, 0.5000000000000002, 1.8541666666666665, 5.333333333333333],
+                [1, 1, 1, 1, 1, 1]
+                ]
     VRP = [25, 15, 80, 1]  
     P = [20, 10, 25, 1]    
     Y = [0, 1, 0]       
@@ -175,4 +173,4 @@ if __name__ == "__main__":
     viewport = [0, 0, 319, 239]    
     
     projecao = ProjecaoAxonometrica(vertices, VRP, P, Y, dp, windows, viewport)
-    projecao.main()
+    projecao.main()'''
