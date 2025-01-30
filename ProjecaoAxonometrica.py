@@ -129,7 +129,7 @@ class ProjecaoAxonometrica:
         # Criar a janela Tkinter
         root = tk.Tk()
         root.title("Projeção Axonométrica")
-        canvas = tk.Canvas(root, width=500, height=500, bg="white")
+        canvas = tk.Canvas(root, width=1000, height=1000, bg="white")
         canvas.pack()
 
         # Configurar escala e deslocamento

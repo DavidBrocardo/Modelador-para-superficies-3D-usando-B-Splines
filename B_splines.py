@@ -84,28 +84,26 @@ if __name__ == "__main__":
 
     import random
     matriz_pontos = []
-    linhas = 20
-    colunas = 20
-    espacamento = 4
+    linhas = 6
+    colunas = 6
+    espacamento = 2
     altura_max = 10
     for i in range(linhas):
         linha = []
         for j in range(colunas):
-            x = j * espacamento
-            y = i * espacamento
-            z = random.randint(0, altura_max)  # Gera alturas aleatórias
+            x = i * espacamento
+            y = random.randint(0, altura_max)# Gera alturas aleatórias
+            z = j * espacamento   
             linha.append((x, y, z))
         matriz_pontos.append(linha)
     acrescimo = 0.125
     bspline = BSplines(acrescimo, matriz_pontos)
 
-
-
-
-    VRP = [50, 70, 50, 1]  
-    P = [30, 20, 25, 1]    
+    VRP = [0, 2, 4, 1]  
+    P = [0, 0, 0, 1]    
     Y = [0, 1, 0]       
-    dp = 40  
+    dp = 0  
+
     windows = [-8, -6, 8, 6]
     viewport = [0, 0, 319, 239]    
 
