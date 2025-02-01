@@ -154,8 +154,9 @@ class ProjecaoAxonometrica:
     def main(self):
             # Calcular a projeção
             projecao_axometrica = self.Axometrica()
+            return projecao_axometrica
             # Desenhar a projeção
-            self.draw_projection(projecao_axometrica)
+            #self.draw_projection(projecao_axometrica)
     
 
 '''if __name__ == "__main__":

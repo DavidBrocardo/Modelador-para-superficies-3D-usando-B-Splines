@@ -84,22 +84,23 @@ if __name__ == "__main__":
 
     import random
     matriz_pontos = []
-    linhas = 6
-    colunas = 6
-    espacamento = 2
-    altura_max = 10
+    linhas = 5
+    colunas = 4
+    espacamento = 8
+    altura_max = 30
     for i in range(linhas):
         linha = []
         for j in range(colunas):
             x = i * espacamento
             y = random.randint(0, altura_max)# Gera alturas aleatórias
-            z = j * espacamento   
+            z = j * espacamento  
             linha.append((x, y, z))
         matriz_pontos.append(linha)
-    acrescimo = 0.125
+    acrescimo = 0.5
+    print(matriz_pontos)
     bspline = BSplines(acrescimo, matriz_pontos)
 
-    VRP = [0, 2, 4, 1]  
+    VRP = [0, 0, 1, 1]  
     P = [0, 0, 0, 1]    
     Y = [0, 1, 0]       
     dp = 0  
@@ -109,6 +110,7 @@ if __name__ == "__main__":
 
     
     matriz_curvas = bspline.main()
+    print(matriz_curvas)
     #Chamando a classe projecao
     projecao = ProjecaoAxonometrica(matriz_curvas, VRP, P, Y, dp, windows, viewport)
     projecao.main()
