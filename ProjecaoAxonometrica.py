@@ -6,7 +6,8 @@ class ProjecaoAxonometrica:
    
     def __init__(self, vertices, VRP, P, Y, dp, windows, viewport):
         # Inicializando variaveis
-        self.vertices = vertices
+
+        self.vertices = np.array(vertices, dtype=float).reshape(len(vertices), -1).tolist()
         self.VRP = VRP
         self.P = P
         self.Y = Y
@@ -36,21 +37,24 @@ class ProjecaoAxonometrica:
         return u
 
     # Recebe duas matrizes e as multiplica
-    def calcula_Mult_Matriz(self,A, B):
+    def calcula_Mult_Matriz(self, A, B):
         if len(A[0]) != len(B):
             raise ValueError("Número de colunas de A deve ser igual ao número de linhas de B.")
         
         m = len(A)  
-        n = len(B) 
-        p = len(B[0]) 
+        n = len(B)  
+        p = len(B[0])  
         resultado = [[0 for _ in range(p)] for _ in range(m)]    
+
         for i in range(m):
             for j in range(p):
                 for k in range(n):
                     resultado[i][j] += A[i][k] * B[k][j]
 
-        return resultado
-    
+        # **Transformação para manter a estrutura correta**
+        resultado_corrigido = list(map(list, zip(*resultado)))  # Transpõe a matriz
+
+        return resultado_corrigido
     #Realiza todo o processo de transformação de um objeto 3D para uma projecao axometrica em 2D
     def Axometrica(self):
         N = [0] * (3)
@@ -116,9 +120,7 @@ class ProjecaoAxonometrica:
         #Calculo realizado abaixo : objeto_projetado =  matriz_SRT * vertices
         objeto_projetado = self.calcula_Mult_Matriz(matriz_SRT, self.vertices)
 
-        #Print bonito
-        '''for i in range(len(objeto_projetado)):
-            print(objeto_projetado[i])'''
+        
         return objeto_projetado
         
 
@@ -154,12 +156,13 @@ class ProjecaoAxonometrica:
     def main(self):
             # Calcular a projeção
             projecao_axometrica = self.Axometrica()
+            #print(projecao_axometrica)
             return projecao_axometrica
             # Desenhar a projeção
             #self.draw_projection(projecao_axometrica)
     
 
-'''if __name__ == "__main__":
+if __name__ == "__main__":
     vertices = [[5.5, 8.500000000000002, 11.5, 11.5, 13.541666666666668, 12.833333333333332],
                 [1.1666666666666665, 3.5208333333333335, 5.999999999999999, 5.999999999999999, 6.270833333333334, 5.166666666666667],
                 [8.666666666666668, 4.145833333333333, 0.5000000000000002, 0.5000000000000002, 1.8541666666666665, 5.333333333333333],
@@ -174,4 +177,4 @@ class ProjecaoAxonometrica:
     viewport = [0, 0, 319, 239]    
     
     projecao = ProjecaoAxonometrica(vertices, VRP, P, Y, dp, windows, viewport)
-    projecao.main()'''
+    print(projecao.main())

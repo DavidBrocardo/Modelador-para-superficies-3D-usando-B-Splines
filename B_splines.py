@@ -69,8 +69,22 @@ class BSplines:
         return matriz_bspline
 
     def main(self):
-        return self.calcular_curvas()
+        matriz_curvas =  self.calcular_curvas()
+    
+        VRP = [0, 0, 1, 1]  
+        P = [0, 0, 0, 1]    
+        Y = [0, 1, 0]       
+        dp = 0  
+
+        windows = [-8, -6, 8, 6]
+        viewport = [0, 0, 319, 239]    
         
+        
+        #Chamando a classe projecao
+        projecao = ProjecaoAxonometrica(matriz_curvas, VRP, P, Y, dp, windows, viewport)
+        return projecao.main()
+
+            
 
 if __name__ == "__main__":
     pontos_controle = [
@@ -100,17 +114,5 @@ if __name__ == "__main__":
     print(matriz_pontos)
     bspline = BSplines(acrescimo, matriz_pontos)
 
-    VRP = [0, 0, 1, 1]  
-    P = [0, 0, 0, 1]    
-    Y = [0, 1, 0]       
-    dp = 0  
-
-    windows = [-8, -6, 8, 6]
-    viewport = [0, 0, 319, 239]    
-
-    
     matriz_curvas = bspline.main()
     print(matriz_curvas)
-    #Chamando a classe projecao
-    projecao = ProjecaoAxonometrica(matriz_curvas, VRP, P, Y, dp, windows, viewport)
-    projecao.main()

@@ -1,71 +1,121 @@
-import random
 import tkinter as tk
-from B_splines import BSplines  # Certifique-se de que a classe BSplines está no mesmo diretório ou no caminho correto
+import random
 from ProjecaoAxonometrica import ProjecaoAxonometrica
 
 
-def gerar_matriz_pontos(linhas, colunas, espacamento, altura_max):
-    matriz_pontos = []
-    for i in range(linhas):
-        linha = []
-        for j in range(colunas):
-            x = i * espacamento
-            y = random.randint(0, altura_max)  # Gera alturas aleatórias
-            z = j * espacamento  
-            linha.append((x, y, z))
-        matriz_pontos.append(linha)
-    return matriz_pontos
+class BSplines:
+    def __init__(self,NI,NJ,TI, TJ,RESOLUTIONI,RESOLUTIONJ,inp):
+        # Definição de pontos de controle
+        self.NI = NI
+        self.NJ = NJ
+        self.TI = TI
+        self.TJ = TJ
+        self.RESOLUTIONI = RESOLUTIONI
+        self.RESOLUTIONJ = RESOLUTIONJ
+        # Inicialização dos pontos de controle com valores aleatórios para a coordenada Z
+        self.inp = inp
+        # Vetores de nós para as direções I e J
+        self.knotsI = [0] * (NI + TI + 1)
+        self.knotsJ = [0] * (NJ + TJ + 1)
+        # Matriz para armazenar os pontos da superfície calculada
+        self.outp = [[[0, 0, 0] for _ in range(self.RESOLUTIONJ)] for _ in range(self.RESOLUTIONI)]
 
-# Definições de resolução e parâmetros
-linhas = 10
-colunas = 10
-espacamento = 8
-altura_max = 30
-acrescimo = 0.125  # Ajuste conforme necessário para suavidade da interpolação
+    def calcular_nos(self,nos, n, t):
+        """ Calcula os nós da spline com base no número de pontos de controle e no grau da spline """
+        for j in range(n + t + 1):
+            if j < t:
+                nos[j] = 0
+            elif j <= n:
+                nos[j] = j - t + 1
+            else:
+                nos[j] = n - t + 2
+        print("Nos " , nos)
+        return nos
 
-# Geração dos pontos de controle
-matriz_pontos = gerar_matriz_pontos(linhas, colunas, espacamento, altura_max)
-bspline = BSplines(acrescimo, matriz_pontos)
+    def calcular_blend(self,k, t, u, v):
+        """ Calcula o valor de blending recursivamente para a spline """
+        if t == 1:
+            return 1 if u[k] <= v < u[k + 1] else 0
+        
+        valor = 0
+        if u[k + t - 1] != u[k]:
+            valor += (v - u[k]) / (u[k + t - 1] - u[k]) * self.calcular_blend(k, t - 1, u, v)
+        if u[k + t] != u[k + 1]:
+            valor += (u[k + t] - v) / (u[k + t] - u[k + 1]) * self.calcular_blend(k + 1, t - 1, u, v)
+        
+        return valor
 
-# Calcula os pontos da B-Spline interpolada
-matriz_curvas = bspline.main()
+    def calcular_superficie(self):
+        """ Calcula os pontos da superfície spline com base nos pontos de controle """
+        self.calcular_nos(self.knotsI, self.NI, self.TI)
+        self.calcular_nos(self.knotsJ, self.NJ, self.TJ)
+        print("Knots I:", self.knotsI)
+        print("Knots J:", self.knotsJ)
 
-# Criar interface gráfica com Tkinter
-root = tk.Tk()
-root.title("Interpolação B-Spline")
-canvas = tk.Canvas(root, width=500, height=500, bg="white")
-canvas.pack()
+        incrementoI = (self.NI - self.TI + 2) / (self.RESOLUTIONI - 1)
+        incrementoJ = (self.NJ - self.TJ + 2) / (self.RESOLUTIONJ - 1)
+        
+        intervaloI = 0
+        for i in range(self.RESOLUTIONI):
+            intervaloJ = 0
+            for j in range(self.RESOLUTIONJ):
+                x, y, z = 0, 0, 0
+                for ki in range(self.NI + 1):
+                    bi = self.calcular_blend(ki, TI, self.knotsI, intervaloI)
+                    for kj in range(self.NJ + 1):
+                        bj = self.calcular_blend(kj, TJ, self.knotsJ, intervaloJ)
+                        x += self.inp[ki][kj][0] * bi * bj
+                        y += self.inp[ki][kj][1] * bi * bj
+                        z += self.inp[ki][kj][2] * bi * bj
+                self.outp[i][j] = [x, y, z]
+                intervaloJ += incrementoJ
+            intervaloI += incrementoI
 
-# Normaliza os pontos para a escala do canvas
-x_min = min(min(linha, key=lambda p: p[0])[0] for linha in matriz_pontos)
-x_max = max(max(linha, key=lambda p: p[0])[0] for linha in matriz_pontos)
-y_min = min(min(linha, key=lambda p: p[1])[1] for linha in matriz_pontos)
-y_max = max(max(linha, key=lambda p: p[1])[1] for linha in matriz_pontos)
+    def desenhar_superficie(self,canvas):
+        """ Desenha a superfície spline usando Tkinter """
+        canvas.delete("all")
+        escala = 50  # Fator de escala para visualização
+        deslocamento_x, deslocamento_y = 100, 100  # Deslocamento para centralizar a visualização
+        for i in range(self.RESOLUTIONI - 1):
+            for j in range(self.RESOLUTIONJ - 1):
+                x1, y1 = deslocamento_x + self.outp[i][j][0] * escala, deslocamento_y - self.outp[i][j][2] * escala
+                x2, y2 = deslocamento_x + self.outp[i][j+1][0] * escala, deslocamento_y - self.outp[i][j+1][2] * escala
+                x3, y3 = deslocamento_x + self.outp[i+1][j+1][0] * escala, deslocamento_y - self.outp[i+1][j+1][2] * escala
+                x4, y4 = deslocamento_x + self.outp[i+1][j][0] * escala, deslocamento_y - self.outp[i+1][j][2] * escala
+                canvas.create_polygon(x1, y1, x2, y2, x3, y3, x4, y4, outline="black", fill="", width=1)
 
-scale_x = 450 / (x_max - x_min)
-scale_y = 450 / (y_max - y_min)
 
-def transformar_ponto(x, y):
-    return (x - x_min) * scale_x + 25, (y - y_min) * scale_y + 25
+    def main(self):
+             
+        VRP = [0, 0, 1, 1]  
+        P = [0, 0, 0, 1]    
+        Y = [0, 1, 0]       
+        dp = 0  
+        windows = [-8, -6, 8, 6]
+        viewport = [0, 0, 319, 239]
+        #print(self.inp)
+        #self.inp = ProjecaoAxonometrica(self.inp, VRP, P, Y, dp, windows, viewport)
+        #projecao = ProjecaoAxonometrica(self.inp, VRP, P, Y, dp, windows, viewport)
+        #self.inp= projecao.main()
+        #print("Depois \n\n")
+        #print(self.inp)
+        self.calcular_superficie()
 
-# Desenhar a malha original dos pontos de controle
-for linha in matriz_pontos:
-    for i in range(len(linha) - 1):
-        x1, y1 = transformar_ponto(linha[i][0], linha[i][1])
-        x2, y2 = transformar_ponto(linha[i + 1][0], linha[i + 1][1])
-        canvas.create_line(x1, y1, x2, y2, fill="blue", dash=(4, 2))
+        """ Função principal para inicializar a interface Tkinter """
+        root = tk.Tk()
+        root.title("Superfície Spline")
+        canvas = tk.Canvas(root, width=400, height=400, bg="white")
+        canvas.pack()
+        self.desenhar_superficie(canvas)
+        root.mainloop()
 
-for j in range(len(matriz_pontos[0])):
-    for i in range(len(matriz_pontos) - 1):
-        x1, y1 = transformar_ponto(matriz_pontos[i][j][0], matriz_pontos[i][j][1])
-        x2, y2 = transformar_ponto(matriz_pontos[i + 1][j][0], matriz_pontos[i + 1][j][1])
-        canvas.create_line(x1, y1, x2, y2, fill="blue", dash=(4, 2))
-
-# Desenhar a curva B-Spline interpolada
-num_pontos = len(matriz_curvas[0])
-for i in range(num_pontos - 1):
-    x1, y1 = transformar_ponto(matriz_curvas[0][i], matriz_curvas[1][i])
-    x2, y2 = transformar_ponto(matriz_curvas[0][i+1], matriz_curvas[1][i+1])
-    canvas.create_line(x1, y1, x2, y2, fill="black")
-
-root.mainloop()
+if __name__ == "__main__":
+    NI, NJ = 5, 4  # Número de pontos de controle na direção I e J
+    TI, TJ = 3, 3  # Grau da spline nas direções I e J
+    RESOLUTIONI = NI*NJ # max(30, NI * 10)  # Proporcional a NI, com um mínimo de 30
+    RESOLUTIONJ = NI*NJ # max(40, NJ * 10)  # Proporcional a NJ, com um mínimo de 40
+    # Inicialização dos pontos de controle com valores aleatórios para a coordenada Z
+    inp = [[[i, j, random.uniform(-1, 1)] for j in range(NJ+1)] for i in range(NI+1)]
+    #print(inp)   
+    bspline = BSplines(NI,NJ,TI, TJ,RESOLUTIONI,RESOLUTIONJ,inp)
+    bspline.main()
