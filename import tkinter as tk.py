@@ -1,107 +1,130 @@
-import random
 import tkinter as tk
+import random
+from ProjecaoAxonometrica import ProjecaoAxonometrica
+import math
 
-class XYZ:
-    def __init__(self, x=0, y=0, z=0):
-        self.x = x
-        self.y = y
-        self.z = z
+class BSplines:
+    def __init__(self, NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp):
+        self.NI = NI
+        self.NJ = NJ
+        self.TI = TI
+        self.TJ = TJ
+        self.RESOLUTIONI = RESOLUTIONI
+        self.RESOLUTIONJ = RESOLUTIONJ
+        self.inp = inp
+        self.knotsI = [0] * (self.NI + self.TI + 1)
+        self.knotsJ = [0] * (self.NJ + self.TJ + 1)
+        self.outp = [[[0, 0, 0] for _ in range(self.RESOLUTIONJ)] for _ in range(self.RESOLUTIONI)]
 
-def SplineKnots(num_control_points, degree):
-    n = num_control_points
-    p = degree
-    m = n + p + 1  # Número total de nós
-    knots = [0.0] * m
-    for i in range(m):
-        if i <= p:
-            knots[i] = 0.0
-        elif i > n:
-            knots[i] = n - p + 1
-        else:
-            knots[i] = i - p
-    return knots
+    def calcular_nos(self, nos, n, t):
+        """ Calcula os nós da spline """
+        for j in range(n + t + 1):
+            if j < t:
+                nos[j] = 0
+            elif j <= n:
+                nos[j] = j - t + 1
+            else:
+                nos[j] = n - t + 2
 
-def basis_function(i, degree, knots, t):
-    if degree == 0:
-        return 1.0 if knots[i] <= t < knots[i+1] else 0.0
-    else:
-        denom1 = knots[i + degree] - knots[i]
-        term1 = 0.0
-        if denom1 != 0.0:
-            term1 = ((t - knots[i]) / denom1) * basis_function(i, degree-1, knots, t)
+    def calcular_blend(self, k, t, u, v):
+        """ Calcula o valor de blending """
+        if t == 1:
+            return 1 if u[k] <= v < u[k + 1] else 0
+        valor = 0
+        if u[k + t - 1] != u[k]:
+            valor += (v - u[k]) / (u[k + t - 1] - u[k]) * self.calcular_blend(k, t - 1, u, v)
+        if u[k + t] != u[k + 1]:
+            valor += (u[k + t] - v) / (u[k + t] - u[k + 1]) * self.calcular_blend(k + 1, t - 1, u, v)
+        return valor
+
+    def calcular_superficie(self):
+        """ Calcula os pontos da superfície """
+        self.calcular_nos(self.knotsI, self.NI, self.TI)
+        self.calcular_nos(self.knotsJ, self.NJ, self.TJ)
+
+        incrementoI = (self.NI - self.TI + 2) / (self.RESOLUTIONI - 1)
+        incrementoJ = (self.NJ - self.TJ + 2) / (self.RESOLUTIONJ - 1)
+
+        intervaloI = 0
+        for i in range(self.RESOLUTIONI):
+            intervaloJ = 0
+            for j in range(self.RESOLUTIONJ):
+                x, y, z = 0, 0, 0
+                for ki in range(self.NI + 1):
+                    bi = self.calcular_blend(ki, self.TI, self.knotsI, intervaloI)
+                    for kj in range(self.NJ + 1):
+                        bj = self.calcular_blend(kj, self.TJ, self.knotsJ, intervaloJ)
+                        x += self.inp[ki][kj][0] * bi * bj
+                        y += self.inp[ki][kj][1] * bi * bj
+                        z += self.inp[ki][kj][2] * bi * bj
+                self.outp[i][j] = [x, y, z]
+                intervaloJ += incrementoJ
+            intervaloI += incrementoI
+
+    def desenhar_superficie(self, canvas):
+        """ Desenha a superfície no Canvas """
+        canvas.delete("all")
+        escala = 100  
+        deslocamento_x, deslocamento_y = 250, 250  
+        for i in range(self.NI):  
+            for j in range(self.NJ):  
+                x = self.inp[i][j][0] * escala + deslocamento_x  # Coordenada X
+                y = self.inp[i][j][1] * escala + deslocamento_y  # Coordenada Y  
+                raio = 2            
+                canvas.create_oval(x - raio, y - raio, x + raio, y + raio, fill="red")
+
         
-        denom2 = knots[i + degree + 1] - knots[i + 1]
-        term2 = 0.0
-        if denom2 != 0.0:
-            term2 = ((knots[i + degree + 1] - t) / denom2) * basis_function(i+1, degree-1, knots, t)
+        for i in range(self.RESOLUTIONI - 1):
+            for j in range(self.RESOLUTIONJ - 1):
+                x1, y1 = deslocamento_x + self.outp[i][j][0] * escala, deslocamento_y - self.outp[i][j][2] * escala
+                x2, y2 = deslocamento_x + self.outp[i][j+1][0] * escala, deslocamento_y - self.outp[i][j+1][2] * escala
+                x3, y3 = deslocamento_x + self.outp[i+1][j+1][0] * escala, deslocamento_y - self.outp[i+1][j+1][2] * escala
+                x4, y4 = deslocamento_x + self.outp[i+1][j][0] * escala, deslocamento_y - self.outp[i+1][j][2] * escala
+                #print(f"Desenhando polígono: ({x1},{y1}), ({x2},{y2}), ({x3},{y3}), ({x4},{y4})")
+                canvas.create_polygon(x1, y1, x2, y2, x3, y3, x4, y4, outline="black", fill="", width=1)
+        return
+
+    def main(self):
+        VRP = [0, 0, 14, 1]  
+        P = [0, 0, 0, 1]    
+        Y = [0, 1, 0]       
+        dp = 0  
+        windows = [-8, -6, 8, 6]
+        viewport = [0, 0, 319, 239]
+
         
-        return term1 + term2
+        projecao = ProjecaoAxonometrica(self.inp, VRP, P, Y, dp, windows, viewport)
+        projecao = projecao.main()
 
-def main():
-    NI, NJ = 3, 4
-    TI, TJ = 3, 3
-    RESOLUTIONI, RESOLUTIONJ = 30, 40
+        self.inp = []
+        for i in range(self.NI + 1):  
+            linha = []
+            for j in range(self.NJ + 1):  
+                elemento = [projecao[0][i * (self.NJ + 1) + j],  
+                            projecao[1][i * (self.NJ + 1) + j],  
+                            projecao[2][i * (self.NJ + 1) + j]]  
+                linha.append(elemento)  
+            self.inp.append(linha)
 
-    # Pontos de controle
-    random.seed(1111)
-    inp = [[XYZ(i, j, (random.randint(0, 9999) / 5000.0 - 1)) for j in range(NJ+1)] for i in range(NI+1)]
+        self.calcular_superficie()
+        print("Pontos calculados da superfície:", self.outp)
 
-    # Calcular nós
-    knotsI = SplineKnots(NI, TI)
-    knotsJ = SplineKnots(NJ, TJ)
+        root = tk.Tk()
+        root.title("Superfície Spline")
+        canvas = tk.Canvas(root, width=500, height=500, bg="white")
+        canvas.pack()
+        self.desenhar_superficie(canvas)
+        root.mainloop()
 
-    # Inicializar pontos de saída
-    outp = [[XYZ() for _ in range(RESOLUTIONJ)] for __ in range(RESOLUTIONI)]
-    incrementI = (NI - TI + 2) / (RESOLUTIONI - 1)
-    incrementJ = (NJ - TJ + 2) / (RESOLUTIONJ - 1)
-
-    # Calcular a superfície
-    for i in range(RESOLUTIONI):
-        intervalI = i * incrementI
-        for j in range(RESOLUTIONJ):
-            intervalJ = j * incrementJ
-            x, y, z = 0.0, 0.0, 0.0
-            for ki in range(NI + 1):
-                bi = basis_function(ki, TI, knotsI, intervalI)
-                for kj in range(NJ + 1):
-                    bj = basis_function(kj, TJ, knotsJ, intervalJ)
-                    x += inp[ki][kj].x * bi * bj
-                    y += inp[ki][kj].y * bi * bj
-                    z += inp[ki][kj].z * bi * bj
-            outp[i][j] = XYZ(x, y, z)
-
-    # Configurar Tkinter
-    root = tk.Tk()
-    root.title("Superfície de Spline")
-    canvas = tk.Canvas(root, width=800, height=600)
-    canvas.pack()
-
-    # Função de projeção isométrica
-    def project(x, y, z):
-        iso_x = (x - y) * 30 + 400
-        iso_y = (x + y) * 15 - z * 30 + 200
-        return iso_x, iso_y
-
-    # Desenhar a superfície
-    for i in range(RESOLUTIONI - 1):
-        for j in range(RESOLUTIONJ - 1):
-            p1 = outp[i][j]
-            p2 = outp[i][j+1]
-            p3 = outp[i+1][j+1]
-            p4 = outp[i+1][j]
-            points = [p1, p2, p3, p4]
-            for k in range(4):
-                x1, y1 = project(points[k].x, points[k].y, points[k].z)
-                x2, y2 = project(points[(k+1)%4].x, points[(k+1)%4].y, points[(k+1)%4].z)
-                canvas.create_line(x1, y1, x2, y2, fill='blue')
-
-    # Desenhar pontos de controle
-    for i in range(NI + 1):
-        for j in range(NJ + 1):
-            x, y = project(inp[i][j].x, inp[i][j].y, inp[i][j].z)
-            canvas.create_oval(x-3, y-3, x+3, y+3, fill='red')
-
-    root.mainloop()
 
 if __name__ == "__main__":
-    main()
+    NI, NJ = 4, 4  
+    TI, TJ = 3, 3
+    RESOLUTIONI = 30  
+    RESOLUTIONJ = 30  
+  
+   
+    inp = [[[i,j, random.uniform(-1, 1) ] for j in range(NJ+1)] for i in range(NI+1)]
+    
+    bspline = BSplines(NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp)
+    bspline.main()
