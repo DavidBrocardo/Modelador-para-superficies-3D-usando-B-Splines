@@ -6,14 +6,25 @@ class ProjecaoAxonometrica:
    
     def __init__(self, vertices, VRP, P, Y, dp, windows, viewport):
         # Inicializando variaveis
-
-        self.vertices = np.array(vertices, dtype=float).reshape(len(vertices), -1).tolist()
+        #self.vertices = vertices
+        self.vertices = self.converter_vertices(vertices)
         self.VRP = VRP
         self.P = P
         self.Y = Y
         self.dp = dp
         self.windows = windows
         self.viewport = viewport
+
+    def converter_vertices(self, lista_vertices):
+        vertices_covertido = [[], [], [],[]]  
+        for linha in lista_vertices:  
+            for item in linha: 
+                x, y, z = item 
+                vertices_covertido[0].append(x)
+                vertices_covertido[1].append(y)
+                vertices_covertido[2].append(z)
+                vertices_covertido[3].append(1)
+        return vertices_covertido
 
     # Recebe um vetor e o retorna o unitario
     def Unitario (self, Vetor , Vetor_normalizado):    
@@ -52,9 +63,9 @@ class ProjecaoAxonometrica:
                     resultado[i][j] += A[i][k] * B[k][j]
 
         # **Transformação para manter a estrutura correta**
-        resultado_corrigido = list(map(list, zip(*resultado)))  # Transpõe a matriz
+        #resultado_corrigido = list(map(list, zip(*resultado)))  # Transpõe a matriz
 
-        return resultado_corrigido
+        return resultado
     #Realiza todo o processo de transformação de um objeto 3D para uma projecao axometrica em 2D
     def Axometrica(self):
         N = [0] * (3)
@@ -118,9 +129,7 @@ class ProjecaoAxonometrica:
         
         #Objeto em projeção axonométrica
         #Calculo realizado abaixo : objeto_projetado =  matriz_SRT * vertices
-        objeto_projetado = self.calcula_Mult_Matriz(matriz_SRT, self.vertices)
-
-        
+        objeto_projetado = self.calcula_Mult_Matriz(matriz_SRT, self.vertices)      
         return objeto_projetado
         
 
@@ -163,9 +172,9 @@ class ProjecaoAxonometrica:
     
 
 if __name__ == "__main__":
-    vertices = [[5.5, 8.500000000000002, 11.5, 11.5, 13.541666666666668, 12.833333333333332],
-                [1.1666666666666665, 3.5208333333333335, 5.999999999999999, 5.999999999999999, 6.270833333333334, 5.166666666666667],
-                [8.666666666666668, 4.145833333333333, 0.5000000000000002, 0.5000000000000002, 1.8541666666666665, 5.333333333333333],
+    vertices = [[21.2, 34.1, 18.8, 5.9, 20],
+                [0.7, 3.4, 5.6, 2.9, 20.9],
+                [42.3, 27.2, 14.6, 29.7, 31.6],
                 [1, 1, 1, 1, 1, 1]
                 ]
     VRP = [25, 15, 80, 1]  
