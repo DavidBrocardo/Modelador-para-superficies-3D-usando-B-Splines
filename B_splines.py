@@ -9,7 +9,7 @@ class BSplines:
     #Acredito que vai ser necessario quando tiver manipulando com interface
     # se nao for, so corta fora
     def formatar_matriz(self,pontos_controle):
-        X, Y, Z = [], [], []        
+        X, Y, Z = [], [], []       
         
         for linha in pontos_controle:
             for ponto in linha:

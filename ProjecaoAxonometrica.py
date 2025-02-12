@@ -186,4 +186,4 @@ if __name__ == "__main__":
     viewport = [0, 0, 319, 239]    
     
     projecao = ProjecaoAxonometrica(vertices, VRP, P, Y, dp, windows, viewport)
-    print(projecao.main())
+    #print(projecao.main())
