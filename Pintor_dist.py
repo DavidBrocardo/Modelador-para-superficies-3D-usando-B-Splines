@@ -7,7 +7,10 @@ class Pintor_dist:
         self.vertices = vertices
         self.VRP = VRP
 
-    
+    #2)	Pré-cálculos
+        #a.	Centróides de faces e de objetos  - Acho que sim
+            #i.	Recortar (3D) os objetos que estejam antes do plano Near e depois do plano Far. acho que não 
+
     def Calcular_centroide_face(self, vertices, indice_face):
 
         v = len(indice_face) # Nº de vertices da face, ex: face ABE = 3; face ABCD = 4;
@@ -26,7 +29,7 @@ class Pintor_dist:
         centroide_z = soma_z / v
     
         return centroide_x, centroide_y, centroide_z
-    
+    #   b.	Vetores normais das faces   ACHO que sim
     def Calcular_distancia_VRP_Face(self, VRP, centroide):
 
         #Formula da distancia euclidiana

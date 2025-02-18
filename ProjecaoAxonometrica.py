@@ -133,34 +133,6 @@ class ProjecaoAxonometrica:
         return objeto_projetado
         
 
-    #GPTzada so pra ver o resultado 
-    #Gera um canva e plota os pontos
-    def draw_projection(self, vertices):
-
-        # Criar a janela Tkinter
-        root = tk.Tk()
-        root.title("Projeção Axonométrica")
-        canvas = tk.Canvas(root, width=1000, height=1000, bg="white")
-        canvas.pack()
-
-        # Configurar escala e deslocamento
-        scale = 0.5  # Ajuste conforme necessário
-        offset_x = 250  # Centro do Canvas no eixo X
-        offset_y = 250  # Centro do Canvas no eixo Y
-
-        # Verificar todos os pontos e desenhá-los
-        for i in range(len(vertices[0])):
-            x = vertices[0][i] * scale + offset_x  # Coordenada x escalada e deslocada
-            y = vertices[1][i] * scale + offset_y  # Coordenada y escalada e deslocada
-            
-            # Desenhar o ponto
-            canvas.create_oval(
-                x - 3, y - 3, x + 3, y + 3,  # Retângulo delimitador do círculo
-                fill="blue"
-            )
-        
-        root.mainloop()
-
 
     def main(self):
             # Calcular a projeção

@@ -3,7 +3,7 @@ import random
 from ProjecaoAxonometrica import ProjecaoAxonometrica
 
 class BSplines:
-    def __init__(self, NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp):
+    def __init__(self,NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P,V,dp,windows,viewport):
         # Parâmetros de controle
         self.NI = NI
         self.NJ = NJ
@@ -11,7 +11,14 @@ class BSplines:
         self.TJ = TJ
         self.RESOLUTIONI = RESOLUTIONI
         self.RESOLUTIONJ = RESOLUTIONJ
-        self.inp = inp  # Matriz de pontos de controle: dimensão (NI+1)x(NJ+1), cada elemento: [x, y, z]
+        self.inp = inp 
+        self.VRP = VRP 
+        self.P = P
+        self.Y = V
+        self.dp = dp 
+        self.windows = windows
+        self.viewport = viewport
+
         # Vetores de nós para as direções I e J
         self.knotsI = [0] * (self.NI + self.TI + 1)
         self.knotsJ = [0] * (self.NJ + self.TJ + 1)
@@ -99,7 +106,7 @@ class BSplines:
         """ Desenha a superfície B-Spline no canvas """
         canvas.delete("all")
         escala = 1
-        deslocamento_x, deslocamento_y = 0, 150  # Deslocamento para centralizar o desenho
+        deslocamento_x, deslocamento_y = -200, 250  # Deslocamento para centralizar o desenho
         # Desenha os pontos de controle (opcional)
         for i in range(self.NI + 1):
             for j in range(self.NJ + 1):
@@ -120,27 +127,29 @@ class BSplines:
                 x4 = deslocamento_x + self.outp[i+1][j][0] * escala
                 y4 = deslocamento_y - self.outp[i+1][j][2] * escala
                 
-                canvas.create_polygon(x1, y1, x2, y2, x3, y3, x4, y4,
-                                        outline="black", fill="", width=1)
-
-    def main(self):
+                #canvas.create_polygon(x1, y1, x4, y4, x3, y3, x2, y2,outline="black", fill="", width=1)
+                canvas.create_line(x1, y1, x4, y4, fill="black", width=1)
+                canvas.create_line(x4, y4, x3, y3, fill="black", width=1)
+                canvas.create_line(x3, y3, x2, y2, fill="black", width=1)
+                canvas.create_line(x2, y2, x1, y1, fill="black", width=1)
+                
+                
+                
+    def main(self):       
         
-        VRP = [6, 7, 14, 1]
-        P = [10, 5, 7, 1]
-        Y = [0, 1, 0]
-        dp = 40
-        windows = [-100, -100, 100, 100]
-        viewport = [0, 0, 500, 400]
-       
         self.calcular_superficie()
         
-
-        projecao = ProjecaoAxonometrica(self.inp, VRP, P, Y, dp, windows, viewport)
+        # 1) OBJETO MODELADO EM SRU
+        # ->  self.inp  <-
+        # 3)	Aplicar as matrizes do pipeline (Converter objeto do SRU para o SRT)
+        projecao = ProjecaoAxonometrica(self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
         projecao = projecao.main()
         
         self.inp = []
         
         #print(projecao)
+        # tem que fazer isso pq usei um formato de matriz na projecao e aqui esta em outro
+        # gambiarra nao, adaptacao kkk
         # Reconstrói a matriz de pontos de controle a partir da projeção
         for i in range(self.NI + 1):
             linha = []
@@ -153,14 +162,15 @@ class BSplines:
                 linha.append(elemento)
             self.inp.append(linha) 
 
-        projecao = ProjecaoAxonometrica(self.outp, VRP, P, Y, dp, windows, viewport)
+        projecao = ProjecaoAxonometrica(self.outp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
         projecao = projecao.main()
         
 
-        print("Axonometrico : \n\n")
-        print("Pontos ANTES de serem axonometrico:", self.outp)
+        #print("Axonometrico : \n\n")
+        #print("Pontos ANTES de serem axonometrico:", self.outp)
         self.outp = [] 
         # Preenchendo self.outp com os valores projetados corretamente
+        # mesma coisa dos pontos de controle, so que aqui é pros demais pontos da superfice
         indice = 0
         for i in range(self.RESOLUTIONI):
             linha = []
@@ -174,32 +184,42 @@ class BSplines:
             self.outp.append(linha)
             
         #print(projecao)'''
-        print("\n\nPontos da superfice DEPOIS de serem axonometrico:", self.outp)
-        print("\n\nPontos de controle DEPOIS de serem axonometrico:", self.inp)
-        root = tk.Tk()
+        #print("\n\nPontos da superfice DEPOIS de serem axonometrico:", self.outp)
+        #print("\n\nPontos de controle DEPOIS de serem axonometrico:", self.inp)
+        return self.inp, self.outp
+        """root = tk.Tk()
         root.title("Superfície Spline")
-        canvas = tk.Canvas(root, width=500, height=400, bg="white")
+        canvas = tk.Canvas(root, width=500, height=500, bg="white")
         canvas.pack()
         self.desenhar_superficie(canvas)
-        root.mainloop()
+        root.mainloop()"""
 
 
 if __name__ == "__main__":
+    VRP = [10, 10, 10, 1]
+    P = [0, 0, 0, 1]
+    Y = [0, 1, 0]
+    dp = 40
+    windows = [-100, -100, 100, 100]
+    viewport = [0, 0, 500, 500]
     
-    NI, NJ = 10, 10  # Número de pontos de controle 
+    NI, NJ = 5, 5  # Número de pontos de controle 
     TI, TJ = 4, 4  # Grau da spline 
-    RESOLUTIONI = 40
-    RESOLUTIONJ = 40
-    espacamento = 30
+    RESOLUTIONI = 10
+    RESOLUTIONJ = 10
+    espacamento = 20
+
     # Criação dos pontos de controle
     inp = []
     for i in range(NI + 1):
         linha = []
         for j in range(NJ + 1):
+            x = i*espacamento
+            y = j*espacamento
             z = random.uniform(-10, 10) 
-            elemento = [i*espacamento, j*espacamento, z]
+            elemento = [x, y, z]
             linha.append(elemento)
         inp.append(linha)
 
-    bspline = BSplines(NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp)
+    bspline = BSplines(NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp,VRP,P,Y,dp,windows,viewport)
     bspline.main()
