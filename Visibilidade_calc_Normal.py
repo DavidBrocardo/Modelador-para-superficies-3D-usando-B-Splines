@@ -30,7 +30,7 @@ class Visibilidade_Normal:
         normais_faces = []
        
         #print("\n")
-        for i, face in enumerate(indices_faces[:4]):  #só funfa para faces com 3 vertices por enquanto
+        for i, face in enumerate(indices_faces): 
             
             normal_unitaria = visi.Calcular_vet_normal_unitario_face(vertices, face)
             normais_faces.append(normal_unitaria)  #calculando e salvando todos os vets normais das faces
