@@ -104,4 +104,3 @@ if __name__ == "__main__":
             print(f"Produto escalar da face {i}: {produto:.3f} --> A face não é visível!")
 
     print("\n")
-    
