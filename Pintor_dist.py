@@ -51,8 +51,6 @@ class Pintor_dist:
 
         return Faces_ordenadas
 
-    
-
 
 if __name__ == "__main__":
    
