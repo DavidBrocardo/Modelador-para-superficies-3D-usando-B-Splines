@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import simpledialog, messagebox
 from Superfice_BSplines import BSplines
+import math
 import random
 
 class Interface:
@@ -32,7 +33,14 @@ class Interface:
         # Criar interface
         self.criar_menu()
         self.criar_botoes()
+        self.click_x = tk.IntVar()
+        self.click_y = tk.IntVar()
+
+        self.canvas.bind("<Button-1>", self.clique)
+
         self.main()
+
+    
 
     def criar_menu(self):
         """Cria a barra de menu suspenso."""
@@ -88,9 +96,52 @@ class Interface:
     def sair(self):
         self.tela.quit()
 
+    def clique(self, event):
+        self.click_x.set(event.x)
+        self.click_y.set(event.y) 
+    
     def definir_ponto_controle(self):
-        print("Lens Pacu")
+        messagebox.showinfo("", "Clique proximo ao ponto que deseja altera")
+        self.desenhar_pontoControle()
 
+        self.tela.wait_variable(self.click_x)  # Espera um clique
+        x_alvo, y_alvo = self.click_x.get(), self.click_y.get()
+        print(x_alvo , y_alvo)
+        print("Lens Pacu")    
+        ponto_mais_proximo = None
+        menor_distancia = float('inf')
+
+        for i in range(self.pontos_controleX + 1):
+            for j in range(self.pontos_controleY + 1):
+                x = self.inp_Axo[i][j][0]
+                y = self.inp_Axo[i][j][1] 
+                distancia = math.sqrt((x - x_alvo)**2 + (y - y_alvo)**2 )
+                if distancia < menor_distancia:
+                    menor_distancia = distancia
+                    posi_i = i
+                    posi_j = j
+                    ponto_mais_proximo = (x, y)
+        
+        messagebox.showinfo("Ponto selecionado:", ponto_mais_proximo)
+
+        janela = tk.Toplevel(self.tela)
+        janela.title("Definir Novo Ponto Controle")
+
+
+        tk.Label(janela, text="X:").grid(row=0, column=0)
+        entrada_x = tk.Entry(janela)
+        entrada_x.grid(row=1, column=0)
+
+        tk.Label(janela, text="Y").grid(row=0, column=1)
+        entrada_y = tk.Entry(janela)
+        entrada_y.grid(row=1, column=1)
+
+        tk.Label(janela, text="Z").grid(row=0, column=2)
+        entrada_z = tk.Entry(janela)
+        entrada_z.grid(row=1, column=2)
+        
+
+        
         
     def definir_tamanho_matriz(self):
         
@@ -280,12 +331,8 @@ class Interface:
                 linha.append([x, y, z])
             self.inp.append(linha)
 
-    def desenhar_superficie(self):
-        """Desenha a superfície B-Spline no Canvas."""
-        self.canvas.delete("all")
-         
-        #deslocamento_x,  50, 250  # Ajuste para centralizar
 
+    def desenhar_pontoControle(self):
         # Desenha os pontos de controle
         for i in range(self.pontos_controleX + 1):
             for j in range(self.pontos_controleY + 1):
@@ -293,6 +340,11 @@ class Interface:
                 y = self.inp_Axo[i][j][1] 
                 #print (x ,  y)
                 self.canvas.create_oval(x-3, y-3, x+3, y+3, fill="red")
+            
+    def desenhar_superficie(self):
+        """Desenha a superfície B-Spline no Canvas."""
+        self.canvas.delete("all")
+                 
 
         # Desenha a superfície usando linhas
         for i in range(self.RESOLUTIONI - 1):
@@ -309,6 +361,7 @@ class Interface:
 
     def main(self):
         """Executa os cálculos e desenha a superfície."""
+        
         self.criar_pontos_controle()
         self.inp_Axo = []
         # Calcula a superfície B-Spline
@@ -317,7 +370,8 @@ class Interface:
         self.inp_Axo, self.outp = bspline.main()
         
         #print("\n\nPontos da superfície:", self.outp)
-        #print("\n\nPontos de controle:", self.inp)
+        print("\n\nPontos de controle:", self.inp_Axo)
+        
 
         self.desenhar_superficie()
 
