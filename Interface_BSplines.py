@@ -298,15 +298,16 @@ class Interface:
 
         tk.Button(janela, text="Salvar", command=Salvar).grid(row=2, columnspan=4)
 
-    def definir_camera(self):
+    """def definir_camera(self):
         #VRP = [0, 0 ,0.7, 1]
-
+               
         janela = tk.Toplevel(self.tela)
         janela.title("Definir Nova Camera")
 
         tk.Label(janela, text="X:").grid(row=0, column=0)
-        entrada_x = tk.Entry(janela)
+        entrada_x = tk.Spinbox(janela, from_=0, to=100, increment=1, width=5)
         entrada_x.grid(row=1, column=0)
+        spinbox.pack()
 
         tk.Label(janela, text="Y").grid(row=0, column=1)
         entrada_y = tk.Entry(janela)
@@ -331,7 +332,43 @@ class Interface:
             self.desenhar_superficie()
 
         tk.Button(janela, text="Salvar", command=Salvar).grid(row=2, columnspan=3)
+            """
 
+    def definir_camera(self):
+        janela = tk.Toplevel(self.tela)
+        janela.title("Definir Nova Camera")
+
+        tk.Label(janela, text="X:").grid(row=0, column=0)
+        entrada_x = tk.Spinbox(janela, from_=0, to=100, increment=1, width=5)
+        entrada_x.grid(row=1, column=0)
+
+        tk.Label(janela, text="Y:").grid(row=0, column=1)  # Adicionado dois pontos para consistência
+        entrada_y = tk.Spinbox(janela, from_=0, to=100, increment=1, width=5) # Spinbox para Y
+        entrada_y.grid(row=1, column=1)
+
+        tk.Label(janela, text="Z:").grid(row=0, column=2) # Adicionado dois pontos para consistência
+        entrada_z = tk.Spinbox(janela, from_=0, to=100, increment=1, width=5) # Spinbox para Z
+        entrada_z.grid(row=1, column=2)
+
+        def Salvar():
+            try:  # Tratamento de erros para entradas inválidas
+                x = float(entrada_x.get())
+                y = float(entrada_y.get())
+                z = float(entrada_z.get())
+                self.VRP = [x, y, z, 1]
+
+                janela.destroy()
+
+                # Calcula a superfície B-Spline (mantido como estava)
+                bspline = BSplines(self.pontos_controleX, self.pontos_controleY, self.TI, self.TJ, self.RESOLUTIONI, self.RESOLUTIONJ,
+                                self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, True)
+                self.inp_Axo, self.outp = bspline.main()
+                self.desenhar_superficie()
+
+            except ValueError:
+                tk.messagebox.showerror("Erro", "Por favor, insira números válidos.")  # Mensagem de erro
+
+        tk.Button(janela, text="Salvar", command=Salvar).grid(row=2, columnspan=3)
 
     def criar_pontos_controle(self):
         """Cria a matriz de pontos de controle."""
@@ -366,12 +403,13 @@ class Interface:
                 x1, y1 =   self.outp[i][j][0] ,   self.outp[i][j][1] 
                 x2, y2 =  self.outp[i][j+1][0] ,  self.outp[i][j+1][1] 
                 x3, y3 =  self.outp[i+1][j+1][0] ,  self.outp[i+1][j+1][1]
-                x4, y4 =   self.outp[i+1][j][0] ,  self.outp[i+1][j][1] 
+                x4, y4 =   self.outp[i+1][j][0] ,  self.outp[i+1][j][1]              
+
                 
-                self.canvas.create_line(x1, y1, x2, y2, fill="black")
-                self.canvas.create_line(x2, y2, x3, y3, fill="black")
-                self.canvas.create_line(x3, y3, x4, y4, fill="black")
-                self.canvas.create_line(x4, y4, x1, y1, fill="black")
+                self.canvas.create_line(x1, y1, x4, y4, fill="black", width=1)
+                self.canvas.create_line(x4, y4, x3, y3, fill="black", width=1)
+                self.canvas.create_line(x3, y3, x2, y2, fill="black", width=1)
+                self.canvas.create_line(x2, y2, x1, y1, fill="black", width=1)
 
     def main(self):
         """Executa os cálculos e desenha a superfície."""
@@ -393,10 +431,10 @@ if __name__ == "__main__":
     # Parâmetros da superfície
     pontos_controleX, pontos_controleY = 5, 5  
     TI, TJ = 4, 4  
-    RESOLUTIONI, RESOLUTIONJ = 10, 10  
-    espacamento = 14
-    VRP = [0, 0 ,0.7, 1]
-    P = [1, 2, 2, 1]
+    RESOLUTIONI, RESOLUTIONJ = 30, 30  
+    espacamento = 20
+    VRP = [10, 20 ,10, 1]
+    P = [0, 0, 0, 1]
     Y = [0, 1, 0]
     dp = 40
     windows = [-100, -100, 100, 100]
