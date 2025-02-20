@@ -3,7 +3,7 @@ import random
 from ProjecaoAxonometrica import ProjecaoAxonometrica
 
 class BSplines:
-    def __init__(self,NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P,V,dp,windows,viewport):
+    def __init__(self,NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P,V,dp,windows,viewport,mundo):
         # Parâmetros de controle
         self.NI = NI
         self.NJ = NJ
@@ -18,6 +18,7 @@ class BSplines:
         self.dp = dp 
         self.windows = windows
         self.viewport = viewport
+        self.mundo = mundo
 
         # Vetores de nós para as direções I e J
         self.knotsI = [0] * (self.NI + self.TI + 1)
@@ -142,47 +143,48 @@ class BSplines:
         # 1) OBJETO MODELADO EM SRU
         # ->  self.inp  <-
         # 3)	Aplicar as matrizes do pipeline (Converter objeto do SRU para o SRT)
-        projecao = ProjecaoAxonometrica(self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
-        projecao = projecao.main()
+        if (self.mundo):
+            projecao = ProjecaoAxonometrica(self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+            projecao = projecao.main()
         
-        self.inp = []
+            self.inp = []
         
-        #print(projecao)
-        # tem que fazer isso pq usei um formato de matriz na projecao e aqui esta em outro
-        # gambiarra nao, adaptacao kkk
-        # Reconstrói a matriz de pontos de controle a partir da projeção
-        for i in range(self.NI + 1):
-            linha = []
-            for j in range(self.NJ + 1):
-                indice = i * (self.NJ + 1) + j
-                # projecao[0], projecao[1], projecao[2] contêm as coordenadas projetadas (desconsiderando W)
-                elemento = [projecao[0][indice],
-                            projecao[1][indice],
-                            projecao[2][indice]]
-                linha.append(elemento)
-            self.inp.append(linha) 
+            #print(projecao)
+            # tem que fazer isso pq usei um formato de matriz na projecao e aqui esta em outro
+            # gambiarra nao, adaptacao kkk
+            # Reconstrói a matriz de pontos de controle a partir da projeção
+            for i in range(self.NI + 1):
+                linha = []
+                for j in range(self.NJ + 1):
+                    indice = i * (self.NJ + 1) + j
+                    # projecao[0], projecao[1], projecao[2] contêm as coordenadas projetadas (desconsiderando W)
+                    elemento = [projecao[0][indice],
+                                projecao[1][indice],
+                                projecao[2][indice]]
+                    linha.append(elemento)
+                self.inp.append(linha) 
 
-        projecao = ProjecaoAxonometrica(self.outp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
-        projecao = projecao.main()
-        
-
-        #print("Axonometrico : \n\n")
-        #print("Pontos ANTES de serem axonometrico:", self.outp)
-        self.outp = [] 
-        # Preenchendo self.outp com os valores projetados corretamente
-        # mesma coisa dos pontos de controle, so que aqui é pros demais pontos da superfice
-        indice = 0
-        for i in range(self.RESOLUTIONI):
-            linha = []
-            for j in range(self.RESOLUTIONJ):
-                indice = i * self.RESOLUTIONJ + j
-
-                elemento = [projecao[0][indice],
-                            projecao[1][indice],
-                            projecao[2][indice]]
-                linha.append(elemento)
-            self.outp.append(linha)
+            projecao = ProjecaoAxonometrica(self.outp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+            projecao = projecao.main()
             
+
+            #print("Axonometrico : \n\n")
+            #print("Pontos ANTES de serem axonometrico:", self.outp)
+            self.outp = [] 
+            # Preenchendo self.outp com os valores projetados corretamente
+            # mesma coisa dos pontos de controle, so que aqui é pros demais pontos da superfice
+            indice = 0
+            for i in range(self.RESOLUTIONI):
+                linha = []
+                for j in range(self.RESOLUTIONJ):
+                    indice = i * self.RESOLUTIONJ + j
+
+                    elemento = [projecao[0][indice],
+                                projecao[1][indice],
+                                projecao[2][indice]]
+                    linha.append(elemento)
+                self.outp.append(linha)
+                
         #print(projecao)'''
         #print("\n\nPontos da superfice DEPOIS de serem axonometrico:", self.outp)
         #print("\n\nPontos de controle DEPOIS de serem axonometrico:", self.inp)

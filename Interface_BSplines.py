@@ -120,12 +120,14 @@ class Interface:
                     menor_distancia = distancia
                     posi_i = i
                     posi_j = j
-                    ponto_mais_proximo = (x, y)
+                    ponto_mais_proximo = (int(x), int(y))
+
+              
         
         messagebox.showinfo("Ponto selecionado:", ponto_mais_proximo)
 
         janela = tk.Toplevel(self.tela)
-        janela.title("Definir Novo Ponto Controle")
+        janela.title("Definir Novo Ponto Controle (Cordenadas de Tela)")
 
 
         tk.Label(janela, text="X:").grid(row=0, column=0)
@@ -136,9 +138,21 @@ class Interface:
         entrada_y = tk.Entry(janela)
         entrada_y.grid(row=1, column=1)
 
-        tk.Label(janela, text="Z").grid(row=0, column=2)
-        entrada_z = tk.Entry(janela)
-        entrada_z.grid(row=1, column=2)
+       
+        
+        def Salvar():
+            self.inp_Axo[posi_i][posi_j][0] =  int(entrada_x.get())
+            self.inp_Axo[posi_i][posi_j][1] =  int(entrada_y.get())
+            print(self.inp_Axo[posi_i][posi_j][0], self.inp_Axo[posi_i][posi_j][1])
+
+            janela.destroy()                      
+            # Calcula a superfície B-Spline
+            bspline = BSplines(self.pontos_controleX,self.pontos_controleY , self.TI, self.TJ, self.RESOLUTIONI, self.RESOLUTIONJ,
+                            self.inp_Axo, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,False)
+            self.inp_Axo, self.outp = bspline.main()
+            self.desenhar_superficie()
+
+        tk.Button(janela, text="Salvar", command=Salvar).grid(row=2, columnspan=2)
         
 
         
@@ -165,7 +179,7 @@ class Interface:
             janela.destroy()                      
             # Calcula a superfície B-Spline
             bspline = BSplines(self.pontos_controleX,self.pontos_controleY , self.TI, self.TJ, self.RESOLUTIONI, self.RESOLUTIONJ,
-                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,True)
             self.inp_Axo, self.outp = bspline.main()
             self.desenhar_superficie()
 
@@ -198,7 +212,7 @@ class Interface:
             janela.destroy()                      
             # Calcula a superfície B-Spline
             bspline = BSplines(self.pontos_controleX,self.pontos_controleY , self.TI, self.TJ, self.RESOLUTIONI, self.RESOLUTIONJ,
-                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,True)
             self.inp_Axo, self.outp = bspline.main()
             self.desenhar_superficie()
 
@@ -237,7 +251,7 @@ class Interface:
             janela.destroy()                      
             # Calcula a superfície B-Spline
             bspline = BSplines(self.pontos_controleX,self.pontos_controleY , self.TI, self.TJ, self.RESOLUTIONI, self.RESOLUTIONJ,
-                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,True)
             self.inp_Axo, self.outp = bspline.main()
             self.desenhar_superficie()
 
@@ -278,7 +292,7 @@ class Interface:
             janela.destroy()                      
             # Calcula a superfície B-Spline
             bspline = BSplines(self.pontos_controleX,self.pontos_controleY , self.TI, self.TJ, self.RESOLUTIONI, self.RESOLUTIONJ,
-                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,True)
             self.inp_Axo, self.outp = bspline.main()
             self.desenhar_superficie()
 
@@ -312,7 +326,7 @@ class Interface:
             janela.destroy()                      
             # Calcula a superfície B-Spline
             bspline = BSplines(self.pontos_controleX,self.pontos_controleY , self.TI, self.TJ, self.RESOLUTIONI, self.RESOLUTIONJ,
-                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,True)
             self.inp_Axo, self.outp = bspline.main()
             self.desenhar_superficie()
 
@@ -366,11 +380,11 @@ class Interface:
         self.inp_Axo = []
         # Calcula a superfície B-Spline
         bspline = BSplines(self.pontos_controleX, self.pontos_controleY, self.TI, self.TJ, self.RESOLUTIONI, self.RESOLUTIONJ,
-                           self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+                           self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,True)
         self.inp_Axo, self.outp = bspline.main()
         
         #print("\n\nPontos da superfície:", self.outp)
-        print("\n\nPontos de controle:", self.inp_Axo)
+        #print("\n\nPontos de controle:", self.inp_Axo)
         
 
         self.desenhar_superficie()
