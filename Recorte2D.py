@@ -29,11 +29,11 @@ class Recorte2D:
                 z = p1[2] + u * (p2[2] - p1[2])
                 
                 novo_vertice = [xmin, y, z]
-                novo_poligono.append(novo_vertice)  #Intersecao
-                novo_poligono.append(p2)  #Vertice interno
+                novo_poligono.append(novo_vertice)  # Sala a Intersecao
+                novo_poligono.append(p2)  #e o vertice interno
 
             elif p1[0] >= xmin and p2[0] >= xmin:  #Ambos dentro
-                novo_poligono.append(p2) #vertice interno
+                novo_poligono.append(p2) #Salvar apenas o vertice interno
 
             elif p1[0] >= xmin and p2[0] < xmin:  #Saindo da area de recorte
 
@@ -42,7 +42,7 @@ class Recorte2D:
                 z = p1[2] + u * (p2[2] - p1[2])
 
                 novo_vertice = [xmin, y, z]
-                novo_poligono.append(novo_vertice) #Apenas a intersecao
+                novo_poligono.append(novo_vertice) #Salvar apenas a intersecao
 
         return novo_poligono
     
@@ -64,10 +64,10 @@ class Recorte2D:
                 
                 novo_vertice = [xmax, y, z]
                 novo_poligono.append(novo_vertice)  #Intersecao
-                novo_poligono.append(p2)  #Vertice interno
+                novo_poligono.append(p2)  
 
             elif p1[0] <= xmax and p2[0] <= xmax:  #Ambos dentro
-                novo_poligono.append(p2) #vertice interno
+                novo_poligono.append(p2) 
 
             elif p1[0] <= xmax and p2[0] > xmax:  #Saindo da area de recorte
 
@@ -76,11 +76,10 @@ class Recorte2D:
                 z = p1[2] + u * (p2[2] - p1[2])
 
                 novo_vertice = [xmax, y, z]
-                novo_poligono.append(novo_vertice)  #Apenas a intersecao
-
+                novo_poligono.append(novo_vertice)  
         return novo_poligono
     
-    def Recortar_Embaixo(self,saida_rec_direita):
+    def Recortar_embaixo(self,saida_rec_direita):
 
         ymax = self.viewport[3]
         novo_poligono = []
@@ -98,10 +97,10 @@ class Recorte2D:
                 
                 novo_vertice = [x, ymax, z]
                 novo_poligono.append(novo_vertice)  #Intersecao
-                novo_poligono.append(p2)  #Vertice interno
+                novo_poligono.append(p2) 
 
             elif p1[1] <= ymax and p2[1] <= ymax:  #Ambos dentro
-                novo_poligono.append(p2) #vertice interno
+                novo_poligono.append(p2) 
 
             elif p1[1] <= ymax and p2[1] > ymax:  #Saindo da area de recorte
 
@@ -110,7 +109,7 @@ class Recorte2D:
                 z = p1[2] + u * (p2[2] - p1[2])
 
                 novo_vertice = [x, ymax, z]
-                novo_poligono.append(novo_vertice)  #Apenas a intersecao
+                novo_poligono.append(novo_vertice)
 
         return novo_poligono
 
@@ -133,10 +132,10 @@ class Recorte2D:
                 
                 novo_vertice = [x, ymin, z]
                 novo_poligono.append(novo_vertice)  #Intersecao
-                novo_poligono.append(p2)  #Vertice interno
+                novo_poligono.append(p2) 
 
             elif p1[1] >= ymin and p2[1] >= ymin:  #Ambos dentro
-                novo_poligono.append(p2) #vertice interno
+                novo_poligono.append(p2) 
 
             elif p1[1] >= ymin and p2[1] < ymin:  #Saindo da area de recorte
 
@@ -145,26 +144,29 @@ class Recorte2D:
                 z = p1[2] + u * (p2[2] - p1[2])
 
                 novo_vertice = [x, ymin, z]
-                novo_poligono.append(novo_vertice)  #Apenas a intersecao
+                novo_poligono.append(novo_vertice)
 
         return novo_poligono
 
+    #chama todos os recortes e executa o recorte total
+    def Recortar_total(self): 
+        resul1 = self.Recortar_esquerda()
+        resul2 = self.Recortar_direita(resul1)
+        resul3 = self.Recortar_embaixo(resul2)
+        resul4 = self.Recortar_topo(resul3)
 
+        return resul4
+
+        
 if __name__ == "__main__":
     vertices = [[  0,  250, 480],  # X
                 [250,  430,   0],  # Y
-                [-30,  -65, -90]]  # Z
-                                   # Tirei o fator homogeneo, mas qlqr coisa adicionar de boa
+                [-30,  -65, -90]]   # Z
+                                    # Tirei o fator homogeneo, mas qlqr coisa adicionar de boa (da peido se add kkk)
 
     viewport = [100, 400, 80, 380]  # umin, umax, vmin, vmax
 
     recorte = Recorte2D(viewport, vertices)
-    poligono_recortado = recorte.Recortar_esquerda()
-    poligono_recortado2 = recorte.Recortar_direita(poligono_recortado)
-    poligono_recortado3 = recorte.Recortar_Embaixo(poligono_recortado2)
-    poligono_recortado4 = recorte.Recortar_topo(poligono_recortado3)
+    poligono_recortado = recorte.Recortar_total()
    
-    print("Polígono final recorte esquerda:", poligono_recortado)
-    print("\n Polígono final recorte direita:", poligono_recortado2)
-    print("\n Polígono final recorte embaixo:", poligono_recortado3)
-    print("\n Polígono final recorte topo:", poligono_recortado4)
+    print("Polígono final Recortado:", poligono_recortado)
