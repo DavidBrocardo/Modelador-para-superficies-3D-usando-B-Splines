@@ -144,6 +144,7 @@ class BSplines:
         # ->  self.inp  <-
         # 3)	Aplicar as matrizes do pipeline (Converter objeto do SRU para o SRT)
         if (self.mundo):
+           
             projecao = ProjecaoAxonometrica(self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
             projecao = projecao.main()
         
