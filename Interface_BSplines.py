@@ -1,8 +1,9 @@
 import tkinter as tk
-from tkinter import simpledialog, messagebox
-from Superfice_BSplines import BSplines
 import math
 import random
+from tkinter import simpledialog, messagebox
+from Superfice_BSplines import BSplines
+from FillPoly import FillPoly
 
 class Interface:
     def __init__(self, tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, espacamento, VRP, P, Y, dp, windows, viewport):
@@ -487,17 +488,24 @@ class Interface:
         for superfice in range(self.quantidadeSuperfice):
 
             for i in range(self.RESOLUTIONI[superfice] - 1):
+                vertices = []
                 for j in range(self.RESOLUTIONJ[superfice] - 1):
                     x1, y1 =   self.outp[superfice][i][j][0] ,   self.outp[superfice][i][j][1] 
                     x2, y2 =  self.outp[superfice][i][j+1][0] ,  self.outp[superfice][i][j+1][1] 
                     x3, y3 =  self.outp[superfice][i+1][j+1][0] ,  self.outp[superfice][i+1][j+1][1]
                     x4, y4 =   self.outp[superfice][i+1][j][0] ,  self.outp[superfice][i+1][j][1]              
 
-                    
+                    vertices.append((x1,y1))
+                    vertices.append((x2,y2))
+                    vertices.append((x3,y3))
+                    vertices.append((x4,y4))
+                    FillPoly(vertices,self.canvas,"white",self.viewport[1],self.viewport[3])
                     self.canvas.create_line(x1, y1, x4, y4, fill="black", width=1)
                     self.canvas.create_line(x4, y4, x3, y3, fill="black", width=1)
                     self.canvas.create_line(x3, y3, x2, y2, fill="black", width=1)
                     self.canvas.create_line(x2, y2, x1, y1, fill="black", width=1)
+
+
 
     def main(self):
         """Executa os cálculos e desenha a superfície."""

@@ -139,8 +139,8 @@ class ProjecaoAxonometrica:
         #Objeto em projeção axonométrica
         #Calculo realizado abaixo : objeto_projetado =  matriz_SRT * vertices
         objeto_projetado = self.calcula_Mult_Matriz(matriz_SRT, self.vertices)      
-        print("TRADICIONAL : \n\n" , objeto_projetado)
-        print("Alternativo : \n\n" , matriz_SRT_teste)
+        #print("TRADICIONAL : \n\n" , objeto_projetado)
+        #print("Alternativo : \n\n" , matriz_SRT_teste)
 
         return matriz_SRT_teste
         
