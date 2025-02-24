@@ -109,10 +109,9 @@ class ProjecaoAxonometrica:
             [0, 0 , 1] + [-self.VRP[2]],
             [0, 0 , 0, 1]
         ]
-        matriz_SRU = self.calcula_Mult_Matriz(matriz_R,matriz_T) # Matriz SRU/SRC  = R * T
+        matriz_SRC = self.calcula_Mult_Matriz(matriz_R,matriz_T) # Matriz SRC  = R * T
         #APLICAR O RECORTE 3D
-        #print("Antes: \n\n",   self.vertices)  
-        vertices_recortados = self.calcula_Mult_Matriz(matriz_SRU, self.vertices)   
+        vertices_recortados = self.calcula_Mult_Matriz(matriz_SRC, self.vertices)   
         #print("Antes: \n\n",  vertices_recortados)  
         recorte = Recorte3D(-100, 100, vertices_recortados)
         vertices_recortados = recorte.Recortar3D()
@@ -132,8 +131,8 @@ class ProjecaoAxonometrica:
         [0,	0,	0,	1]
         ]
 
-        #Calculo realizado abaixo : matriz_SRTSRU =  M_jp * (M_proj*matriz_SRU)
-        matriz_SRT = self.calcula_Mult_Matriz(M_jp, self.calcula_Mult_Matriz(M_proj,matriz_SRU))  
+        #Calculo realizado abaixo : matriz_SRTSRU =  M_jp * (M_proj*matriz_SRC)
+        matriz_SRT = self.calcula_Mult_Matriz(M_jp, self.calcula_Mult_Matriz(M_proj,matriz_SRC))  
         #Teste de calculo
         matriz_SRT_teste = self.calcula_Mult_Matriz(M_jp, self.calcula_Mult_Matriz(M_proj,vertices_recortados))  
         
