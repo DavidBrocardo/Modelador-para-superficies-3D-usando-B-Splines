@@ -1,6 +1,7 @@
 import tkinter as tk
 import math
 import numpy as np
+from Recorte3D import Recorte3D
 
 class ProjecaoAxonometrica:
    
@@ -108,7 +109,14 @@ class ProjecaoAxonometrica:
             [0, 0 , 1] + [-self.VRP[2]],
             [0, 0 , 0, 1]
         ]
-        matriz_SRU = self.calcula_Mult_Matriz(matriz_R,matriz_T)
+        matriz_SRU = self.calcula_Mult_Matriz(matriz_R,matriz_T) # Matriz SRU/SRC  = R * T
+        #APLICAR O RECORTE 3D
+        #print("Antes: \n\n",   self.vertices)  
+        vertices_recortados = self.calcula_Mult_Matriz(matriz_SRU, self.vertices)   
+        #print("Antes: \n\n",  vertices_recortados)  
+        recorte = Recorte3D(-100, 100, vertices_recortados)
+        vertices_recortados = recorte.Recortar3D()
+        #print("Depois: \n\n", vertices_recortados)
         
         #Ultima etapa da PROJEÇÃO AXONOMÉTRICA
         M_proj = [
@@ -126,11 +134,16 @@ class ProjecaoAxonometrica:
 
         #Calculo realizado abaixo : matriz_SRTSRU =  M_jp * (M_proj*matriz_SRU)
         matriz_SRT = self.calcula_Mult_Matriz(M_jp, self.calcula_Mult_Matriz(M_proj,matriz_SRU))  
+        #Teste de calculo
+        matriz_SRT_teste = self.calcula_Mult_Matriz(M_jp, self.calcula_Mult_Matriz(M_proj,vertices_recortados))  
         
         #Objeto em projeção axonométrica
         #Calculo realizado abaixo : objeto_projetado =  matriz_SRT * vertices
         objeto_projetado = self.calcula_Mult_Matriz(matriz_SRT, self.vertices)      
-        return objeto_projetado
+        print("TRADICIONAL : \n\n" , objeto_projetado)
+        print("Alternativo : \n\n" , matriz_SRT_teste)
+
+        return matriz_SRT_teste
         
 
 
@@ -143,19 +156,3 @@ class ProjecaoAxonometrica:
             #self.draw_projection(projecao_axometrica)
     
 
-if __name__ == "__main__":
-    vertices = [[21.2, 34.1, 18.8, 5.9, 20],
-                [0.7, 3.4, 5.6, 2.9, 20.9],
-                [42.3, 27.2, 14.6, 29.7, 31.6],
-                [1, 1, 1, 1, 1, 1]
-                ]
-    VRP = [25, 15, 80, 1]  
-    P = [20, 10, 25, 1]    
-    Y = [0, 1, 0]       
-    dp = 40    
-
-    windows = [-8, -6, 8, 6]
-    viewport = [0, 0, 319, 239]    
-    
-    projecao = ProjecaoAxonometrica(vertices, VRP, P, Y, dp, windows, viewport)
-    #print(projecao.main())

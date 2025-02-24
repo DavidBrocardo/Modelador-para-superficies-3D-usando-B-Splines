@@ -507,12 +507,12 @@ class Interface:
         self.inp_Axo[self.superficie_selecionada] = []  
 
         self.criar_pontos_controle()
-             
+        
         # Calcula a superfície B-Spline
         bspline = BSplines(self.pontos_controleX[self.superficie_selecionada], self.pontos_controleY[self.superficie_selecionada],  self.TI[self.superficie_selecionada], self.TJ[self.superficie_selecionada], self.RESOLUTIONI[self.superficie_selecionada], self.RESOLUTIONJ[self.superficie_selecionada],
                            self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,True)
         self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
-        
+       
         #print("\n\nPontos da superfície:", self.outp)
         #print("\n\nPontos de controle:", self.inp_Axo)
         
@@ -522,7 +522,7 @@ class Interface:
 if __name__ == "__main__":
     # Parâmetros da superfície
     pontos_controleX, pontos_controleY = 5, 5  
-    TI, TJ = 4, 4  
+    TI, TJ = 5, 5  
     RESOLUTIONI, RESOLUTIONJ = 30, 30  
     espacamento = 20
     VRP = [1, 1 ,1, 1]
