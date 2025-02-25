@@ -2,6 +2,7 @@ import tkinter as tk
 import math
 import numpy as np
 from Recorte3D import Recorte3D
+from Recorte2D import Recorte2D
 
 class ProjecaoAxonometrica:
    
@@ -140,8 +141,7 @@ class ProjecaoAxonometrica:
         #Calculo realizado abaixo : objeto_projetado =  matriz_SRT * vertices
         objeto_projetado = self.calcula_Mult_Matriz(matriz_SRT, self.vertices)      
         #print("TRADICIONAL : \n\n" , objeto_projetado)
-        #print("Alternativo : \n\n" , matriz_SRT_teste)
-
+        #print("Alternativo : \n\n" , matriz_SRT_teste)      
         return matriz_SRT_teste
         
 

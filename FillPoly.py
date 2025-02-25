@@ -28,7 +28,7 @@ class FillPoly:
         FillPoly.lista_intersecoess = {}
         
         for i in range(len(self.poligino)):
-            x , y = self.poligino[(i)]             
+            x , y ,z= self.poligino[(i)]             
             if y > self.y_max :
                 self.y_max = round(y)
             if y < self.y_min :
@@ -44,17 +44,17 @@ class FillPoly:
     def calc_intersecoes(self):
         for i in range(len(self.poligino)):             
             if i != len(self.poligino) - 1:
-                x_Ini, y_ini = self.poligino[i]
-                x_Fin, y_Fin = self.poligino[i + 1]
+                x_Ini, y_ini ,z = self.poligino[i]
+                x_Fin, y_Fin, z = self.poligino[i + 1]
             else:
-                x_Ini, y_ini = self.poligino[i]
-                x_Fin, y_Fin = self.poligino[0]
+                x_Ini, y_ini ,z = self.poligino[i]
+                x_Fin, y_Fin ,z = self.poligino[0]
             
             if y_ini > y_Fin:
                 x_Ini, x_Fin = x_Fin, x_Ini
                 y_ini, y_Fin = y_Fin, y_ini
 
-            y_ini = round(y_ini)  # ✅ Garante que y_ini seja um inteiro
+            y_ini = round(y_ini)  
             y_Fin = round(y_Fin)
 
             if y_ini != y_Fin:                    
@@ -62,7 +62,7 @@ class FillPoly:
                 YInter = y_ini
                 XInter = x_Ini
 
-                if y_ini not in FillPoly.lista_intersecoess:  # ✅ Previne KeyError
+                if y_ini not in FillPoly.lista_intersecoess:   
                     FillPoly.lista_intersecoess[y_ini] = []
 
                 FillPoly.lista_intersecoess[y_ini].append(XInter)
@@ -71,7 +71,7 @@ class FillPoly:
                     YInter += 1
                     XInter += Tx
 
-                    YInter = round(YInter)  # ✅ Garante que seja inteiro
+                    YInter = round(YInter)  
                     if YInter not in FillPoly.lista_intersecoess:
                         FillPoly.lista_intersecoess[YInter] = []
                         

@@ -2,6 +2,7 @@ import tkinter as tk
 import random
 from ProjecaoAxonometrica import ProjecaoAxonometrica
 
+
 class BSplines:
     def __init__(self,NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P,V,dp,windows,viewport,mundo):
         # Parâmetros de controle
@@ -149,7 +150,7 @@ class BSplines:
         projecao = projecao.main()
     
         self.inp = []
-    
+        
         #print(projecao)
         # tem que fazer isso pq usei um formato de matriz na projecao e aqui esta em outro
         # gambiarra nao, adaptacao kkk

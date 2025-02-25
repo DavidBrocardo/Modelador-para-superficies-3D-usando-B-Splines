@@ -7,14 +7,17 @@ class Recorte2D:
 
     def __init__(self, viewport, vertices):
         self.viewport = viewport
-
+        #self.vertices = vertices
         #Converte a matriz de vertices para uma lista de listas, mais facil
-        self.vertices = [[vertices[0][i], vertices[1][i], vertices[2][i]] 
-                         for i in range(len(vertices[0]))] #tem q te, gpt
+        self.vertices = vertices
+        """for i in range(len(vertices[0])):
+            print(i)
+            self.vertices = [[vertices[0][i], vertices[1][i]]]"""
+        #print("\n Antes : ", self.vertices)
 
     def Recortar_esquerda(self):
-        
-        xmin = self.viewport[0]
+       #[u_min, v_min, u_max, v_max]
+        xmin = self.viewport[1]
         novo_poligono = []
         num_vertices = len(self.vertices)
 
@@ -47,8 +50,8 @@ class Recorte2D:
         return novo_poligono
     
     def Recortar_direita(self,saida_rec_esquerda):
-        
-        xmax = self.viewport[1]
+        #[u_min, v_min, u_max, v_max]
+        xmax = self.viewport[3]
         novo_poligono = []
         num_vertices = len(saida_rec_esquerda)
 
@@ -80,8 +83,8 @@ class Recorte2D:
         return novo_poligono
     
     def Recortar_embaixo(self,saida_rec_direita):
-
-        ymax = self.viewport[3]
+        #[u_min, v_min, u_max, v_max]
+        ymax = self.viewport[2]
         novo_poligono = []
         num_vertices = len(saida_rec_direita)
 
@@ -115,8 +118,8 @@ class Recorte2D:
 
 
     def Recortar_topo(self,saida_rec_embaixo):
-        
-        ymin = self.viewport[2]
+         #[u_min, v_min, u_max, v_max]
+        ymin = self.viewport[0]
         novo_poligono = []
         num_vertices = len(saida_rec_embaixo)
         
@@ -148,23 +151,36 @@ class Recorte2D:
 
         return novo_poligono
 
+    def converter_vertices(self, lista_vertices):
+        vertices_covertido = [[], [], []]  
+        for linha in lista_vertices:      
+            #print("\n\n" ,linha) 
+            x, y,z= linha 
+            vertices_covertido[0].append(x)
+            vertices_covertido[1].append(y)
+            #vertices_covertido[2].append(z)
+                
+        return vertices_covertido
+
     #chama todos os recortes e executa o recorte total
     def Recortar_total(self): 
         resul1 = self.Recortar_esquerda()
         resul2 = self.Recortar_direita(resul1)
         resul3 = self.Recortar_embaixo(resul2)
         resul4 = self.Recortar_topo(resul3)
+        #print("\n RECORTE: " ,resul4)
+        recortado  = self.converter_vertices(resul4)
 
         return resul4
 
         
 if __name__ == "__main__":
-    vertices = [[  0,  250, 480],  # X
-                [250,  430,   0],  # Y
-                [-30,  -65, -90]]   # Z
+    vertices = [[  0,  250, 480 , 100 ,200 ,50],  # X
+                [250,  430,   0 , 20 , 100, 25],  # Y
+                [-30,  -65, -90, -20 ,50 , 0]]   # Z
                                     # Tirei o fator homogeneo, mas qlqr coisa adicionar de boa (da peido se add kkk)
 
-    viewport = [100, 400, 80, 380]  # umin, umax, vmin, vmax
+    viewport = [0, 0, 500, 500]  #[u_min, v_min, u_max, v_max]
 
     recorte = Recorte2D(viewport, vertices)
     poligono_recortado = recorte.Recortar_total()
