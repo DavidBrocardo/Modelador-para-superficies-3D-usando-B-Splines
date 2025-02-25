@@ -486,7 +486,6 @@ class Interface:
 
         # Desenha a superfície usando linhas
         for superfice in range(self.quantidadeSuperfice):
-
             for i in range(self.RESOLUTIONI[superfice] - 1):
                 vertices = []
                 for j in range(self.RESOLUTIONJ[superfice] - 1):
@@ -499,11 +498,11 @@ class Interface:
                     vertices.append((x2,y2))
                     vertices.append((x3,y3))
                     vertices.append((x4,y4))
-                    FillPoly(vertices,self.canvas,"white",self.viewport[1],self.viewport[3])
-                    self.canvas.create_line(x1, y1, x4, y4, fill="black", width=1)
-                    self.canvas.create_line(x4, y4, x3, y3, fill="black", width=1)
-                    self.canvas.create_line(x3, y3, x2, y2, fill="black", width=1)
-                    self.canvas.create_line(x2, y2, x1, y1, fill="black", width=1)
+                    FillPoly(vertices,self.canvas,"white")
+                    self.canvas.create_line(x1, y1, x4, y4, fill="black", width=2)
+                    self.canvas.create_line(x4, y4, x3, y3, fill="black", width=2)
+                    self.canvas.create_line(x3, y3, x2, y2, fill="black", width=2)
+                    self.canvas.create_line(x2, y2, x1, y1, fill="black", width=2)
 
 
 
@@ -531,7 +530,7 @@ if __name__ == "__main__":
     # Parâmetros da superfície
     pontos_controleX, pontos_controleY = 5, 5  
     TI, TJ = 5, 5  
-    RESOLUTIONI, RESOLUTIONJ = 30, 30  
+    RESOLUTIONI, RESOLUTIONJ = 10, 10  
     espacamento = 20
     VRP = [1, 1 ,1, 1]
     P = [0, 0, 0, 1]
