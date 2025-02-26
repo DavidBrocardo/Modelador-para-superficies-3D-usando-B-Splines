@@ -499,23 +499,31 @@ class Interface:
                     vertices.append((x2,y2,z2))
                     vertices.append((x3,y3,z3))
                     vertices.append((x4,y4,z4))
-                    #print("Antes do Recorte: \n\n", vertices)
+                    
                     recorte = Recorte2D(self.viewport, vertices)
                     poligono_recortado = recorte.Recortar_total()
-                    
-                    #print("\n\n Depois do recorte \n\n" ,poligono_recortado)                  
+
+                    if (poligono_recortado != vertices ):
+                        print("\n Antes do Recorte: \n", vertices)
+                        print("\n Depois do recorte \n" ,poligono_recortado)    
+              
                     FillPoly(poligono_recortado,self.canvas,"white")
                     
                     x1, y1=  poligono_recortado[0][0],  poligono_recortado[0][1]
                     x2, y2=  poligono_recortado[1][0],  poligono_recortado[1][1]
                     x3, y3=  poligono_recortado[2][0],  poligono_recortado[2][1]
-                    x4, y4=  poligono_recortado[3][0],  poligono_recortado[3][1]
+                    if (poligono_recortado[3][0] != ""):
+                        x4, y4=  poligono_recortado[3][0],  poligono_recortado[3][1]
 
-                    self.canvas.create_line(x1, y1, x4, y4, fill="black", width=2)
-                    self.canvas.create_line(x4, y4, x3, y3, fill="black", width=2)
-                    self.canvas.create_line(x3, y3, x2, y2, fill="black", width=2)
-                    self.canvas.create_line(x2, y2, x1, y1, fill="black", width=2)
-
+                        self.canvas.create_line(x1, y1, x4, y4, fill="black", width=1)
+                        self.canvas.create_line(x4, y4, x3, y3, fill="black", width=1)
+                        self.canvas.create_line(x3, y3, x2, y2, fill="black", width=1)
+                        self.canvas.create_line(x2, y2, x1, y1, fill="black", width=1)
+                    else:
+                        print("AQUI")
+                        self.canvas.create_line(x1, y1, x3, y3, fill="black", width=1)
+                        self.canvas.create_line(x3, y3, x2, y2, fill="black", width=1)
+                        self.canvas.create_line(x2, y2, x1, y1, fill="black", width=1)
 
 
     def main(self):
