@@ -1,6 +1,8 @@
 import tkinter as tk
 import random
+import copy
 from ProjecaoAxonometrica import ProjecaoAxonometrica
+from Pintor_dist import Pintor_dist
 
 
 class BSplines:
@@ -135,7 +137,15 @@ class BSplines:
                 canvas.create_line(x3, y3, x2, y2, fill="black", width=1)
                 canvas.create_line(x2, y2, x1, y1, fill="black", width=1)
                 
-                
+    def gerar_faces(self):
+        faces = []
+        for i in range(self.RESOLUTIONI - 1):
+            for j in range(self.RESOLUTIONJ - 1):
+                faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
+        #print(faces)
+        return faces  
+
+    #def atualiza_vertice(self, ponto)          
                 
     def main(self):       
         
@@ -145,10 +155,49 @@ class BSplines:
         # ->  self.inp  <-
         # 3)	Aplicar as matrizes do pipeline (Converter objeto do SRU para o SRT)
         
-           
+        #PINTOR 
+        #Verifica as faces
+        faces = self.gerar_faces()
+        #chama algoritmo do pintor
+        pintor = Pintor_dist(self.outp,self.VRP)
+        faces_ordenadas_distancia  = pintor.Calcular_dists_e_Ordenar_faces(faces)
+        print(faces_ordenadas_distancia)
+
+        faces_ordenadas = []
+
+        '''for _, face in faces_ordenadas_distancia:
+            linha = []
+            for i, j in face:
+                linha.append((i, j))
+                #print(i ,j)     
+            #print("\n")
+            faces_ordenadas.append(linha) 
+        #print("\nFACE: ", faces_ordenadas)
+        #Reorganiza as faces de acordo com o resultado do pintor        
+        outp_ordenado = []
+        for i in range(len(faces_ordenadas)):
+                #print("Ordenado : ", faces_ordenadas[i])
+                (x1_ord, y1_ord), (x2_ord, y2_ord), (x3_ord, y3_ord), (x4_ord, y4_ord) = faces_ordenadas[i]
+                outp_ordenado.append(self.outp[x1_ord][y1_ord])
+                outp_ordenado.append(self.outp[x2_ord][y2_ord])
+                outp_ordenado.append(self.outp[x3_ord][y3_ord])
+                outp_ordenado.append(self.outp[x4_ord][y4_ord])
+        #print(outp_ordenado)
+        matriz_3D = []
+        index = 0  # Para percorrer a matriz original
+        for i in range(self.RESOLUTIONI - 1):
+            linha = []
+            for j in range(self.RESOLUTIONJ - 1):
+                linha.append(outp_ordenado)  # Adiciona o ponto correspondente
+                index += 1
+            matriz_3D.append(linha)'''
+        #print("\n\n",matriz_3D)
+        #print("\n\n",self.outp)       
+
+        # PROJECAO AXONOMETRICA
+
         projecao = ProjecaoAxonometrica(self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
         projecao = projecao.main()
-    
         self.inp = []
         
         #print(projecao)
@@ -165,13 +214,13 @@ class BSplines:
                             projecao[2][indice]]
                 linha.append(elemento)
             self.inp.append(linha) 
-
+        
+        #print("Axonometrico : \n\n")
+        #print("\n\n",self.outp) 
+        #print("\n\n",faces_ordenadas)
+        #print("\n\n",faces)
         projecao = ProjecaoAxonometrica(self.outp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
         projecao = projecao.main()
-        
-
-        #print("Axonometrico : \n\n")
-        #print("Pontos ANTES de serem axonometrico:", self.outp)
         self.outp = [] 
         # Preenchendo self.outp com os valores projetados corretamente
         # mesma coisa dos pontos de controle, so que aqui é pros demais pontos da superfice
@@ -180,16 +229,14 @@ class BSplines:
             linha = []
             for j in range(self.RESOLUTIONJ):
                 indice = i * self.RESOLUTIONJ + j
-
                 elemento = [projecao[0][indice],
                             projecao[1][indice],
-                            projecao[2][indice]]
+                            projecao[2][indice]]                
                 linha.append(elemento)
             self.outp.append(linha)
-                
-        #print(projecao)'''
-        #print("\n\nPontos da superfice DEPOIS de serem axonometrico:", self.outp)
-        #print("\n\nPontos de controle DEPOIS de serem axonometrico:", self.inp)
+        
+
+
         return self.inp, self.outp
 
 

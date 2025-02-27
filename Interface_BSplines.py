@@ -5,6 +5,7 @@ from tkinter import simpledialog, messagebox
 from Superfice_BSplines import BSplines
 from FillPoly import FillPoly
 from Recorte2D import Recorte2D
+from Visibilidade_calc_Normal import Visibilidade_Normal
 
 class Interface:
     def __init__(self, tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, espacamento, VRP, P, Y, dp, windows, viewport):
@@ -484,9 +485,10 @@ class Interface:
         """Desenha a superfície B-Spline no Canvas."""
         self.canvas.delete("all")
                  
-
+        
         # Desenha a superfície usando linhas
         for superfice in range(self.quantidadeSuperfice):
+            visi = Visibilidade_Normal()
             for i in range(self.RESOLUTIONI[superfice] - 1):
                 for j in range(self.RESOLUTIONJ[superfice] - 1):
                     vertices =[]
@@ -499,7 +501,13 @@ class Interface:
                     vertices.append((x2,y2,z2))
                     vertices.append((x3,y3,z3))
                     vertices.append((x4,y4,z4))
-                    
+                    #print(vertices)
+                    #print(self.VRP)
+                    visivel = visi.Verificar_visibilidade_face(self.VRP, vertices)
+                    if visivel :
+                        color = "Red"
+                    else:
+                        color = "green"
                     recorte = Recorte2D(self.viewport, vertices)
                     poligono_recortado = recorte.Recortar_total()
 
@@ -512,18 +520,20 @@ class Interface:
                     x1, y1=  poligono_recortado[0][0],  poligono_recortado[0][1]
                     x2, y2=  poligono_recortado[1][0],  poligono_recortado[1][1]
                     x3, y3=  poligono_recortado[2][0],  poligono_recortado[2][1]
+                    
+                    
                     if (poligono_recortado[3][0] != ""):
                         x4, y4=  poligono_recortado[3][0],  poligono_recortado[3][1]
 
-                        self.canvas.create_line(x1, y1, x4, y4, fill="black", width=1)
-                        self.canvas.create_line(x4, y4, x3, y3, fill="black", width=1)
-                        self.canvas.create_line(x3, y3, x2, y2, fill="black", width=1)
-                        self.canvas.create_line(x2, y2, x1, y1, fill="black", width=1)
+                        self.canvas.create_line(x1, y1, x4, y4, fill=color, width=1)
+                        self.canvas.create_line(x4, y4, x3, y3, fill=color, width=1)
+                        self.canvas.create_line(x3, y3, x2, y2, fill=color, width=1)
+                        self.canvas.create_line(x2, y2, x1, y1, fill=color, width=1)
                     else:
                         print("AQUI")
-                        self.canvas.create_line(x1, y1, x3, y3, fill="black", width=1)
-                        self.canvas.create_line(x3, y3, x2, y2, fill="black", width=1)
-                        self.canvas.create_line(x2, y2, x1, y1, fill="black", width=1)
+                        self.canvas.create_line(x1, y1, x3, y3, fill=color, width=1)
+                        self.canvas.create_line(x3, y3, x2, y2, fill=color, width=1)
+                        self.canvas.create_line(x2, y2, x1, y1, fill=color, width=1)
 
 
     def main(self):
@@ -548,10 +558,10 @@ class Interface:
 
 if __name__ == "__main__":
     # Parâmetros da superfície
-    pontos_controleX, pontos_controleY = 5, 5  
-    TI, TJ = 5, 5  
-    RESOLUTIONI, RESOLUTIONJ = 10, 10  
-    espacamento = 20
+    pontos_controleX, pontos_controleY = 5, 5 
+    TI, TJ = 4, 4  
+    RESOLUTIONI, RESOLUTIONJ = 5, 5  
+    espacamento = 10
     VRP = [1, 1 ,1, 1]
     P = [0, 0, 0, 1]
     Y = [0, 1, 0]
