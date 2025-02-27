@@ -2,105 +2,73 @@ import numpy as np
 
 class Visibilidade_Normal:
 
-    def __init__(self, vertices, indices_faces):
-        self.vertices = vertices
-        self.indices_faces = indices_faces
-        self.VRP = VRP
- 
-    def Calcular_vet_normal_unitario_face(self, vertices, indice_face): #calcula de uma face
+    def __init__(self):
+        pass  # Nenhuma inicialização necessária
 
-        vertices = np.array(vertices) #só funfa convertendo pra array pra manipular
+    def Calcular_vet_normal_unitario_face(self, pontos_face):
+        """ Calcula o vetor normal unitário de uma única face usando seus pontos diretamente """
+        pontos = np.array(pontos_face)  # Converter para numpy array
 
-        p0 = vertices[:3, indice_face[0]]
-        p1 = vertices[:3, indice_face[1]] #pegando os vertices da face e seus x,y,z
-        p2 = vertices[:3, indice_face[2]]
+        if pontos.shape[0] < 3:
+            raise ValueError("Uma face precisa de pelo menos 3 pontos para calcular o vetor normal.")
 
-        v1 = p1 - p0 
-        v2 = p2 - p0  #vets 1 e 2 para calcular o vet normal
+        p0, p1, p2 = pontos[:3]  # Pegando os três primeiros pontos da face
 
-        Vnormal = np.cross(v1, v2)  #produto vetorial v1 x v2
-  
+        v1 = np.array(p1) - np.array(p0)
+        v2 = np.array(p2) - np.array(p0)  # Vetores para calcular normal
+
+        Vnormal = np.cross(v1, v2)  # Produto vetorial v1 x v2
         norma = np.linalg.norm(Vnormal)
-        Vnormal_unitario = Vnormal / norma  #calc do vet unitario
 
-        return Vnormal_unitario
-    
-    def Calcular_vet_normal_das_faces(self, vertices, indices_faces): #calcula de todas as faces armazenadas
-
-        normais_faces = []
-       
-        #print("\n")
-        for i, face in enumerate(indices_faces): 
-            
-            normal_unitaria = visi.Calcular_vet_normal_unitario_face(vertices, face)
-            normais_faces.append(normal_unitaria)  #calculando e salvando todos os vets normais das faces
-
-            #print(f"Normal da face {i}: {normal_unitaria}")
-        #print("\n")
-
-        return normais_faces
-
-    def Calcular_centroide_face(self, vertices, indice_face):
-
-        v = len(indice_face) # Nº de vertices da face, ex: face ABE = 3; face ABCD = 4;
+        if norma == 0:
+            return np.array([0, 0, 0])  # Evitar divisão por zero
         
-        soma_x = 0
-        soma_y = 0
-        soma_z = 0
+        return Vnormal / norma  # Vetor normal unitário
 
-        for i in indice_face:
-            soma_x += vertices[0][i]
-            soma_y += vertices[1][i] #vai somando os valores xyz de cada face
-            soma_z += vertices[2][i]
+    def Calcular_centroide_face(self, pontos_face):
+        """ Calcula o centroide da face usando seus pontos diretamente """
+        pontos = np.array(pontos_face)
+        return np.mean(pontos, axis=0)  # Média das coordenadas (x, y, z)
 
-        centroide_x = soma_x / v
-        centroide_y = soma_y / v #calcula o centroide, dividindo pelo Nº de vertices
-        centroide_z = soma_z / v
-    
-        return centroide_x, centroide_y, centroide_z
-    
-    def Calcular_vet_observacao_face (self, VRP, vertices, indices_faces):
+    def Calcular_vet_observacao_face(self, VRP, pontos_face):
+        """ Calcula o vetor de observação da face usando seus pontos diretamente """
+        VRP = np.array(VRP[:3])  # Garantir que estamos usando apenas (x, y, z)
+        centroide = self.Calcular_centroide_face(pontos_face)
+        vet_observacao = VRP - centroide  # Vetor de observação
 
-        VRP = np.array(VRP) 
-        vets_de_observacao_faces = []
+        norma = np.linalg.norm(vet_observacao)
+        if norma == 0:
+            return np.array([0, 0, 0])  # Evitar divisão por zero
         
-        for indice_face in indices_faces:
-            centroide = self.Calcular_centroide_face(vertices, indice_face) 
-            vet_observacao = VRP - centroide  
+        return vet_observacao / norma  # Vetor de observação unitário
 
-            norma = np.linalg.norm(vet_observacao)  #calc do vet de observacao unitario
-            VetorO_unitario = vet_observacao / norma 
+    def Verificar_visibilidade_face(self, VRP, pontos_face):
+        """ Verifica se uma única face é visível """
+        normal = self.Calcular_vet_normal_unitario_face(pontos_face)
+        observacao = self.Calcular_vet_observacao_face(VRP, pontos_face)
+        produto_escalar = np.dot(normal, observacao)  # Produto escalar
 
-            vets_de_observacao_faces.append(VetorO_unitario) 
-           
-        return vets_de_observacao_faces
+        # Se o produto escalar for negativo, inverter a normal
+        if produto_escalar < 0:
+            normal = -normal
+            produto_escalar = np.dot(normal, observacao)
+
+        return produto_escalar >= 0  # Retorna True se a face for visível
 
 
 if __name__ == "__main__":
-   
-    vertices = [[21.2, 34.1, 18.8, 5.9, 20],
-                [0.7,  3.4,  5.6,  2.9, 20.9],
-                [42.3, 27.2, 14.6, 29.7,31.6],
-                [  1,   1 ,   1,     1,  1]]
-    
-    indices_faces = [ [0,1,4],[1,2,4],[2,3,4],[3,0,4],[0,3,2,1] ] #Os vertices de cada face, ex: Face ABE(Face 014)
+    VRP = [1, 1, 1, 1]  # Ponto de visão
 
-    VRP = [25, 15, 80]   
+    # Definição das faces diretamente com seus pontos
+    face_0 = [
+        (250.0, 246.9422254266286, -0.8671815531005864),
+        (222.03337437689925, 262.866939649663, 8.329421601481734),
+        (250.0, 280.0736078814987, 17.163433406946957),
+        (277.96662562310075, 268.90782000217405, 6.620802616842856)
+    ]  # Face 0 (quadrangular)
 
-    visi = Visibilidade_Normal(vertices, indices_faces) #instancia da classe, só funfa assim
+    visi = Visibilidade_Normal()  # Instância da classe
 
-    vets_normais = visi.Calcular_vet_normal_das_faces(vertices, indices_faces)
-    vets_observacao = visi.Calcular_vet_observacao_face(VRP, vertices, indices_faces)
-    produtos_escalares = [np.dot(vn, vo) for vn, vo in zip(vets_normais, vets_observacao)] #gpt cantou
-
-    #print(np.array(vets_observacao))  #printa como uma matriz numpy (mais facil assim)
-
-    print("\n")
-
-    for i, produto in enumerate(produtos_escalares):
-        if produto >= 0:
-            print(f"Produto escalar da face {i}: {produto:.3f} --> A face é visível!")
-        else:
-            print(f"Produto escalar da face {i}: {produto:.3f} --> A face não é visível!")
-
-    print("\n")
+    # Teste para a Face 0
+    visivel_0 = visi.Verificar_visibilidade_face(VRP, face_0)
+    print(f"Face 0: {'Visível' if visivel_0 else 'Não Visível'}")

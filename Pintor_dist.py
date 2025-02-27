@@ -7,7 +7,7 @@ class Pintor_dist:
         self.vertices = vertices
         self.VRP = VRP
         
-    def Calcular_centroide_face(self, vertices, indice_face):
+    def Calcular_centroide_face(self, indice_face):
 
         v = len(indice_face) # Nº de vertices da face, ex: face ABE = 3; face ABCD = 4;
         
@@ -15,10 +15,10 @@ class Pintor_dist:
         soma_y = 0
         soma_z = 0
 
-        for i in indice_face:
-            soma_x += vertices[0][i]
-            soma_y += vertices[1][i] #vai somando os valores xyz de cada face
-            soma_z += vertices[2][i]
+        for i, j in indice_face:
+            soma_x += self.vertices[i][j][0]
+            soma_y += self.vertices[i][j][1]
+            soma_z += self.vertices[i][j][2]
 
         centroide_x = soma_x / v
         centroide_y = soma_y / v #calcula o centroide, dividindo pelo Nº de vertices
@@ -26,21 +26,22 @@ class Pintor_dist:
     
         return centroide_x, centroide_y, centroide_z
     #   b.	Vetores normais das faces   ACHO que sim
-    def Calcular_distancia_VRP_Face(self, VRP, centroide):
+    def Calcular_distancia_VRP_Face(self, centroide):
 
         #Formula da distancia euclidiana
-        dist = math.sqrt((VRP[0] - centroide[0])**2 + (VRP[1] - centroide[1])**2 + (VRP[2] - centroide[2])**2)
+        dist = math.sqrt((self.VRP[0] - centroide[0])**2 + (self.VRP[1] - centroide[1])**2 + (self.VRP[2] - centroide[2])**2)
 
         return dist
 
-    def Calcular_dists_e_Ordenar_faces(self, vertices, VRP, indices_faces):
+    def Calcular_dists_e_Ordenar_faces(self, indices_faces):
 
         face_e_distancia = [] #face e distancia dela em relação ao VRP
 
         for indice_face in indices_faces:
-            centroide = self.Calcular_centroide_face(vertices, indice_face)
-            distancia = self.Calcular_distancia_VRP_Face(VRP, centroide)
+            centroide = self.Calcular_centroide_face(indice_face)
+            distancia = self.Calcular_distancia_VRP_Face(centroide)
             face_e_distancia.append((distancia, indice_face))
+            
 
         #Ordenar as faces pela dist, maior para menor
         Faces_ordenadas = sorted(face_e_distancia, key=lambda x: x[0], reverse=True)
@@ -61,7 +62,7 @@ if __name__ == "__main__":
 
     pintor = Pintor_dist(vertices, VRP) #instancia da classe, só funfa assim
 
-    Faces_ordenadas = pintor.Calcular_dists_e_Ordenar_faces(vertices, VRP, indices_faces)
+    Faces_ordenadas = pintor.Calcular_dists_e_Ordenar_faces(indices_faces)
 
     x = 1
     print("\nFaces ordenadas da mais distante para a mais próxima:\n") #Essa é a ordem pra ser pintada já, de tras pra frente

@@ -10,6 +10,7 @@ class ProjecaoAxonometrica:
         # Inicializando variaveis
         #self.vertices = vertices
         self.vertices = self.converter_vertices(vertices)
+        #print(self.vertices)
         self.VRP = VRP
         self.P = P
         self.Y = Y
