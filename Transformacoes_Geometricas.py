@@ -7,7 +7,8 @@ palavras, os fatores de escala devem ser os mesmos nas 3 dimensões. """
 class Transformacoes_Geometricas:
 
     def __init__(self,vertices):
-         self.vertices = np.array(vertices)  #convertendo pra array desde o inicio para as mult de matriz
+         #self.vertices = np.array(vertices)  #convertendo pra array desde o inicio para as mult de matriz
+         self.vertices = vertices
 
     
     def Translacao(self,dx,dy,dz):
