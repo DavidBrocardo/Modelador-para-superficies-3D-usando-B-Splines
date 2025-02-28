@@ -19,7 +19,7 @@ class Pintor_dist:
 
         for i in indice_face:
             x, y = i
-            print(x , y)
+            #print(x , y)
             soma_x += self.vertices[x][y][0]
             soma_y += self.vertices[x][y][1]
             soma_z += self.vertices[x][y][2]
@@ -51,12 +51,12 @@ class Pintor_dist:
                 xi, yi = i
                 x = self.vertices[xi][yi][0]  # Coordenada X do vértice
                 y = self.vertices[xi][yi][1]  # Coordenada Y do vértice
-                z = self.vertices[xi][yi][2]  # Coordenada Y do vértice
+                z = self.vertices[xi][yi][2]  # Coordenada z do vértice
                 pontos.append((x, y, z))
 
             visi = Visibilidade_Normal(pontos,[[0,1,2,3]],self.VRP[:-1] ,True) #instancia da classe, so funfa assim
             produtos_escalares = visi.main()
-            print(produtos_escalares)
+            #print(produtos_escalares)
             if produtos_escalares[0] >= 0: 
                 color = "Red"
             else:

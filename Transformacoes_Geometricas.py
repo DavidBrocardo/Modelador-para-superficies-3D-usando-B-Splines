@@ -10,6 +10,7 @@ class Transformacoes_Geometricas:
          #self.vertices = np.array(vertices)  #convertendo pra array desde o inicio para as mult de matriz
          self.vertices = vertices
 
+   
     
     def Translacao(self,dx,dy,dz):
 
@@ -21,8 +22,8 @@ class Transformacoes_Geometricas:
         vertices_transladados = matriz_translacao @ self.vertices  #multiplicacao de arrays
         
         #self.vertices = matriz_translacao @ self.vertices --> caso querer salvar a cada operação!!!
-
-        return vertices_transladados
+        dados_convertidos = [[float(valor) for valor in linha] for linha in vertices_transladados] 
+        return dados_convertidos
     
     
     def Escala(self, Sgeral):  #a Escala (Sgeral) deve ser a mesma nas 3 dimensões
@@ -35,8 +36,9 @@ class Transformacoes_Geometricas:
         vertices_escalados = matriz_escala @ self.vertices
 
         #self.vertices = matriz_escala @ self.vertices --> caso querer salvar a cada operação!!!
-
-        return vertices_escalados
+# Convertendo para float puro do Python
+        dados_convertidos = [[float(valor) for valor in linha] for linha in vertices_escalados] 
+        return dados_convertidos
     
     def Rotacao_em_x(self, graus):
 
@@ -80,8 +82,8 @@ class Transformacoes_Geometricas:
         vertices_rodados = matriz_rotacao_z @ self.vertices
 
         #self.vertices = matriz_rotacao_z @ self.vertices --> caso querer salvar a cada operação!!!
-
-        return vertices_rodados
+        dados_convertidos = [[float(valor) for valor in linha] for linha in vertices_rodados] 
+        return dados_convertidos
         
 
 if __name__ == "__main__":
@@ -91,7 +93,10 @@ if __name__ == "__main__":
     [-2, -1, 0, 6],   # Y
     [-3, 3, -4, 0],   # Z
     [1, 1, 1, 1] ]     # H
-
+    vertices = [(187.36430672822868, 281.52216239265516, 20.03723291849055), 
+     (176.61584716852576, 286.1471108623356, 23.99474823671324), 
+     (191.62004198536994, 300.2942413294096, 27.343859742189753), 
+     (202.36850154507283, 296.02688528938364, 23.28520201120323)]
 
     operacao = Transformacoes_Geometricas(vertices)   #instancia da classe
 

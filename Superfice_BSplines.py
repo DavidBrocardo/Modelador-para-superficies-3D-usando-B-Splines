@@ -2,11 +2,11 @@ import tkinter as tk
 import random
 import copy
 from ProjecaoAxonometrica import ProjecaoAxonometrica
-
+from Transformacoes_Geometricas import Transformacoes_Geometricas
 
 
 class BSplines:
-    def __init__(self,NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P,V,dp,windows,viewport,mundo):
+    def __init__(self,NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P,V,dp,windows,viewport,geometrica,valores_geo):
         # Parâmetros de controle
         self.NI = NI
         self.NJ = NJ
@@ -21,7 +21,8 @@ class BSplines:
         self.dp = dp 
         self.windows = windows
         self.viewport = viewport
-        self.mundo = mundo
+        self.geometrica = geometrica
+        self.valores_geo = valores_geo
 
         # Vetores de nós para as direções I e J
         self.knotsI = [0] * (self.NI + self.TI + 1)
@@ -137,29 +138,74 @@ class BSplines:
                 canvas.create_line(x3, y3, x2, y2, fill="black", width=1)
                 canvas.create_line(x2, y2, x1, y1, fill="black", width=1)
                 
-    def gerar_faces(self):
-        faces = []
-        for i in range(self.RESOLUTIONI - 1):
-            for j in range(self.RESOLUTIONJ - 1):
-                faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
-        #print(faces)
-        return faces  
 
-    #def atualiza_vertice(self, ponto)          
+    def converter_vertices_tradicional(self, lista_vertices):
+        vertices_covertido = [[], [], [],[]]  
+        for linha in lista_vertices:  
+            for item in linha: 
+                x, y, z = item 
+                vertices_covertido[0].append(x)
+                vertices_covertido[1].append(y)
+                vertices_covertido[2].append(z)
+                vertices_covertido[3].append(1)
+        return vertices_covertido        
+    
+    def converter_vertices_superfice(self, lista_vertices):
+            indice = 0
+            for i in range(self.RESOLUTIONI):
+                linha = []
+                for j in range(self.RESOLUTIONJ):
+                    indice = i * self.RESOLUTIONJ + j
+                    elemento = [lista_vertices[0][indice] ,
+                                lista_vertices[1][indice] ,
+                                lista_vertices[2][indice] ]                
+                    linha.append(elemento)
+                self.outp.append(linha)
                 
     def main(self):       
         
         self.calcular_superficie()
         
+        #Transformacap_Geometrica
+        # geometrica  = 0 (Nenhuma) / =1 (Escala) / = 2 (Rotacao) / = 3 (Translacao)
+        if self.geometrica != 0:
+            vertices=[]
+            vertices = self.converter_vertices_tradicional(self.outp)
+            operacao = Transformacoes_Geometricas(vertices) 
+            if self.geometrica == 1:     # ESCALA       
+                resul_escala = operacao.Escala(self.valores_geo)
+                self.outp = [] 
+                self.converter_vertices_superfice(resul_escala)
+                #print(self.outp)
+
+            if self.geometrica  == 2:    # ROTACAO
+                x,y,z = self.valores_geo[0]   
+                resul_rotacao_x = operacao.Rotacao_em_x(x)
+                operacao = Transformacoes_Geometricas(resul_rotacao_x) 
+                resul_rotacao_y = operacao.Rotacao_em_y(y)
+                operacao = Transformacoes_Geometricas(resul_rotacao_x) 
+                resul_rotacao_z = operacao.Rotacao_em_z(z)
+                self.outp = [] 
+                self.converter_vertices_superfice(resul_rotacao_z)
+                
+
+            if self.geometrica == 3: # TRANSLACAO
+                x,y,z = self.valores_geo[0]
+                resul_translacao = operacao.Translacao(x,y,z)
+                self.outp = [] 
+                self.converter_vertices_superfice(resul_translacao)
+
+
+
         # 1) OBJETO MODELADO EM SRU
         # ->  self.inp  <-
-        # 3)	Aplicar as matrizes do pipeline (Converter objeto do SRU para o SRT)
-              
+        # 3)	Aplicar as matrizes do pipeline (Converter objeto do SRU para o SRT)             
           
 
         # PROJECAO AXONOMETRICA
-
-        projecao = ProjecaoAxonometrica(self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+        vertices=[]
+        vertices = self.converter_vertices_tradicional(self.inp)
+        projecao = ProjecaoAxonometrica(vertices, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
         projecao = projecao.main()
         self.inp = []
         
@@ -177,22 +223,16 @@ class BSplines:
                             projecao[2][indice]]
                 linha.append(elemento)
             self.inp.append(linha) 
-        
-        projecao = ProjecaoAxonometrica(self.outp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+        vertices =[]
+        vertices = self.converter_vertices_tradicional(self.outp)
+        projecao = ProjecaoAxonometrica(vertices, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
         projecao = projecao.main()
         self.outp = [] 
         # Preenchendo self.outp com os valores projetados corretamente
         # mesma coisa dos pontos de controle, so que aqui é pros demais pontos da superfice
         indice = 0
-        for i in range(self.RESOLUTIONI):
-            linha = []
-            for j in range(self.RESOLUTIONJ):
-                indice = i * self.RESOLUTIONJ + j
-                elemento = [projecao[0][indice],
-                            projecao[1][indice],
-                            projecao[2][indice]]                
-                linha.append(elemento)
-            self.outp.append(linha)
+        self.outp = [] 
+        self.converter_vertices_superfice(projecao)
 
         return self.inp, self.outp
 

@@ -5,7 +5,6 @@ class Visibilidade_Normal:
     def __init__(self, vertices, indices_faces,VRP, pintor):
         if pintor:
             self.vertices = self.converter_vertices(vertices)
-            
         else:
             self.vertices = vertices
         self.indices_faces = indices_faces
@@ -19,7 +18,7 @@ class Visibilidade_Normal:
                 vertices_covertido[0].append(x)
                 vertices_covertido[1].append(y)
                 vertices_covertido[2].append(z)
-        print(vertices_covertido)
+        #print(vertices_covertido)
         return vertices_covertido
     
     def Calcular_vet_normal_unitario_face(self, vertices, indice_face): #calcula de uma face
@@ -64,9 +63,6 @@ class Visibilidade_Normal:
         soma_z = 0
 
         for i in indice_face:
-            print(vertices[0])
-            print(i)
-            print(vertices[0][i])
             soma_x += vertices[0][i]
             soma_y += vertices[1][i] #vai somando os valores xyz de cada face
             soma_z += vertices[2][i]
@@ -99,6 +95,7 @@ class Visibilidade_Normal:
         vets_observacao = self.Calcular_vet_observacao_face(self.VRP, self.vertices, self.indices_faces)
         produtos_escalares = [np.dot(vn, vo) for vn, vo in zip(vets_normais, vets_observacao)] #gpt cantou
         return produtos_escalares
+    
 if __name__ == "__main__":
    
     vertices = [[21.2, 34.1, 18.8],
@@ -117,7 +114,7 @@ if __name__ == "__main__":
 
     #print(np.array(vets_observacao))  #printa como uma matriz numpy (mais facil assim)
 
-    print("\n")
+    #print("\n")
 
     for i, produto in enumerate(produtos_escalares):
         if produto >= 0:

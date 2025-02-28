@@ -2,14 +2,14 @@ import tkinter as tk
 import math
 import numpy as np
 from Recorte3D import Recorte3D
-from Recorte2D import Recorte2D
+
 
 class ProjecaoAxonometrica:
    
     def __init__(self, vertices, VRP, P, Y, dp, windows, viewport):
         # Inicializando variaveis
         #self.vertices = vertices
-        self.vertices = self.converter_vertices(vertices)
+        self.vertices = vertices
         #print(self.vertices)
         self.VRP = VRP
         self.P = P
@@ -18,16 +18,7 @@ class ProjecaoAxonometrica:
         self.windows = windows
         self.viewport = viewport
 
-    def converter_vertices(self, lista_vertices):
-        vertices_covertido = [[], [], [],[]]  
-        for linha in lista_vertices:  
-            for item in linha: 
-                x, y, z = item 
-                vertices_covertido[0].append(x)
-                vertices_covertido[1].append(y)
-                vertices_covertido[2].append(z)
-                vertices_covertido[3].append(1)
-        return vertices_covertido
+
 
     # Recebe um vetor e o retorna o unitario
     def Unitario (self, Vetor , Vetor_normalizado):    
@@ -117,7 +108,7 @@ class ProjecaoAxonometrica:
         #print("Antes: \n\n",  vertices_recortados)  
         recorte = Recorte3D(-100, 100, vertices_recortados)
         vertices_recortados = recorte.Recortar3D()
-        #print("Depois: \n\n", vertices_recortados)
+        print("Depois: \n\n", vertices_recortados)
         
         #Ultima etapa da PROJEÇÃO AXONOMÉTRICA
         M_proj = [

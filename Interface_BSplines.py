@@ -1,12 +1,13 @@
 import tkinter as tk
 import math
 import random
+import numpy as np
 from tkinter import simpledialog, messagebox
 from Superfice_BSplines import BSplines
 from FillPoly import FillPoly
 from Recorte2D import Recorte2D
 from Visibilidade_calc_Normal import Visibilidade_Normal
-from Transformacoes_Geometricas import Transformacoes_Geometricas
+
 from Pintor_dist import Pintor_dist
 
 class Interface:
@@ -211,7 +212,7 @@ class Interface:
             # Calcula a superfície B-Spline
             bspline = BSplines(
                 self.pontos_controleX[self.superficie_selecionada], self.pontos_controleY[self.superficie_selecionada], self.TI[self.superficie_selecionada], self.TJ[self.superficie_selecionada], self.RESOLUTIONI[self.superficie_selecionada], self.RESOLUTIONJ[self.superficie_selecionada],
-                self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, True
+                self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0,0
             )
             self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
             self.desenhar_superficie()
@@ -295,7 +296,7 @@ class Interface:
             # Calcula a superfície B-Spline
             bspline = BSplines(
                 self.pontos_controleX[self.superficie_selecionada], self.pontos_controleY[self.superficie_selecionada],  self.TI[self.superficie_selecionada], self.TJ[self.superficie_selecionada], self.RESOLUTIONI[self.superficie_selecionada], self.RESOLUTIONJ[self.superficie_selecionada],
-                self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, True
+                self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0,0
             )
             self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
             self.desenhar_superficie()
@@ -331,7 +332,7 @@ class Interface:
                 # Calcula a superfície B-Spline (mantido como estava)
                 for superfice in range(self.quantidadeSuperfice):                    
                     bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,True)
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
                     self.inp_Axo[superfice], self.outp[superfice] = bspline.main()
                 self.desenhar_superficie()
 
@@ -375,7 +376,7 @@ class Interface:
             # Calcula a superfície B-Spline
             for superfice in range(self.quantidadeSuperfice):                    
                     bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,True)
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
                     self.inp_Axo[superfice], self.outp[superfice] = bspline.main()
             self.desenhar_superficie()
 
@@ -417,7 +418,7 @@ class Interface:
             # Calcula a superfície B-Spline
             for superfice in range(self.quantidadeSuperfice):                    
                     bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,True)
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
                     self.inp_Axo[superfice], self.outp[superfice] = bspline.main()
             self.desenhar_superficie()
 
@@ -449,7 +450,7 @@ class Interface:
                 
                 for superfice in range(self.quantidadeSuperfice):                    
                     bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,True)
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
                     self.inp_Axo[superfice], self.outp[superfice] = bspline.main()
 
                 self.desenhar_superficie()
@@ -461,7 +462,7 @@ class Interface:
 
     def rotacao(self):
         janela = tk.Toplevel(self.tela)
-        janela.title("Definir Nova Camera")
+        janela.title("Rotacao")       
 
         tk.Label(janela, text="X:").grid(row=0, column=0)
         entrada_x = tk.Spinbox(janela, from_=-360, to=360, increment=1, width=10)
@@ -476,59 +477,70 @@ class Interface:
         entrada_z.grid(row=1, column=2)
 
         def Salvar():
-            try:  
-                x = float(entrada_x.get())                
-                y = float(entrada_y.get())
-                z = float(entrada_z.get())
-                self.VRP = [x, y, z, 1]
-
-                
-                for superfice in range(self.quantidadeSuperfice):    
-                    vertices = self.converter_vertices(self.outp[superfice]) 
-                    operacao = Transformacoes_Geometricas(vertices)     
-                    resul_rotacao_x = operacao.Rotacao_em_x(x)
-                    print("Lens Jacu")
-                    operacao = Transformacoes_Geometricas(resul_rotacao_x)
-                    resul_rotacao_y = operacao.Rotacao_em_y(y)
-                    print("Lens Jacu")   
-                    operacao = Transformacoes_Geometricas(resul_rotacao_y)   
-                    resul_rotacao_z = operacao.Rotacao_em_z(z) 
-                    resul_rotacao_z =resul_rotacao_z.tolist()
-                    print(resul_rotacao_z)
-                    '''indice = 0
-                    for i in range(self.RESOLUTIONI):
-                        linha = []
-                        for j in range(self.RESOLUTIONJ):
-                            indice = i * self.RESOLUTIONJ + j
-                            elemento = [resul_rotacao_z[0][indice],
-                                        resul_rotacao_z[1][indice],
-                                        resul_rotacao_z[2][indice]]                
-                            linha.append(elemento)
-                        self.outp[superfice].append(linha)'''
-
+                x = int(entrada_x.get())
+                y = int(entrada_y.get())
+                z = int(entrada_z.get())
+                valores_geo = []
+                valores_geo.append((x,y,z))
+                # Calcula a superfície B-Spline
+                for superfice in range(self.quantidadeSuperfice):                    
+                    bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,2,valores_geo)
+                    self.inp_Axo[superfice], self.outp[superfice] = bspline.main()
                 self.desenhar_superficie()
 
-            except ValueError:
-                tk.messagebox.showerror("Erro", "Por favor, insira números válidos.")  # Mensagem de erro
 
         tk.Button(janela, text="Atualizar", command=Salvar).grid(row=2, columnspan=3)
 
     def escala(self):
-        print("Lens Pacu")
+        janela = tk.Toplevel(self.tela)
+        janela.title("Escala")       
 
+        tk.Label(janela, text="Aumentar em:").grid(row=0, column=0)
+        entrada_x = tk.Spinbox(janela, from_=0, to=500, increment=1, width=10)
+        entrada_x.grid(row=1, column=0)
+
+        def Salvar():
+                x = float(entrada_x.get())
+                # Calcula a superfície B-Spline
+                for superfice in range(self.quantidadeSuperfice):                    
+                    bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,1,x)
+                    self.inp_Axo[superfice], self.outp[superfice] = bspline.main()
+                self.desenhar_superficie()
+            
+        tk.Button(janela, text="Atualizar", command=Salvar).grid(row=2, columnspan=3)
     def translacao(self):
-        print("Gabriel Jacu")
+        janela = tk.Toplevel(self.tela)
+        janela.title("Translacao")       
+
+        tk.Label(janela, text="X:").grid(row=0, column=0)
+        entrada_x = tk.Spinbox(janela, from_=0, to=600, increment=1, width=10)
+        entrada_x.grid(row=1, column=0)
+
+        tk.Label(janela, text="Y:").grid(row=0, column=1)  # Adicionado dois pontos para consistência
+        entrada_y = tk.Spinbox(janela, from_=0, to=600, increment=1, width=10) # Spinbox para Y
+        entrada_y.grid(row=1, column=1)
+
+        tk.Label(janela, text="Z:").grid(row=0, column=2) # Adicionado dois pontos para consistência
+        entrada_z = tk.Spinbox(janela, from_=0, to=600, increment=1, width=10) # Spinbox para Z
+        entrada_z.grid(row=1, column=2)
+
+        def Salvar():
+                x = int(entrada_x.get())
+                y = int(entrada_y.get())
+                z = int(entrada_z.get())
+                valores_geo = []
+                valores_geo.append((x,y,z))
+                # Calcula a superfície B-Spline
+                for superfice in range(self.quantidadeSuperfice):                    
+                    bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,3,valores_geo)
+                    self.inp_Axo[superfice], self.outp[superfice] = bspline.main()
+                self.desenhar_superficie()
+
+        tk.Button(janela, text="Atualizar", command=Salvar).grid(row=2, columnspan=3)
     
-    def converter_vertices(self, lista_vertices):
-        vertices_covertido = [[], [], [],[]]  
-        for linha in lista_vertices:  
-            for item in linha: 
-                x, y, z = item 
-                vertices_covertido[0].append(x)
-                vertices_covertido[1].append(y)
-                vertices_covertido[2].append(z)
-                vertices_covertido[3].append(1)
-        return vertices_covertido
       
     #------------------------------------------
     def criar_pontos_controle(self):
@@ -591,7 +603,7 @@ class Interface:
         
         # Calcula a superfície B-Spline
         bspline = BSplines(self.pontos_controleX[self.superficie_selecionada], self.pontos_controleY[self.superficie_selecionada],  self.TI[self.superficie_selecionada], self.TJ[self.superficie_selecionada], self.RESOLUTIONI[self.superficie_selecionada], self.RESOLUTIONJ[self.superficie_selecionada],
-                           self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,True)
+                           self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
         self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
        
         #print("\n\nPontos da superfície:", self.outp)
