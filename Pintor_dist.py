@@ -1,73 +1,101 @@
 import math
-import numpy as np
+import tkinter as tk
+from tkinter import Canvas
+from Recorte2D import Recorte2D
+from Visibilidade_calc_Normal import Visibilidade_Normal
+from FillPoly import FillPoly
+
 
 class Pintor_dist:
-
-    def __init__(self, vertices, VRP):
-        self.vertices = vertices
+    def __init__(self, vertices, VRP, canvas,viewport):
+        self.vertices = vertices  # Lista de listas de vértices
         self.VRP = VRP
-        
-    def Calcular_centroide_face(self, indice_face):
+        self.canvas = canvas
+        self.viewport = viewport
+    
+    def calcular_centroide_face(self, indice_face):
+        v = len(indice_face)
+        soma_x = soma_y = soma_z = 0
 
-        v = len(indice_face) # Nº de vertices da face, ex: face ABE = 3; face ABCD = 4;
-        
-        soma_x = 0
-        soma_y = 0
-        soma_z = 0
-
-        for i, j in indice_face:
-            soma_x += self.vertices[i][j][0]
-            soma_y += self.vertices[i][j][1]
-            soma_z += self.vertices[i][j][2]
+        for i in indice_face:
+            x, y = i
+            print(x , y)
+            soma_x += self.vertices[x][y][0]
+            soma_y += self.vertices[x][y][1]
+            soma_z += self.vertices[x][y][2]
 
         centroide_x = soma_x / v
-        centroide_y = soma_y / v #calcula o centroide, dividindo pelo Nº de vertices
+        centroide_y = soma_y / v
         centroide_z = soma_z / v
     
         return centroide_x, centroide_y, centroide_z
-    #   b.	Vetores normais das faces   ACHO que sim
-    def Calcular_distancia_VRP_Face(self, centroide):
+    
+    def calcular_distancia_VRP_face(self, centroide):
+        return math.sqrt((self.VRP[0] - centroide[0])**2 + 
+                         (self.VRP[1] - centroide[1])**2 + 
+                         (self.VRP[2] - centroide[2])**2)
 
-        #Formula da distancia euclidiana
-        dist = math.sqrt((self.VRP[0] - centroide[0])**2 + (self.VRP[1] - centroide[1])**2 + (self.VRP[2] - centroide[2])**2)
+    def calcular_dists_e_ordenar_faces(self, indices_faces):
+        face_e_distancia = [(self.calcular_distancia_VRP_face(self.calcular_centroide_face(face)), face) for face in indices_faces]
+        
+        faces_ordenadas = sorted(face_e_distancia, key=lambda x: x[0], reverse=True)
+        
+        return  faces_ordenadas
 
-        return dist
+    def controle(self, indices_faces):
+        faces_ordenadas = self.calcular_dists_e_ordenar_faces(indices_faces)
 
-    def Calcular_dists_e_Ordenar_faces(self, indices_faces):
+        for _, face in faces_ordenadas:
+            pontos = []
+            for i in face:
+                xi, yi = i
+                x = self.vertices[xi][yi][0]  # Coordenada X do vértice
+                y = self.vertices[xi][yi][1]  # Coordenada Y do vértice
+                z = self.vertices[xi][yi][2]  # Coordenada Y do vértice
+                pontos.append((x, y, z))
 
-        face_e_distancia = [] #face e distancia dela em relação ao VRP
+            visi = Visibilidade_Normal(pontos,[[0,1,2,3]],self.VRP[:-1] ,True) #instancia da classe, so funfa assim
+            produtos_escalares = visi.main()
+            print(produtos_escalares)
+            if produtos_escalares[0] >= 0: 
+                color = "Red"
+            else:
+                color = "green"
 
-        for indice_face in indices_faces:
-            centroide = self.Calcular_centroide_face(indice_face)
-            distancia = self.Calcular_distancia_VRP_Face(centroide)
-            face_e_distancia.append((distancia, indice_face))
+            recorte = Recorte2D(self.viewport, pontos)
+            poligono_recortado = recorte.Recortar_total()
+
+            FillPoly(poligono_recortado,self.canvas,"white")
             
+            x1, y1, z1 = poligono_recortado[0]
+            cond = True
+            for i in reversed(poligono_recortado):
+                if cond :
+                    x2, y2, z2 = i
+                    self.canvas.create_line(x1, y1, x2, y2, fill=color, width=1)
+                    cond  = False
+                else:
+                    x1, y1, z1 = i
+                    self.canvas.create_line(x2, y2, x1, y1, fill=color, width=1)
+                    x2 = x1
+                    y2 = y1
 
-        #Ordenar as faces pela dist, maior para menor
-        Faces_ordenadas = sorted(face_e_distancia, key=lambda x: x[0], reverse=True)
+        
+        return
 
-        return Faces_ordenadas
-
+        
 
 if __name__ == "__main__":
-   
-    vertices = [[21.2, 34.1, 18.8, 5.9, 20],
-                [0.7,  3.4,  5.6,  2.9, 20.9],
-                [42.3, 27.2, 14.6, 29.7,31.6],
-                [  1,   1 ,   1,     1,  1]]
+    vertices = [
+        [21.2, 0.7, 42.3],
+        [34.1, 3.4, 27.2],
+        [18.8, 5.6, 14.6],
+        [5.9, 2.9, 29.7],
+        [20, 20.9, 31.6]
+    ]
     
-    indices_faces = [ [0,1,4],[1,2,4],[2,3,4],[3,0,4],[0,3,2,1] ] #Os vertices de cada face, ex: Face ABE(Face 014)
-        
-    VRP = [25, 15, 80, 1]   
+    indices_faces = [[0,1,4], [1,2,4], [2,3,4], [3,0,4], [0,3,2,1]]
+    VRP = [25, 15, 80]    
 
-    pintor = Pintor_dist(vertices, VRP) #instancia da classe, só funfa assim
-
-    Faces_ordenadas = pintor.Calcular_dists_e_Ordenar_faces(indices_faces)
-
-    x = 1
-    print("\nFaces ordenadas da mais distante para a mais próxima:\n") #Essa é a ordem pra ser pintada já, de tras pra frente
-    for distancia, face in Faces_ordenadas:
-        print(f"{x}º Face: {face} ; Distância: {distancia:.5f}")
-        x = x + 1
-
-    print("\n")
+    pintor = Pintor_dist(vertices, VRP)
+    pintor.controle(indices_faces)

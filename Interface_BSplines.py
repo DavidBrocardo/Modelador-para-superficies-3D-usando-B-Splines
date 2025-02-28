@@ -7,6 +7,8 @@ from FillPoly import FillPoly
 from Recorte2D import Recorte2D
 from Visibilidade_calc_Normal import Visibilidade_Normal
 from Transformacoes_Geometricas import Transformacoes_Geometricas
+from Pintor_dist import Pintor_dist
+
 class Interface:
     def __init__(self, tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, espacamento, VRP, P, Y, dp, windows, viewport):
         self.tela = tela        
@@ -160,8 +162,7 @@ class Interface:
         self.atualizar_menu()
         self.tela.wait_variable(self.click_x)  # Espera um clique
         x_alvo, y_alvo = self.click_x.get(), self.click_y.get()
-        #print(x_alvo , y_alvo)
-        print("Lens Pacu")    
+        #print(x_alvo , y_alvo)   
         ponto_mais_proximo = None
         menor_distancia = float('inf')
 
@@ -562,58 +563,22 @@ class Interface:
             
     def desenhar_superficie(self):
         """Desenha a superfície B-Spline no Canvas."""
-        self.canvas.delete("all")
-                 
-        
+        self.canvas.delete("all")      
         # Desenha a superfície usando linhas
         for superfice in range(self.quantidadeSuperfice):
-            visi = Visibilidade_Normal()
+            faces = []
             for i in range(self.RESOLUTIONI[superfice] - 1):
                 for j in range(self.RESOLUTIONJ[superfice] - 1):
-                    vertices =[]
-                    x1, y1, z1 =   self.outp[superfice][i][j][0] ,   self.outp[superfice][i][j][1],   self.outp[superfice][i][j][2] 
-                    x2, y2, z2 =  self.outp[superfice][i][j+1][0] ,  self.outp[superfice][i][j+1][1],  self.outp[superfice][i][j+1][2] 
-                    x3, y3, z3 =  self.outp[superfice][i+1][j+1][0] ,  self.outp[superfice][i+1][j+1][1],  self.outp[superfice][i+1][j+1][2]
-                    x4, y4, z4 =   self.outp[superfice][i+1][j][0] ,  self.outp[superfice][i+1][j][1],  self.outp[superfice][i+1][j][2]              
-
-                    vertices.append((x1,y1,z1))
-                    vertices.append((x2,y2,z2))
-                    vertices.append((x3,y3,z3))
-                    vertices.append((x4,y4,z4))
-                    #print(vertices)
-                    #print(self.VRP)
-                    visivel = visi.Verificar_visibilidade_face(self.VRP, vertices)
-                    if visivel :
-                        color = "Red"
-                    else:
-                        color = "green"
-                    recorte = Recorte2D(self.viewport, vertices)
-                    poligono_recortado = recorte.Recortar_total()
-
-                    if (poligono_recortado != vertices ):
-                        print("\n Antes do Recorte: \n", vertices)
-                        print("\n Depois do recorte \n" ,poligono_recortado)    
-              
-                    FillPoly(poligono_recortado,self.canvas,"white")
+                    faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
                     
-                    x1, y1=  poligono_recortado[0][0],  poligono_recortado[0][1]
-                    x2, y2=  poligono_recortado[1][0],  poligono_recortado[1][1]
-                    x3, y3=  poligono_recortado[2][0],  poligono_recortado[2][1]
+            #print(self.outp[superfice])
+            #print("\n\n" ,faces)
+            pintor = Pintor_dist(self.outp[superfice], self.VRP,self.canvas,self.viewport)
+            pintor.controle(faces)         
+        
+        
+        
                     
-                    
-                    if (poligono_recortado[3][0] != ""):
-                        x4, y4=  poligono_recortado[3][0],  poligono_recortado[3][1]
-
-                        self.canvas.create_line(x1, y1, x4, y4, fill=color, width=1)
-                        self.canvas.create_line(x4, y4, x3, y3, fill=color, width=1)
-                        self.canvas.create_line(x3, y3, x2, y2, fill=color, width=1)
-                        self.canvas.create_line(x2, y2, x1, y1, fill=color, width=1)
-                    else:
-                        print("AQUI")
-                        self.canvas.create_line(x1, y1, x3, y3, fill=color, width=1)
-                        self.canvas.create_line(x3, y3, x2, y2, fill=color, width=1)
-                        self.canvas.create_line(x2, y2, x1, y1, fill=color, width=1)
-
 
     def main(self):
         """Executa os cálculos e desenha a superfície."""
@@ -639,7 +604,7 @@ if __name__ == "__main__":
     # Parâmetros da superfície
     pontos_controleX, pontos_controleY = 5, 5 
     TI, TJ = 4, 4  
-    RESOLUTIONI, RESOLUTIONJ = 5, 5  
+    RESOLUTIONI, RESOLUTIONJ = 10, 10  
     espacamento = 10
     VRP = [1, 1 ,1, 1]
     P = [0, 0, 0, 1]
