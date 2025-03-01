@@ -3,7 +3,7 @@ import random
 import copy
 from ProjecaoAxonometrica import ProjecaoAxonometrica
 from Transformacoes_Geometricas import Transformacoes_Geometricas
-
+from Recorte3D import Recorte3D
 
 class BSplines:
     def __init__(self,NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P,V,dp,windows,viewport,geometrica,valores_geo):
@@ -16,6 +16,7 @@ class BSplines:
         self.RESOLUTIONJ = RESOLUTIONJ
         self.inp = inp 
         self.VRP = VRP 
+        self.inp_projetado = inp
         self.P = P
         self.Y = V
         self.dp = dp 
@@ -161,21 +162,68 @@ class BSplines:
                                 lista_vertices[2][indice] ]                
                     linha.append(elemento)
                 self.outp.append(linha)
+    
+    
+    def converter_pontos_superfice(self, lista_vertices,geo):
+            indice = 0
+            for i in range(self.NI + 1):
+                linha = []
+                for j in range(self.NJ + 1):
+                    indice = i * (self.NJ + 1) + j
+                    # projecao[0], projecao[1], projecao[2] contêm as coordenadas projetadas (desconsiderando W)
+                    elemento = [lista_vertices[0][indice],
+                                lista_vertices[1][indice],
+                                lista_vertices[2][indice]]
+                    linha.append(elemento)
+                if geo:
+                    self.inp.append(linha)
+                self.inp_projetado.append(linha) 
+
+    def axonometrica(self,entrada,pontos):       
+        if pontos:
+            vertices=[]
+            vertices = self.converter_vertices_tradicional(entrada)
+            projecao = ProjecaoAxonometrica(vertices, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+            projecao = projecao.main() 
+            self.inp_projetado = []
+            self.converter_pontos_superfice(projecao,False)   
+        else:
+            # RECORTE 3D -> i.Recorte (3D) dos objetos que estejam antes do plano Near e depois do plano Far.
+            vertices=[]
+            vertices = self.converter_vertices_tradicional(self.outp)
+            print("Antes :" , vertices)
+            recorte = Recorte3D(-5000, 5000, vertices)
+            vertices_visiveis = recorte.Recortar3D()
+            print("\n\nDepois",vertices_visiveis)
+            projecao = ProjecaoAxonometrica(vertices_visiveis, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+            projecao = projecao.main() 
+            self.outp = []
+            self.converter_vertices_superfice(projecao)
                 
     def main(self):       
         
         self.calcular_superficie()
         
-        #Transformacap_Geometrica
+        #Transformacap_Geometrica 
+        # 1)	Objetos modelados em SRU
+        #       a.	Transformações geométricas (rotações, translações, escalas, cisalhamentos, etc. aplicada ao objeto).       
         # geometrica  = 0 (Nenhuma) / =1 (Escala) / = 2 (Rotacao) / = 3 (Translacao)
         if self.geometrica != 0:
             vertices=[]
             vertices = self.converter_vertices_tradicional(self.outp)
+            pontos = self.converter_vertices_tradicional(self.inp)
             operacao = Transformacoes_Geometricas(vertices) 
+
             if self.geometrica == 1:     # ESCALA       
                 resul_escala = operacao.Escala(self.valores_geo)
                 self.outp = [] 
                 self.converter_vertices_superfice(resul_escala)
+
+                operacao = Transformacoes_Geometricas(pontos) 
+                self.inp = []
+                self.inp_projetado = []
+                resul_escala = operacao.Escala(self.valores_geo)
+                self.converter_pontos_superfice(resul_escala,True)
                 #print(self.outp)
 
             if self.geometrica  == 2:    # ROTACAO
@@ -187,6 +235,17 @@ class BSplines:
                 resul_rotacao_z = operacao.Rotacao_em_z(z)
                 self.outp = [] 
                 self.converter_vertices_superfice(resul_rotacao_z)
+
+                operacao = Transformacoes_Geometricas(pontos)
+                resul_rotacao_x = operacao.Rotacao_em_x(x)
+                operacao = Transformacoes_Geometricas(resul_rotacao_x) 
+                resul_rotacao_y = operacao.Rotacao_em_y(y)
+                operacao = Transformacoes_Geometricas(resul_rotacao_x) 
+                resul_rotacao_z = operacao.Rotacao_em_z(z)
+
+                self.inp = []
+                self.inp_projetado = []
+                self.converter_pontos_superfice(resul_rotacao_z,True)
                 
 
             if self.geometrica == 3: # TRANSLACAO
@@ -195,45 +254,27 @@ class BSplines:
                 self.outp = [] 
                 self.converter_vertices_superfice(resul_translacao)
 
+                operacao = Transformacoes_Geometricas(pontos) 
+                self.inp = []
+                self.inp_projetado = []
+                resul_translacao = operacao.Translacao(x,y,z)
+                self.converter_pontos_superfice(resul_translacao,True)
 
 
-        # 1) OBJETO MODELADO EM SRU
-        # ->  self.inp  <-
-        # 3)	Aplicar as matrizes do pipeline (Converter objeto do SRU para o SRT)             
-          
+
+        # 3)Aplicar as matrizes do pipeline (Converter objeto do SRU para o SRT)           
 
         # PROJECAO AXONOMETRICA
-        vertices=[]
-        vertices = self.converter_vertices_tradicional(self.inp)
-        projecao = ProjecaoAxonometrica(vertices, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
-        projecao = projecao.main()
-        self.inp = []
+            #PONTOS
+        print(self.inp)
+        self.axonometrica(self.inp,True)      
         
-        #print(projecao)
-        # tem que fazer isso pq usei um formato de matriz na projecao e aqui esta em outro
-        # gambiarra nao, adaptacao kkk
-        # Reconstrói a matriz de pontos de controle a partir da projeção
-        for i in range(self.NI + 1):
-            linha = []
-            for j in range(self.NJ + 1):
-                indice = i * (self.NJ + 1) + j
-                # projecao[0], projecao[1], projecao[2] contêm as coordenadas projetadas (desconsiderando W)
-                elemento = [projecao[0][indice],
-                            projecao[1][indice],
-                            projecao[2][indice]]
-                linha.append(elemento)
-            self.inp.append(linha) 
-        vertices =[]
-        vertices = self.converter_vertices_tradicional(self.outp)
-        projecao = ProjecaoAxonometrica(vertices, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
-        projecao = projecao.main()
-        self.outp = [] 
-        # Preenchendo self.outp com os valores projetados corretamente
-        # mesma coisa dos pontos de controle, so que aqui é pros demais pontos da superfice
-        indice = 0
-        self.outp = [] 
-        self.converter_vertices_superfice(projecao)
+            
 
-        return self.inp, self.outp
+            #SUPERFICE
+        self.axonometrica(self.outp,False)      
+         
+        print("SAIDA \n\n ",self.outp)
+        return self.inp, self.inp_projetado, self.outp
 
 

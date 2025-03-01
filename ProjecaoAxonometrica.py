@@ -1,8 +1,4 @@
-import tkinter as tk
 import math
-import numpy as np
-from Recorte3D import Recorte3D
-
 
 class ProjecaoAxonometrica:
    
@@ -103,13 +99,7 @@ class ProjecaoAxonometrica:
             [0, 0 , 0, 1]
         ]
         matriz_SRC = self.calcula_Mult_Matriz(matriz_R,matriz_T) # Matriz SRC  = R * T
-        #APLICAR O RECORTE 3D
-        vertices_recortados = self.calcula_Mult_Matriz(matriz_SRC, self.vertices)   
-        #print("Antes: \n\n",  vertices_recortados)  
-        recorte = Recorte3D(-100, 100, vertices_recortados)
-        vertices_recortados = recorte.Recortar3D()
-        print("Depois: \n\n", vertices_recortados)
-        
+                       
         #Ultima etapa da PROJEÇÃO AXONOMÉTRICA
         M_proj = [
             [1, 0 , 0, 0],
@@ -126,15 +116,12 @@ class ProjecaoAxonometrica:
 
         #Calculo realizado abaixo : matriz_SRTSRU =  M_jp * (M_proj*matriz_SRC)
         matriz_SRT = self.calcula_Mult_Matriz(M_jp, self.calcula_Mult_Matriz(M_proj,matriz_SRC))  
-        #Teste de calculo
-        matriz_SRT_teste = self.calcula_Mult_Matriz(M_jp, self.calcula_Mult_Matriz(M_proj,vertices_recortados))  
-        
+                
         #Objeto em projeção axonométrica
         #Calculo realizado abaixo : objeto_projetado =  matriz_SRT * vertices
         objeto_projetado = self.calcula_Mult_Matriz(matriz_SRT, self.vertices)      
-        #print("TRADICIONAL : \n\n" , objeto_projetado)
-        #print("Alternativo : \n\n" , matriz_SRT_teste)      
-        return matriz_SRT_teste
+       
+        return objeto_projetado
         
 
 

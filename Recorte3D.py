@@ -6,14 +6,14 @@ class Recorte3D:
 
     def Recortar3D(self):
         novo_poligono = []
-
         for vertice in self.vertices[:-1]:  # Evita acessar a [0, 0, 0, 1]
             z = vertice[2]
-
+           
              #o poligono ta dentro do volume visivel ou nao
             if self.znear <= z <= self.zfar:
-                novo_poligono.append(vertice)
 
+                novo_poligono.append(vertice)
+    
         novo_poligono.append(self.vertices[3])
         return novo_poligono
 
