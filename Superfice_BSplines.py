@@ -5,6 +5,7 @@ from Recorte3D import Recorte3D
 
 class BSplines:
     def __init__(self,NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P,V,dp,windows,viewport,geometrica,valores_geo):
+            
         # Parâmetros de controle
         self.NI = NI
         self.NJ = NJ
@@ -275,7 +276,7 @@ class BSplines:
             #SUPERFICE
         self.axonometrica(self.outp,False)      
 
-        return self.inp, self.inp_projetado, self.outp 
+        return self.inp, self.outp 
 
 
 

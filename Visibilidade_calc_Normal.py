@@ -2,25 +2,11 @@ import numpy as np
 
 class Visibilidade_Normal:
 
-    def __init__(self, vertices, indices_faces,VRP, pintor):
-        if pintor:
-            self.vertices = self.converter_vertices(vertices)
-        else:
-            self.vertices = vertices
+    def __init__(self, vertices, indices_faces):
+        self.vertices = vertices
         self.indices_faces = indices_faces
         self.VRP = VRP
-    
-    
-    def converter_vertices(self, lista_vertices):
-        vertices_covertido = [[], [], []]  
-        for linha in lista_vertices:  
-                x, y, z = linha 
-                vertices_covertido[0].append(x)
-                vertices_covertido[1].append(y)
-                vertices_covertido[2].append(z)
-        #print(vertices_covertido)
-        return vertices_covertido
-    
+ 
     def Calcular_vet_normal_unitario_face(self, vertices, indice_face): #calcula de uma face
 
         vertices = np.array(vertices) #s├│ funfa convertendo pra array pra manipular
@@ -46,7 +32,7 @@ class Visibilidade_Normal:
         #print("\n")
         for i, face in enumerate(indices_faces): 
             
-            normal_unitaria = self.Calcular_vet_normal_unitario_face(vertices, face)
+            normal_unitaria = visi.Calcular_vet_normal_unitario_face(vertices, face)
             normais_faces.append(normal_unitaria)  #calculando e salvando todos os vets normais das faces
 
             #print(f"Normal da face {i}: {normal_unitaria}")
@@ -61,8 +47,11 @@ class Visibilidade_Normal:
         soma_x = 0
         soma_y = 0
         soma_z = 0
-
+        print("ARRR")
         for i in indice_face:
+            print(vertices[0][i])
+            print(vertices[1][i])
+            print(vertices[2][i])
             soma_x += vertices[0][i]
             soma_y += vertices[1][i] #vai somando os valores xyz de cada face
             soma_z += vertices[2][i]
@@ -89,34 +78,27 @@ class Visibilidade_Normal:
            
         return vets_de_observacao_faces
 
-    def main(self):
 
-        vets_normais = self.Calcular_vet_normal_das_faces(self.vertices, self.indices_faces)
-        vets_observacao = self.Calcular_vet_observacao_face(self.VRP, self.vertices, self.indices_faces)
-        produtos_escalares = [np.dot(vn, vo) for vn, vo in zip(vets_normais, vets_observacao)] #gpt cantou
-        return produtos_escalares
-    
 if __name__ == "__main__":
    
-    vertices = [[21.2, 34.1, 18.8],
-                [0.7,  3.4,  5.6],
-                [42.3, 27.2, 14.6],
-                [50.3, 10.2, 2.6]]
+    vertices = [[21.2, 34.1, 18.8, 5.9, 20],
+                [0.7,  3.4,  5.6,  2.9, 20.9],
+                [42.3, 27.2, 14.6, 29.7,31.6],
+                [  1,   1 ,   1,     1,  1]]
     
-    indices_faces = [ [0,1,2,3]] #Os vertices de cada face, ex: Face ABE(Face 014)
-    vertices =  [(147.65903385378255, 313.9165890311658, 30.326237147066724),
-                (114.1610657194264, 328.7452796783735, 42.542635931800135),
-                (179.57282438145648, 356.40754056424265, 66.76365340967062), 
-                (213.07079251581263, 347.49360951923575, 52.874307975415476)]
-    
-    VRP = [500, 500, 500]   
+    indices_faces = [ [0,1,4],[1,2,4],[2,3,4],[3,0,4],[0,3,2,1] ] #Os vertices de cada face, ex: Face ABE(Face 014)
 
-    visi = Visibilidade_Normal(vertices, indices_faces,VRP ,True) #instancia da classe, so funfa assim
-    produtos_escalares = visi.main()
+    VRP = [25, 15, 80]   
+
+    visi = Visibilidade_Normal(vertices, indices_faces) #instancia da classe, so funfa assim
+
+    vets_normais = visi.Calcular_vet_normal_das_faces(vertices, indices_faces)
+    vets_observacao = visi.Calcular_vet_observacao_face(VRP, vertices, indices_faces)
+    produtos_escalares = [np.dot(vn, vo) for vn, vo in zip(vets_normais, vets_observacao)] #gpt cantou
 
     #print(np.array(vets_observacao))  #printa como uma matriz numpy (mais facil assim)
 
-    #print("\n")
+    print("\n")
 
     for i, produto in enumerate(produtos_escalares):
         if produto >= 0:

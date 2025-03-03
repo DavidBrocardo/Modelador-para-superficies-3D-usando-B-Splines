@@ -122,11 +122,8 @@ class Interface:
 
         self.menu = tk.Menu(self.menu_button, tearoff=0)
         self.menu_button["menu"] = self.menu
-
+      
         
-
-        
-
     def abrir_arquivo(self):
         messagebox.showinfo("Abrir", "Abrindo arquivo...")
 
@@ -291,6 +288,7 @@ class Interface:
             self.TJ[self.superficie_selecionada] = int(entrada_ti.get())
 
             self.criar_pontos_controle() 
+
             janela.destroy()                      
             # Calcula a superfície B-Spline
             bspline = BSplines(
@@ -298,8 +296,7 @@ class Interface:
                 self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0,0
             )
             _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
-            self.RESOLUTIONI[self.superficie_selecionada] = self.RESOLUTIONI[self.superficie_selecionada] 
-            self.RESOLUTIONJ[self.superficie_selecionada] = self.RESOLUTIONJ[self.superficie_selecionada] 
+            
             self.desenhar_superficie()
 
         tk.Button(janela, text="Salvar", command=Salvar).grid(row=12, column=0, columnspan=3)
@@ -335,8 +332,7 @@ class Interface:
                     bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
                                 self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
                     _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
-                    self.RESOLUTIONI[self.superficie_selecionada] = self.RESOLUTIONI[self.superficie_selecionada] 
-                    self.RESOLUTIONJ[self.superficie_selecionada] = self.RESOLUTIONJ[self.superficie_selecionada] 
+                   
                 self.desenhar_superficie()
 
             except ValueError:
@@ -491,7 +487,7 @@ class Interface:
                 # Calcula a superfície B-Spline
                 for superfice in range(self.quantidadeSuperfice):                    
                     bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,2,valores_geo)
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 2, valores_geo)
                     self.inp[superfice], self.inp_Axo[superfice], self.outp[superfice] = bspline.main()
                     
                 self.desenhar_superficie()
