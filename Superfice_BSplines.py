@@ -1,6 +1,4 @@
 import tkinter as tk
-import random
-import copy
 from ProjecaoAxonometrica import ProjecaoAxonometrica
 from Transformacoes_Geometricas import Transformacoes_Geometricas
 from Recorte3D import Recorte3D
@@ -161,8 +159,7 @@ class BSplines:
                     elemento = [lista_vertices[0][indice] ,
                                 lista_vertices[1][indice] ,
                                 lista_vertices[2][indice] ]  
-                    print(indice)
-                    print (elemento)              
+                             
                     linha.append(elemento)
                 self.outp.append(linha)
     
@@ -274,11 +271,10 @@ class BSplines:
         # PROJECAO AXONOMETRICA
             #PONTOS
         self.axonometrica(self.inp,True)            
-            
+   
             #SUPERFICE
-        print(len(self.outp))
         self.axonometrica(self.outp,False)      
-        print(len(self.outp))
+
         return self.inp, self.inp_projetado, self.outp 
 
 

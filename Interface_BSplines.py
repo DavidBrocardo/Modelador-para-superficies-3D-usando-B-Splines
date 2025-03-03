@@ -5,10 +5,6 @@ import numpy as np
 import copy
 from tkinter import simpledialog, messagebox
 from Superfice_BSplines import BSplines
-from FillPoly import FillPoly
-from Recorte2D import Recorte2D
-from Visibilidade_calc_Normal import Visibilidade_Normal
-
 from Pintor_dist import Pintor_dist
 
 class Interface:

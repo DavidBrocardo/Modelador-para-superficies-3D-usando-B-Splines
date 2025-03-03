@@ -28,7 +28,7 @@ if __name__ == "__main__":
                 [30,  -65,  510]]  # Z
     
     znear = -100   #perto d+ da camera, tampa ela inteira, por isso deve ser recortado 
-    zfar = 600   #longe d+ da camera, só gasta processamento e nem da pra direito
+    zfar = 400   #longe d+ da camera, só gasta processamento e nem da pra direito
 
     recorte = Recorte3D(znear, zfar, vertices)
     vertices_visiveis = recorte.Recortar3D()

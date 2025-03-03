@@ -53,7 +53,7 @@ class Pintor_dist:
                 y = self.vertices[xi][yi][1]  # Coordenada Y do vértice
                 z = self.vertices[xi][yi][2]  # Coordenada z do vértice
                 pontos.append((x, y, z))
-            print(pontos)
+            #print(pontos)
             visi = Visibilidade_Normal(pontos,[[0,1,2,3]],self.VRP[:-1] ,True) #instancia da classe, so funfa assim
             produtos_escalares = visi.main()
             #print(produtos_escalares)
