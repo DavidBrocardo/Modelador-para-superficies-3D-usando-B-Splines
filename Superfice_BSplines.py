@@ -24,6 +24,7 @@ class BSplines:
         self.viewport = viewport
         self.geometrica = geometrica
         self.valores_geo = valores_geo
+ 
 
         # Vetores de nós para as direções I e J
         self.knotsI = [0] * (self.NI + self.TI + 1)
@@ -159,7 +160,9 @@ class BSplines:
                     indice = i * self.RESOLUTIONJ + j
                     elemento = [lista_vertices[0][indice] ,
                                 lista_vertices[1][indice] ,
-                                lista_vertices[2][indice] ]                
+                                lista_vertices[2][indice] ]  
+                    print(indice)
+                    print (elemento)              
                     linha.append(elemento)
                 self.outp.append(linha)
     
@@ -189,15 +192,19 @@ class BSplines:
             self.converter_pontos_superfice(projecao,False)   
         else:
             # RECORTE 3D -> i.Recorte (3D) dos objetos que estejam antes do plano Near e depois do plano Far.
-            vertices=[]
-            vertices = self.converter_vertices_tradicional(self.outp)
-            print("Antes :" , vertices)
-            recorte = Recorte3D(-5000, 5000, vertices)
-            vertices_visiveis = recorte.Recortar3D()
-            print("\n\nDepois",vertices_visiveis)
+            vertices=[]      
+            vertices = self.converter_vertices_tradicional(self.outp)      
+            #print("\n\nANTES\n\n",vertices)
+            
+            recorte = Recorte3D(0, 600, vertices)
+            vertices_visiveis= recorte.Recortar3D()     
+            
+            
+            #print("\n\nDEPOIS\n\n",vertices_visiveis)
             projecao = ProjecaoAxonometrica(vertices_visiveis, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
             projecao = projecao.main() 
             self.outp = []
+
             self.converter_vertices_superfice(projecao)
                 
     def main(self):       
@@ -231,7 +238,7 @@ class BSplines:
                 resul_rotacao_x = operacao.Rotacao_em_x(x)
                 operacao = Transformacoes_Geometricas(resul_rotacao_x) 
                 resul_rotacao_y = operacao.Rotacao_em_y(y)
-                operacao = Transformacoes_Geometricas(resul_rotacao_x) 
+                operacao = Transformacoes_Geometricas(resul_rotacao_y) 
                 resul_rotacao_z = operacao.Rotacao_em_z(z)
                 self.outp = [] 
                 self.converter_vertices_superfice(resul_rotacao_z)
@@ -240,7 +247,7 @@ class BSplines:
                 resul_rotacao_x = operacao.Rotacao_em_x(x)
                 operacao = Transformacoes_Geometricas(resul_rotacao_x) 
                 resul_rotacao_y = operacao.Rotacao_em_y(y)
-                operacao = Transformacoes_Geometricas(resul_rotacao_x) 
+                operacao = Transformacoes_Geometricas(resul_rotacao_y) 
                 resul_rotacao_z = operacao.Rotacao_em_z(z)
 
                 self.inp = []
@@ -266,15 +273,14 @@ class BSplines:
 
         # PROJECAO AXONOMETRICA
             #PONTOS
-        print(self.inp)
-        self.axonometrica(self.inp,True)      
-        
+        self.axonometrica(self.inp,True)            
             
-
             #SUPERFICE
+        print(len(self.outp))
         self.axonometrica(self.outp,False)      
-         
-        print("SAIDA \n\n ",self.outp)
-        return self.inp, self.inp_projetado, self.outp
+        print(len(self.outp))
+        return self.inp, self.inp_projetado, self.outp 
+
+
 
 

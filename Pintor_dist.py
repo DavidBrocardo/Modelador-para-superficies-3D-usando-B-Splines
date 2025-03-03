@@ -53,32 +53,31 @@ class Pintor_dist:
                 y = self.vertices[xi][yi][1]  # Coordenada Y do vértice
                 z = self.vertices[xi][yi][2]  # Coordenada z do vértice
                 pontos.append((x, y, z))
-
+            print(pontos)
             visi = Visibilidade_Normal(pontos,[[0,1,2,3]],self.VRP[:-1] ,True) #instancia da classe, so funfa assim
             produtos_escalares = visi.main()
             #print(produtos_escalares)
             if produtos_escalares[0] >= 0: 
-                color = "Red"
+                color = "Green"
             else:
-                color = "green"
+                color = "Red"
 
             recorte = Recorte2D(self.viewport, pontos)
             poligono_recortado = recorte.Recortar_total()
-
             FillPoly(poligono_recortado,self.canvas,"white")
-            
-            x1, y1, z1 = poligono_recortado[0]
-            cond = True
-            for i in reversed(poligono_recortado):
-                if cond :
-                    x2, y2, z2 = i
-                    self.canvas.create_line(x1, y1, x2, y2, fill=color, width=1)
-                    cond  = False
-                else:
-                    x1, y1, z1 = i
-                    self.canvas.create_line(x2, y2, x1, y1, fill=color, width=1)
-                    x2 = x1
-                    y2 = y1
+            if len(poligono_recortado) != 0:
+                x1, y1, z1 = poligono_recortado[0]
+                cond = True
+                for i in reversed(poligono_recortado):
+                    if cond :
+                        x2, y2, z2 = i
+                        self.canvas.create_line(x1, y1, x2, y2, fill=color, width=1)
+                        cond  = False
+                    else:
+                        x1, y1, z1 = i
+                        self.canvas.create_line(x2, y2, x1, y1, fill=color, width=1)
+                        x2 = x1
+                        y2 = y1
 
         
         return

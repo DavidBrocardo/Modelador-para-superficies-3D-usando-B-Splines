@@ -155,11 +155,15 @@ class Recorte2D:
 
     #chama todos os recortes e executa o recorte total
     def Recortar_total(self): 
+        
         resul1 = self.Recortar_esquerda()
+        
         resul2 = self.Recortar_direita(resul1)
+        
         resul3 = self.Recortar_embaixo(resul2)
+        
         resul4 = self.Recortar_topo(resul3)
-        #print("\n RECORTE: " ,resul4)
+        
         return resul4
 
         
