@@ -4,8 +4,7 @@ import random
 import numpy as np
 import copy
 from tkinter import simpledialog, messagebox
-from Superfice_BSplines import BSplines
-from Pintor_dist import Pintor_dist
+from Controle import Controle
 
 class Interface:
     def __init__(self, tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, espacamento, VRP, P, Y, dp, windows, viewport):
@@ -205,13 +204,13 @@ class Interface:
 
             janela.destroy()                      
             # Calcula a superfície B-Spline
-            bspline = BSplines(
+            control = Controle(self.canvas,
                 self.pontos_controleX[self.superficie_selecionada], self.pontos_controleY[self.superficie_selecionada], self.TI[self.superficie_selecionada], self.TJ[self.superficie_selecionada], self.RESOLUTIONI[self.superficie_selecionada], self.RESOLUTIONJ[self.superficie_selecionada],
                 self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0,0
             )
-            _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
+            _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
            
-            self.desenhar_superficie()
+            
 
         tk.Button(janela, text="Salvar", command=Salvar).grid(row=2, columnspan=2)
         
@@ -291,13 +290,13 @@ class Interface:
 
             janela.destroy()                      
             # Calcula a superfície B-Spline
-            bspline = BSplines(
+            control = Controle(self.canvas,
                 self.pontos_controleX[self.superficie_selecionada], self.pontos_controleY[self.superficie_selecionada],  self.TI[self.superficie_selecionada], self.TJ[self.superficie_selecionada], self.RESOLUTIONI[self.superficie_selecionada], self.RESOLUTIONJ[self.superficie_selecionada],
                 self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0,0
             )
-            _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
+            _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
             
-            self.desenhar_superficie()
+            
 
         tk.Button(janela, text="Salvar", command=Salvar).grid(row=12, column=0, columnspan=3)
 
@@ -329,11 +328,11 @@ class Interface:
 
                 # Calcula a superfície B-Spline (mantido como estava)
                 for superfice in range(self.quantidadeSuperfice):                    
-                    bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
+                    control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
                                 self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
+                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
                    
-                self.desenhar_superficie()
+               
 
             except ValueError:
                 tk.messagebox.showerror("Erro", "Por favor, insira números válidos.")  # Mensagem de erro
@@ -374,11 +373,11 @@ class Interface:
             janela.destroy()                      
             # Calcula a superfície B-Spline
             for superfice in range(self.quantidadeSuperfice):                    
-                    bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
+                    control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
                                 self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
+                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
                    
-            self.desenhar_superficie()
+            
 
         tk.Button(janela, text="Salvar", command=Salvar).grid(row=2, columnspan=4)
 
@@ -417,11 +416,11 @@ class Interface:
             janela.destroy()                      
             # Calcula a superfície B-Spline
             for superfice in range(self.quantidadeSuperfice):                    
-                    bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
+                    control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
                                 self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
+                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
                     
-            self.desenhar_superficie()
+            
 
         tk.Button(janela, text="Salvar", command=Salvar).grid(row=2, columnspan=4)
 
@@ -450,13 +449,12 @@ class Interface:
 
                 
                 for superfice in range(self.quantidadeSuperfice):                    
-                    bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
+                    control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
                                 self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
+                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
                     
 
-                self.desenhar_superficie()
-
+                
             except ValueError:
                 tk.messagebox.showerror("Erro", "Por favor, insira números válidos.")  # Mensagem de erro
 
@@ -486,11 +484,11 @@ class Interface:
                 valores_geo.append((x,y,z))
                 # Calcula a superfície B-Spline
                 for superfice in range(self.quantidadeSuperfice):                    
-                    bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
+                    control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
                                 self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 2, valores_geo)
-                    self.inp[superfice], self.inp_Axo[superfice], self.outp[superfice] = bspline.main()
+                    self.inp[superfice], self.inp_Axo[superfice], self.outp[superfice] = control.main()
                     
-                self.desenhar_superficie()
+              
 
         tk.Button(janela, text="Atualizar", command=Salvar).grid(row=2, columnspan=3)
 
@@ -499,7 +497,7 @@ class Interface:
         janela.title("Escala")       
 
         tk.Label(janela, text="Aumentar em:").grid(row=0, column=0)
-        entrada_x = tk.Spinbox(janela, from_=0, to=500, increment=1, width=10)
+        entrada_x = tk.Spinbox(janela, from_=2, to=500, increment=1, width=10)
         entrada_x.grid(row=1, column=0)
 
         def Salvar():
@@ -508,15 +506,15 @@ class Interface:
                 
                 for superfice in range(self.quantidadeSuperfice):   
                     #print(self.inp[superfice])                 
-                    bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
+                    control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
                                 self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,1,x)
-                    self.inp[superfice] , self.inp_Axo[superfice], self.outp[superfice] = bspline.main()
+                    self.inp[superfice] , self.inp_Axo[superfice], self.outp[superfice] = control.main()
                    
 
                     #print("\n",self.inp[superfice])
                     
 
-                self.desenhar_superficie()
+                
             
         tk.Button(janela, text="Atualizar", command=Salvar).grid(row=2, columnspan=3)
     def translacao(self):
@@ -543,12 +541,12 @@ class Interface:
                 valores_geo.append((x,y,z))
                 # Calcula a superfície B-Spline
                 for superfice in range(self.quantidadeSuperfice):                    
-                    bspline = BSplines(self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
+                    control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
                                 self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,3,valores_geo)
-                    self.inp[superfice] ,self.inp_Axo[superfice], self.outp[superfice]= bspline.main()
+                    self.inp[superfice] ,self.inp_Axo[superfice], self.outp[superfice]= control.main()
                     
                    
-                self.desenhar_superficie()
+               
 
         tk.Button(janela, text="Atualizar", command=Salvar).grid(row=2, columnspan=3)
     
@@ -579,10 +577,10 @@ class Interface:
             for j in range(self.pontos_controleY[self.superficie_selecionada] + 1):
                 x = self.inp_Axo[self.superficie_selecionada][i][j][0]
                 y = self.inp_Axo[self.superficie_selecionada][i][j][1] 
-                #print (x ,  y)
+                print (x ,  y)
                 self.canvas.create_oval(x-3, y-3, x+3, y+3, fill="red")
             
-    def desenhar_superficie(self):
+    '''def desenhar_superficie(self):
         """Desenha a superfície B-Spline no Canvas."""
         self.canvas.delete("all")      
         # Desenha a superfície usando linhas
@@ -594,7 +592,7 @@ class Interface:
                     
            
             pintor = Pintor_dist(self.outp[superfice], self.VRP,self.canvas,self.viewport)
-            pintor.controle(faces)         
+            pintor.controle(faces)'''         
         
         
         
@@ -606,24 +604,27 @@ class Interface:
         self.inp[self.superficie_selecionada] = []
         self.inp_Axo = {}
         self.inp_Axo[self.superficie_selecionada] = []  
-
+        self.canvas.delete("all")
         self.criar_pontos_controle()
-        
+                          
+        control = Controle(self.canvas, self.pontos_controleX[self.superficie_selecionada], self.pontos_controleY[self.superficie_selecionada], self.TI[self.superficie_selecionada], self.TJ[self.superficie_selecionada], self.RESOLUTIONI[self.superficie_selecionada], self.RESOLUTIONJ[self.superficie_selecionada], 
+                          self.inp[self.superficie_selecionada],self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
+        _ , self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
         # Calcula a superfície B-Spline
-        bspline = BSplines(self.pontos_controleX[self.superficie_selecionada], self.pontos_controleY[self.superficie_selecionada],  self.TI[self.superficie_selecionada], self.TJ[self.superficie_selecionada], self.RESOLUTIONI[self.superficie_selecionada], self.RESOLUTIONJ[self.superficie_selecionada],
-                           self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
-        _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
+        #bspline = BSplines(self.pontos_controleX[self.superficie_selecionada], self.pontos_controleY[self.superficie_selecionada],  self.TI[self.superficie_selecionada], self.TJ[self.superficie_selecionada], self.RESOLUTIONI[self.superficie_selecionada], self.RESOLUTIONJ[self.superficie_selecionada],
+        #                   self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
+        #self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = bspline.main()
         
        
         #print("\n\nPontos da superfície:", self.outp)
         #print("\n\nPontos de controle:", self.inp_Axo)
         
 
-        self.desenhar_superficie()
+        #self.desenhar_superficie()
 
 if __name__ == "__main__":
     # Parâmetros da superfície
-    pontos_controleX, pontos_controleY = 20, 20 
+    pontos_controleX, pontos_controleY = 4, 4 
     TI, TJ = 4, 4  
     RESOLUTIONI, RESOLUTIONJ = 20, 20  
     espacamento = 20

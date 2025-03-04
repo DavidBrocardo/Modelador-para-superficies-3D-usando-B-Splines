@@ -5,7 +5,7 @@ class Recorte3D:
         self.vertices = vertices
 
     def Recortar3D(self):
-        
+        recortou = False
         nova_matriz = [[], [], [],[]]
         for i in range(len(self.vertices[0])):  
             x = self.vertices[0][i]  
@@ -17,9 +17,11 @@ class Recorte3D:
                 nova_matriz[1].append(y)
                 nova_matriz[2].append(z)  #mantido
                 nova_matriz[3].append(1)
+            else: 
+                recortou = True
         
 
-        return nova_matriz
+        return nova_matriz,recortou
 
 
 if __name__ == "__main__":
