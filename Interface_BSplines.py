@@ -487,6 +487,7 @@ class Interface:
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
                                 self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 2, valores_geo)
                     self.inp[superfice], self.inp_Axo[superfice], self.outp[superfice] = control.main()
+                    #print(self.inp[superfice],"\n", self.inp_Axo[superfice],"\n" ,self.outp[superfice])
                     
               
 

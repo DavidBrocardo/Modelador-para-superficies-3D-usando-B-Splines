@@ -1,3 +1,4 @@
+import math
 from Superfice_BSplines import BSplines
 from Pintor_dist import Pintor_dist
 from Recorte2D import Recorte2D
@@ -40,39 +41,42 @@ class Controle:
                 vertices_covertido[3].append(1)
         return vertices_covertido        
     
+
     def converter_vertices_superfice(self, lista_vertices):
-            indice = 0
-            saida = []
-            for i in range(self.RESOLUTIONI):
-                linha = []
-                for j in range(self.RESOLUTIONJ):
-                    indice = i * self.RESOLUTIONJ + j
-                    elemento = [lista_vertices[0][indice] ,
-                                lista_vertices[1][indice] ,
-                                lista_vertices[2][indice] ]  
-                             
-                    linha.append(elemento)
-                saida.append(linha)
-            return saida
-    
+        indice = 0
+        saida = []
+        for i in range(self.RESOLUTIONI):
+            linha = []
+            for j in range(self.RESOLUTIONJ):
+                indice = i * self.RESOLUTIONJ + j
+                elemento = [
+                    math.ceil(lista_vertices[0][indice] * 1000) / 1000,
+                    math.ceil(lista_vertices[1][indice] * 1000) / 1000,
+                    math.ceil(lista_vertices[2][indice] * 1000) / 1000,
+                ]
+                linha.append(elemento)
+            saida.append(linha)
+        return saida
+
     def converter_pontos_superfice(self, lista_vertices):
-            indice = 0
-            saida_inp = []
-            saida_projetado =[]
-            for i in range(self.pontos_controleX + 1):
-                linha = []
-                for j in range(self.pontos_controleY + 1):
-                    indice = i * (self.pontos_controleY + 1) + j
-                    # projecao[0], projecao[1], projecao[2] contêm as coordenadas projetadas (desconsiderando W)
-                    elemento = [lista_vertices[0][indice],
-                                lista_vertices[1][indice],
-                                lista_vertices[2][indice]]
-                    #print(elemento)
-                    linha.append(elemento)
-                if self.atualizarInp:
-                    saida_inp.append(linha)
-                saida_projetado.append(linha) 
-            return saida_projetado, saida_inp
+        indice = 0
+        saida_projetado = []
+        for i in range(self.pontos_controleX + 1):
+            linha = []
+            for j in range(self.pontos_controleY + 1):
+                indice = i * (self.pontos_controleY + 1) + j
+                # projecao[0], projecao[1], projecao[2] contêm as coordenadas projetadas (desconsiderando W)
+                elemento = [
+                    lista_vertices[0][indice],
+                    lista_vertices[1][indice],
+                    lista_vertices[2][indice]
+                ]
+                linha.append(elemento)
+            
+            saida_projetado.append(linha)
+        
+        return saida_projetado
+
 
     def axonometrica(self,entrada,pontos):       
         if pontos:
@@ -82,10 +86,9 @@ class Controle:
             projecao = projecao.main() 
             self.inp_projetado = []
             if self.atualizarInp:
-                self.inp = []
-                self.inp_projetado,self.inp = self.converter_pontos_superfice(projecao)   
+                self.inp_projetado= self.converter_pontos_superfice(projecao)   
             else:
-                self.inp_projetado, _ = self.converter_pontos_superfice(projecao)   
+                self.inp_projetado= self.converter_pontos_superfice(projecao)   
             
         else:
             #vertices=[]      
@@ -127,7 +130,7 @@ class Controle:
             resul_rotacao_y = operacao.Rotacao_em_y(y)
             operacao = Transformacoes_Geometricas(resul_rotacao_y) 
             resul_rotacao_z_pontos = operacao.Rotacao_em_z(z)
-
+            #print("\n\n", resul_rotacao_z_superfice)
             return resul_rotacao_z_superfice, resul_rotacao_z_pontos
 
         if self.geometrica == 3: # TRANSLACAO
@@ -147,7 +150,7 @@ class Controle:
         vertice_superfice = []
         vertice_superfice = self.converter_vertices_superfice(vertices)
         self.Faces = []
-        self.Faces_visi_centroide = []
+        self.Faces_visi_centroide = {}
         for i in range(self.RESOLUTIONI - 1):            
             vertices_face = []
 
@@ -158,16 +161,18 @@ class Controle:
                 vertices_face.append(vertice_superfice[i+1][j]) 
                 #Recorte 3D      
                 #print(vertices_face)      
-                #recorte = Recorte3D(0, 600, pontos)
-                #vertices,recortou = recorte.Recortar3D() #Fazer um tratamento para tirar toda a face
+                recorte = Recorte3D(0, 600, vertices_face)
+                vertices,recortou = recorte.Recortar3D() #Fazer um tratamento para tirar toda a face
                 recortou =False
                 if not(recortou):
                     #Visibilidade
                     visi= Visibilidade_Normal(vertices_face,[[0,1,2,3]],self.VRP[:-1],True) 
-                    visibilidade = visi.main()
+                    visibilidade , centroide= visi.main()
                     self.Faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
-                    self.Faces_visi_centroide.append(visibilidade)
-            
+                    chave = ((i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j))
+                    self.Faces_visi_centroide[chave] = []
+                    self.Faces_visi_centroide[chave].append([(visibilidade),(centroide)])
+        
 
                 #ACHO QUE TALVEZ SEJA LEGAL JA CHAMAR O SOBREAMENTO AQUI, JA TEM O CENTROIDE POR EXEMPLO
         return  
@@ -179,6 +184,7 @@ class Controle:
 
         #CRIAR A SUPERFICE 
         # Calcula a superfície B-Spline
+        #print("comeco \n\n", self.inp)
         bspline = BSplines(self.pontos_controleX, self.pontos_controleY ,self.TI, self.TJ, self.RESOLUTIONI, self.RESOLUTIONJ,
                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
         self.pontos_SRU,  self.Superfice_SRU = bspline.main()
@@ -192,9 +198,12 @@ class Controle:
         # 1) Objetos modelados em SRU
         #   a.Transformações geométricas (rotações, translações, escalas, cisalhamentos, etc. aplicada ao objeto).
         if self.geometrica != 0:
-            print("jacu")
             matriz_superfice , matriz_pontos = self.transformacoes_Geometricas(matriz_superfice,matriz_pontos)        
-
+            
+            self.inp = []
+            self.inp = self.converter_pontos_superfice(matriz_pontos)
+            
+        
         # 2) Pré-cálculos 
         #   a. Centróides de faces e de objetos
         #       i. Recorte (3D) dos objetos que estejam antes do plano Near e depois do plano Far.
@@ -222,22 +231,33 @@ class Controle:
         for i in range(self.RESOLUTIONI - 1):
             for j in range(self.RESOLUTIONJ - 1):
                 faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
-
+        
         pintor = Pintor_dist(self.outp, self.VRP, self.tela,self.viewport)           
-        faces_ordenadas = pintor.calcular_dists_e_ordenar_faces(faces)
-
+        faces_ordenadas = pintor.calcular_dists_e_ordenar_faces(self.Faces)
+        #print("\n\n AQUI")
         for _, face in faces_ordenadas:
             pontos = []
+            chave = tuple(face)
+            
             for i in face:
                 xi, yi = i
+                #print(xi,yi)
                 x = self.outp[xi][yi][0]  # Coordenada X do vértice
                 y = self.outp[xi][yi][1]  # Coordenada Y do vértice
                 z = self.outp[xi][yi][2]  # Coordenada z do vértice
                 pontos.append((x, y, z))
+            
+            visivel = self.Faces_visi_centroide[chave][0][0]
+            print(visivel[0])
+            if visivel[0] >= 0:
+                color = "Green"
+            else:
+                color = "Red"
 
             #   a. Recorte 2D
             recorte = Recorte2D(self.viewport, pontos)
             poligono_recortado = recorte.Recortar_total()
+            #print(poligono_recortado)
 
             #   b. Algoritmo da scanline (Associar neste algoritmo z-buffer e o algoritmo de rasterização – Fillpoly)
             #       i. Constante: Usar o fillpoly com a cor pré-computada anteriormente;
@@ -254,14 +274,16 @@ class Controle:
                 for i in reversed(poligono_recortado):
                     if cond :
                         x2, y2, z2 = i
-                        self.tela.create_line(x1, y1, x2, y2, fill="black", width=1)
+                        self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
                         cond  = False
                     else:
                         x1, y1, z1 = i
-                        self.tela.create_line(x2, y2, x1, y1, fill="black", width=1)
+                        self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
                         x2 = x1
                         y2 = y1
-
+        #print(self.inp)
+        #print("\n\n Fim \n\n", self.inp)
+        #print("\n\n Fim \n\n", self.inp_projetado)
         return self.inp, self.inp_projetado, self.outp
         
         

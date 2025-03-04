@@ -72,6 +72,8 @@ class BSplines:
                     for kj in range(self.NJ + 1):
                         bi = self.calcular_blend(ki, self.TI, self.knotsI, intervaloI)
                         bj = self.calcular_blend(kj, self.TJ, self.knotsJ, intervaloJ)
+                        
+
                         x += self.inp[ki][kj][0] * bi * bj
                         y += self.inp[ki][kj][1] * bi * bj
                         z += self.inp[ki][kj][2] * bi * bj

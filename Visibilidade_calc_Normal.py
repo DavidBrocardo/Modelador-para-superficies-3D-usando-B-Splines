@@ -87,14 +87,14 @@ class Visibilidade_Normal:
 
             vets_de_observacao_faces.append(VetorO_unitario) 
            
-        return vets_de_observacao_faces
+        return vets_de_observacao_faces, centroide
 
     def main(self):
 
         vets_normais = self.Calcular_vet_normal_das_faces(self.vertices, self.indices_faces)
-        vets_observacao = self.Calcular_vet_observacao_face(self.VRP, self.vertices, self.indices_faces)
+        vets_observacao , centroide = self.Calcular_vet_observacao_face(self.VRP, self.vertices, self.indices_faces)
         produtos_escalares = [np.dot(vn, vo) for vn, vo in zip(vets_normais, vets_observacao)] #gpt cantou
-        return produtos_escalares
+        return produtos_escalares, centroide
     
 if __name__ == "__main__":
    
