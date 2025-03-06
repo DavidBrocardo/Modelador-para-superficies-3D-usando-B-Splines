@@ -111,7 +111,7 @@ class Controle:
                 resul_escala_pontos = operacao.Escala(self.valores_geo)
                 #self.converter_pontos_superfice(resul_escala,True)
                 #print (vertices)
-                print ("Escala em " , self.valores_geo)
+                #print ("Escala em " , self.valores_geo)
                 return resul_escala_superfice, resul_escala_pontos
             else:
                 return vertices, pontos
@@ -152,26 +152,26 @@ class Controle:
         self.Faces = []
         self.Faces_visi_centroide = {}
         for i in range(self.RESOLUTIONI - 1):            
-            vertices_face = []
-
+            
             for j in range(self.RESOLUTIONJ - 1):
+                vertices_face = []
                 vertices_face.append(vertice_superfice[i][j])
                 vertices_face.append(vertice_superfice[i][j+1]) 
                 vertices_face.append(vertice_superfice[i+1][j+1]) 
                 vertices_face.append(vertice_superfice[i+1][j]) 
+                
                 #Recorte 3D      
                 #print(vertices_face)      
-                recorte = Recorte3D(0, 600, vertices_face)
+                recorte = Recorte3D(-200, 200, vertices_face)
                 vertices,recortou = recorte.Recortar3D() #Fazer um tratamento para tirar toda a face
-                recortou =False
-                if not(recortou):
-                    #Visibilidade
-                    visi= Visibilidade_Normal(vertices_face,[[0,1,2,3]],self.VRP[:-1],True) 
-                    visibilidade , centroide= visi.main()
-                    self.Faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
-                    chave = ((i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j))
-                    self.Faces_visi_centroide[chave] = []
-                    self.Faces_visi_centroide[chave].append([(visibilidade),(centroide)])
+                
+                #Visibilidade
+                visi= Visibilidade_Normal(vertices_face,[[0,1,2,3]],self.VRP[:-1],True) 
+                visibilidade , centroide= visi.main()
+                self.Faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
+                chave = ((i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j))
+                self.Faces_visi_centroide[chave] = []
+                self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(recortou)])
         
 
                 #ACHO QUE TALVEZ SEJA LEGAL JA CHAMAR O SOBREAMENTO AQUI, JA TEM O CENTROIDE POR EXEMPLO
@@ -209,6 +209,8 @@ class Controle:
         #       i. Recorte (3D) dos objetos que estejam antes do plano Near e depois do plano Far.
         #   b. Vetores normais das faces
         self.facePorFace(matriz_superfice)    
+        pintor = Pintor_dist(self.converter_vertices_superfice(matriz_superfice), self.VRP, self.tela, self.viewport)           
+        faces_ordenadas = pintor.calcular_dists_e_ordenar_faces(self.Faces)
 
         #   c. Sombreamento constante
         #       i. Computar o valor de iluminação total (cor) de cada face
@@ -227,16 +229,17 @@ class Controle:
         # 4) Aplicar o teste de visibilidade pelo cálculo da normal para cada face de objeto restante.
         self.tela.delete("all") 
         # -- Aplicando o Algoritmo do Pintor -- 
-        faces=[]
-        for i in range(self.RESOLUTIONI - 1):
-            for j in range(self.RESOLUTIONJ - 1):
-                faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
+        #faces=[]
+        #for i in range(self.RESOLUTIONI - 1):
+        #    for j in range(self.RESOLUTIONJ - 1):
+        #        faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
         
-        pintor = Pintor_dist(self.outp, self.VRP, self.tela,self.viewport)           
-        faces_ordenadas = pintor.calcular_dists_e_ordenar_faces(self.Faces)
+        #pintor = Pintor_dist(self.outp, self.VRP, self.tela,self.viewport)           
+        #faces_ordenadas = pintor.calcular_dists_e_ordenar_faces(self.Faces)
         #print("\n\n AQUI")
+
         for _, face in faces_ordenadas:
-            pontos = []
+            pontos = []            
             chave = tuple(face)
             
             for i in face:
@@ -247,40 +250,46 @@ class Controle:
                 z = self.outp[xi][yi][2]  # Coordenada z do vértice
                 pontos.append((x, y, z))
             
-            visivel = self.Faces_visi_centroide[chave][0][0]
-            print(visivel[0])
-            if visivel[0] >= 0:
-                color = "Green"
-            else:
-                color = "Red"
+            recortou = self.Faces_visi_centroide[chave][0][2]
+            visibilidadeSRU = self.Faces_visi_centroide[chave][0][0]
+            #recortou = False
+            if not(recortou):
+                
+                #visi= Visibilidade_Normal(pontos,[[0,1,2,3]],self.VRP[:-1],True)
+                #visibilidade , centroide= visi.main()
+                
+                if visibilidadeSRU[0] >= 0:
+                    color = "Green"
+                else:
+                    color = "Red"
 
-            #   a. Recorte 2D
-            recorte = Recorte2D(self.viewport, pontos)
-            poligono_recortado = recorte.Recortar_total()
+                #   a. Recorte 2D
+                recorte = Recorte2D(self.viewport, pontos)
+                poligono_recortado = recorte.Recortar_total()
             #print(poligono_recortado)
 
             #   b. Algoritmo da scanline (Associar neste algoritmo z-buffer e o algoritmo de rasterização – Fillpoly)
             #       i. Constante: Usar o fillpoly com a cor pré-computada anteriormente;
-            FillPoly(poligono_recortado,self.tela,"white")
+                FillPoly(poligono_recortado,self.tela,"white")
              #       ii. Gouraud: Usar o fillpoly interpolando as cores dos vértices que foram pré-calculadas;
         
             #       iii. Phong: Usar o fillpoly interpolando os vetores normais dos vértices que foram pré-calculados e, na sequência, calcular a iluminação total (cor) em cada pixel.
 
             # -- Desenhar a  superfice --             
 
-            if len(poligono_recortado) != 0:
-                x1, y1, z1 = poligono_recortado[0]
-                cond = True
-                for i in reversed(poligono_recortado):
-                    if cond :
-                        x2, y2, z2 = i
-                        self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
-                        cond  = False
-                    else:
-                        x1, y1, z1 = i
-                        self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
-                        x2 = x1
-                        y2 = y1
+                if len(poligono_recortado) != 0:
+                    x1, y1, z1 = poligono_recortado[0]
+                    cond = True
+                    for i in reversed(poligono_recortado):
+                        if cond :
+                            x2, y2, z2 = i
+                            self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
+                            cond  = False
+                        else:
+                            x1, y1, z1 = i
+                            self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
+                            x2 = x1
+                            y2 = y1
         #print(self.inp)
         #print("\n\n Fim \n\n", self.inp)
         #print("\n\n Fim \n\n", self.inp_projetado)

@@ -561,6 +561,9 @@ class Interface:
         for i in range(self.pontos_controleX[self.superficie_selecionada] + 1):
             linha = []
             for j in range(self.pontos_controleY[self.superficie_selecionada] + 1):
+                #x = (self.ponto_inicial[self.superficie_selecionada][0] + i)
+                #y = (self.ponto_inicial[self.superficie_selecionada][0] + i)
+                z =(random.randint(0, 9999) / 5000.0) - 1
                 x = (self.ponto_inicial[self.superficie_selecionada][0] + i) * self.espacamento
                 y = random.uniform(-10, 10)  # Altura aleatória 
                 z = (self.ponto_inicial[self.superficie_selecionada][2] + j) * self.espacamento
@@ -576,6 +579,7 @@ class Interface:
         # Desenha os pontos de controle
         for i in range(self.pontos_controleX[self.superficie_selecionada] + 1):
             for j in range(self.pontos_controleY[self.superficie_selecionada] + 1):
+
                 x = self.inp_Axo[self.superficie_selecionada][i][j][0]
                 y = self.inp_Axo[self.superficie_selecionada][i][j][1] 
                 print (x ,  y)
@@ -629,7 +633,7 @@ if __name__ == "__main__":
     TI, TJ = 4, 4  
     RESOLUTIONI, RESOLUTIONJ = 20, 20  
     espacamento = 20
-    VRP = [1, 1, 1, 1]
+    VRP = [20, 20, 20, 1]
     P = [0, 0, 0, 1]
     Y = [0, 1, 0]
     dp = 40

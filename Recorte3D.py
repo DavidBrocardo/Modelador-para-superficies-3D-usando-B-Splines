@@ -2,15 +2,28 @@ class Recorte3D:
     def __init__(self, znear, zfar, vertices):
         self.znear = znear
         self.zfar = zfar
-        self.vertices = vertices
+        self.vertices = self.converter_vertices(vertices)
+
+
+    def converter_vertices(self, lista_vertices):
+        vertices_covertido = [[], [], []]  
+        for linha in lista_vertices:  
+                x, y, z = linha 
+                vertices_covertido[0].append(x)
+                vertices_covertido[1].append(y)
+                vertices_covertido[2].append(z)
+        #print(vertices_covertido)
+        return vertices_covertido
 
     def Recortar3D(self):
         recortou = False
         nova_matriz = [[], [], [],[]]
         for i in range(len(self.vertices[0])):  
+            
             x = self.vertices[0][i]  
             y = self.vertices[1][i]
             z = self.vertices[2][i]  
+            
             #o poligono ta dentro do volume visivel ou nao
             if self.znear <= z <= self.zfar:
                 nova_matriz[0].append(x)
@@ -19,6 +32,8 @@ class Recorte3D:
                 nova_matriz[3].append(1)
             else: 
                 recortou = True
+                #print(self.vertices)
+                #print(x, y, z)
         
 
         return nova_matriz,recortou
