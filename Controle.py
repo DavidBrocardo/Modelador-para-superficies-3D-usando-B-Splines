@@ -9,7 +9,7 @@ from Transformacoes_Geometricas import Transformacoes_Geometricas
 from Recorte3D import Recorte3D
 
 class Controle:
-    def __init__(self,  tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P, Y, dp, windows, viewport,geometrica,valores_geo):
+    def __init__(self,  tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P, Y, dp, windows, viewport,geometrica,valores_geo,corFrente,corFundo):
                 
         # Parâmetros de controle
         self.inp = inp
@@ -29,6 +29,8 @@ class Controle:
         self.geometrica = geometrica
         self.valores_geo = valores_geo
         self.atualizarInp = False
+        self.cor_aresta_frente = corFrente  
+        self.cor_aresta_fundo = corFundo 
 
     def converter_vertices_tradicional(self, lista_vertices):
         vertices_covertido = [[], [], [],[]]  
@@ -161,17 +163,20 @@ class Controle:
                 vertices_face.append(vertice_superfice[i+1][j]) 
                 
                 #Recorte 3D      
-                #print(vertices_face)      
-                recorte = Recorte3D(-200, 200, vertices_face)
-                vertices,recortou = recorte.Recortar3D() #Fazer um tratamento para tirar toda a face
+                #print(self.VRP[2])  
                 
+                recorte = Recorte3D(-100000, 100000, vertices_face)
+                vertices,recortou = recorte.Recortar3D() #Fazer um tratamento para tirar toda a face
+                if not(recortou):
+                    self.recortou = recortou
+                    
                 #Visibilidade
                 visi= Visibilidade_Normal(vertices_face,[[0,1,2,3]],self.VRP[:-1],True) 
                 visibilidade , centroide= visi.main()
                 self.Faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
                 chave = ((i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j))
                 self.Faces_visi_centroide[chave] = []
-                self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(recortou)])
+                self.Faces_visi_centroide[chave].append([(visibilidade),(centroide)])
         
 
                 #ACHO QUE TALVEZ SEJA LEGAL JA CHAMAR O SOBREAMENTO AQUI, JA TEM O CENTROIDE POR EXEMPLO
@@ -208,9 +213,13 @@ class Controle:
         #   a. Centróides de faces e de objetos
         #       i. Recorte (3D) dos objetos que estejam antes do plano Near e depois do plano Far.
         #   b. Vetores normais das faces
-        self.facePorFace(matriz_superfice)    
-        pintor = Pintor_dist(self.converter_vertices_superfice(matriz_superfice), self.VRP, self.tela, self.viewport)           
-        faces_ordenadas = pintor.calcular_dists_e_ordenar_faces(self.Faces)
+        self.facePorFace(matriz_superfice)   
+        
+        #recortou = False
+            #print(recortou)
+        if not(self.recortou):
+            pintor = Pintor_dist(self.converter_vertices_superfice(matriz_superfice), self.VRP, self.tela, self.viewport)           
+            faces_ordenadas = pintor.calcular_dists_e_ordenar_faces(self.Faces)
 
         #   c. Sombreamento constante
         #       i. Computar o valor de iluminação total (cor) de cada face
@@ -221,13 +230,13 @@ class Controle:
 
         # 3) Aplicar as matrizes do pipeline (Converter objeto do SRU para o SRT)
             #PONTOS
-        self.axonometrica(matriz_pontos,True)          
-            #SUPERFICE
-        self.axonometrica(matriz_superfice,False)    
+            self.axonometrica(matriz_pontos,True)          
+                #SUPERFICE
+            self.axonometrica(matriz_superfice,False)    
 
 
         # 4) Aplicar o teste de visibilidade pelo cálculo da normal para cada face de objeto restante.
-        self.tela.delete("all") 
+        #self.tela.delete("all") 
         # -- Aplicando o Algoritmo do Pintor -- 
         #faces=[]
         #for i in range(self.RESOLUTIONI - 1):
@@ -238,30 +247,29 @@ class Controle:
         #faces_ordenadas = pintor.calcular_dists_e_ordenar_faces(self.Faces)
         #print("\n\n AQUI")
 
-        for _, face in faces_ordenadas:
-            pontos = []            
-            chave = tuple(face)
+            for _, face in faces_ordenadas:
+                pontos = []            
+                chave = tuple(face)
+                
+                for i in face:
+                    xi, yi = i
+                    #print(xi,yi)
+                    x = self.outp[xi][yi][0]  # Coordenada X do vértice
+                    y = self.outp[xi][yi][1]  # Coordenada Y do vértice
+                    z = self.outp[xi][yi][2]  # Coordenada z do vértice
+                    pontos.append((x, y, z))
+                
+                
+                visibilidadeSRU = self.Faces_visi_centroide[chave][0][0]
             
-            for i in face:
-                xi, yi = i
-                #print(xi,yi)
-                x = self.outp[xi][yi][0]  # Coordenada X do vértice
-                y = self.outp[xi][yi][1]  # Coordenada Y do vértice
-                z = self.outp[xi][yi][2]  # Coordenada z do vértice
-                pontos.append((x, y, z))
-            
-            recortou = self.Faces_visi_centroide[chave][0][2]
-            visibilidadeSRU = self.Faces_visi_centroide[chave][0][0]
-            #recortou = False
-            if not(recortou):
                 
                 #visi= Visibilidade_Normal(pontos,[[0,1,2,3]],self.VRP[:-1],True)
                 #visibilidade , centroide= visi.main()
                 
                 if visibilidadeSRU[0] >= 0:
-                    color = "Green"
+                    color = self.cor_aresta_frente
                 else:
-                    color = "Red"
+                    color = self.cor_aresta_fundo
 
                 #   a. Recorte 2D
                 recorte = Recorte2D(self.viewport, pontos)

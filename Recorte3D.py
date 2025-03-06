@@ -32,8 +32,7 @@ class Recorte3D:
                 nova_matriz[3].append(1)
             else: 
                 recortou = True
-                #print(self.vertices)
-                #print(x, y, z)
+                
         
 
         return nova_matriz,recortou
