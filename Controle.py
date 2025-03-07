@@ -7,6 +7,7 @@ from FillPoly import FillPoly
 from ProjecaoAxonometrica import ProjecaoAxonometrica
 from Transformacoes_Geometricas import Transformacoes_Geometricas
 from Recorte3D import Recorte3D
+from Sombreamento_constante import Sombreamento_constante
 
 class Controle:
     def __init__(self,  tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P, Y, dp, windows, viewport,geometrica,valores_geo,corFrente,corFundo):
@@ -31,6 +32,16 @@ class Controle:
         self.atualizarInp = False
         self.cor_aresta_frente = corFrente  
         self.cor_aresta_fundo = corFundo 
+
+        #---------Sombreamento--------------
+        self.ila = 120 
+        self.il = 150    
+        self.ka = 0.4   
+        self.kd = 0.7    
+        self.ks = 0.5  
+        self.n = 2.15     
+        self.luz_pos = [70, 20, 35]
+        
 
     def converter_vertices_tradicional(self, lista_vertices):
         vertices_covertido = [[], [], [],[]]  
@@ -162,9 +173,7 @@ class Controle:
                 vertices_face.append(vertice_superfice[i+1][j+1]) 
                 vertices_face.append(vertice_superfice[i+1][j]) 
                 
-                #Recorte 3D      
-                #print(self.VRP[2])  
-                
+                #Recorte 3D                    
                 recorte = Recorte3D(-100000, 100000, vertices_face)
                 vertices,recortou = recorte.Recortar3D() #Fazer um tratamento para tirar toda a face
                 if not(recortou):
@@ -172,14 +181,19 @@ class Controle:
                     
                 #Visibilidade
                 visi= Visibilidade_Normal(vertices_face,[[0,1,2,3]],self.VRP[:-1],True) 
-                visibilidade , centroide= visi.main()
+                visibilidade, centroide, vets_observacao , vets_normais = visi.main()
                 self.Faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
                 chave = ((i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j))
                 self.Faces_visi_centroide[chave] = []
-                self.Faces_visi_centroide[chave].append([(visibilidade),(centroide)])
-        
+                self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(vets_observacao),(vets_normais)])
 
-                #ACHO QUE TALVEZ SEJA LEGAL JA CHAMAR O SOBREAMENTO AQUI, JA TEM O CENTROIDE POR EXEMPLO
+                #Calculando o Sobreamento somente das faces visiveis
+                if visibilidade[0] >= 0:
+                    sombrear = Sombreamento_constante(self.ila, self.il, self.ka, self.kd, self.ks, self.n, self.luz_pos,
+                                                      centroide[0], vets_normais[0], vets_observacao[0])
+                    iluminacoes = sombrear.Calcular_iluminacao_total()  #Todas as iluminaçoes para serem aplicadas em cada face estão aqui, é uma lista
+                    print("Lens jacu sombreado", iluminacoes[0])
+               
         return  
 
 
