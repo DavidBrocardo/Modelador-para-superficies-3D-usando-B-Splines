@@ -24,8 +24,8 @@ class Zbuffer:
        if testar_e_atualizar_profundidade(x, y, z):  - se for true ele sombreia
           canvas[y, x] = color  '''
     # -Fill Poly: (essa explicacao GPT kkk)
-    '''for y in range(y_min, y_max):
-        for x in range(x1, x2):  # Supondo que x1 e x2 foram calculados para essa linha
+    '''for y in range(y_x):
+        for x in range(x1, xmin, y_ma2):  # Supondo que x1 e x2 foram calculados para essa linha
             z = interpolar_z(x, y, vertices, z_values)  # Interpola a profundidade
             if zbuffer.testar_e_atualizar_profundidade(x, y, z):  # Verifica o Z-Buffer
                 canvas[y, x] = color  # Desenha o pixel'''

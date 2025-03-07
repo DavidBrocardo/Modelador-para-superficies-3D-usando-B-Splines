@@ -175,7 +175,7 @@ class Controle:
                 
                 #Recorte 3D                    
                 recorte = Recorte3D(-100000, 100000, vertices_face)
-                vertices,recortou = recorte.Recortar3D() #Fazer um tratamento para tirar toda a face
+                vertices,recortou = recorte.Recortar3D() 
                 if not(recortou):
                     self.recortou = recortou
                     
@@ -206,6 +206,7 @@ class Controle:
         #print("comeco \n\n", self.inp)
         bspline = BSplines(self.pontos_controleX, self.pontos_controleY ,self.TI, self.TJ, self.RESOLUTIONI, self.RESOLUTIONJ,
                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
+        
         self.pontos_SRU,  self.Superfice_SRU = bspline.main()
         
         #TRANSFORMANDO EM FORMATO Padrao de Matriz 

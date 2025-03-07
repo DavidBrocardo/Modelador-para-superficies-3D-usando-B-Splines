@@ -86,33 +86,3 @@ class BSplines:
 
             
 
-if __name__ == "__main__":
-    pontos_controle = [
-    [(0, 0, 0), (3, 0, 2), (6, 0, 4), (9, 0, 6), (12, 0, 8), (15, 0, 10), (18, 0, 12)],
-    [(0, 3, 2), (3, 3, 4), (6, 3, 6), (9, 3, 8), (12, 3, 10), (15, 3, 12), (18, 3, 14)],
-    [(0, 6, 4), (3, 6, 6), (6, 6, 8), (9, 6, 10), (12, 6, 12), (15, 6, 14), (18, 6, 16)],
-    [(0, 9, 6), (3, 9, 8), (6, 9, 10), (9, 9, 12), (12, 9, 14), (15, 9, 16), (18, 9, 18)],
-    [(0, 12, 8), (3, 12, 10), (6, 12, 12), (9, 12, 14), (12, 12, 16), (15, 12, 18), (18, 12, 20)]
-    ]
-
-
-    import random
-    matriz_pontos = []
-    linhas = 5
-    colunas = 4
-    espacamento = 8
-    altura_max = 30
-    for i in range(linhas):
-        linha = []
-        for j in range(colunas):
-            x = i * espacamento
-            y = random.randint(0, altura_max)# Gera alturas aleatórias
-            z = j * espacamento  
-            linha.append((x, y, z))
-        matriz_pontos.append(linha)
-    acrescimo = 0.5
-    print(matriz_pontos)
-    bspline = BSplines(acrescimo, matriz_pontos)
-
-    matriz_curvas = bspline.main()
-    print(matriz_curvas)

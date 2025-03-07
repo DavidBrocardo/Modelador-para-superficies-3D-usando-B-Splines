@@ -71,7 +71,7 @@ class Interface:
         menu_superfice.add_command(label="Camera", command=self.definir_camera)
         menu_superfice.add_command(label="Viewport", command=self.definir_viewport)
         menu_superfice.add_command(label="Window", command=self.definir_windows)
-        menu_principal.add_cascade(label="Superfice", menu=menu_superfice)
+        menu_principal.add_cascade(label="Superficie", menu=menu_superfice)
         
         # Menu Transformações Geometricas
         menu_geometrico = tk.Menu(menu_principal, tearoff=0)
@@ -653,7 +653,7 @@ class Interface:
 
 if __name__ == "__main__":
     # Parâmetros da superfície
-    pontos_controleX, pontos_controleY = 4, 4 
+    pontos_controleX, pontos_controleY = 4, 10
     TI, TJ = 4, 4  
     RESOLUTIONI, RESOLUTIONJ = 20, 20  
     espacamento = 20
