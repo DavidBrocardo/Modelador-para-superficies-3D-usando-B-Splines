@@ -36,6 +36,7 @@ class Pintor_dist:
                          (self.VRP[2] - centroide[2])**2)
 
     def calcular_dists_e_ordenar_faces(self, indices_faces):
+        
         face_e_distancia = [(self.calcular_distancia_VRP_face(self.calcular_centroide_face(face)), face) for face in indices_faces]
         
         faces_ordenadas = sorted(face_e_distancia, key=lambda x: x[0], reverse=True)

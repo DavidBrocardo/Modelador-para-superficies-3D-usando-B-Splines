@@ -185,14 +185,19 @@ class Controle:
                 self.Faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
                 chave = ((i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j))
                 self.Faces_visi_centroide[chave] = []
-                self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(vets_observacao),(vets_normais)])
+                
+                
 
                 #Calculando o Sobreamento somente das faces visiveis
                 if visibilidade[0] >= 0:
                     sombrear = Sombreamento_constante(self.ila, self.il, self.ka, self.kd, self.ks, self.n, self.luz_pos,
                                                       centroide[0], vets_normais[0], vets_observacao[0])
+                    
                     iluminacoes = sombrear.Calcular_iluminacao_total()  #Todas as iluminaçoes para serem aplicadas em cada face estão aqui, é uma lista
-                    print("Lens jacu sombreado", iluminacoes[0])
+                    #print("Lens jacu sombreado", iluminacoes[0])
+                    self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(vets_observacao),(vets_normais),(iluminacoes)])
+                else:
+                    self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(vets_observacao),(vets_normais)])
                
         return  
 
@@ -293,7 +298,9 @@ class Controle:
 
             #   b. Algoritmo da scanline (Associar neste algoritmo z-buffer e o algoritmo de rasterização – Fillpoly)
             #       i. Constante: Usar o fillpoly com a cor pré-computada anteriormente;
-                FillPoly(poligono_recortado,self.tela,"white")
+                if visibilidadeSRU[0] >= 0:
+                    sombreamento = self.Faces_visi_centroide[chave][0][4]
+                    FillPoly(poligono_recortado,self.tela,"white",sombreamento[0])
              #       ii. Gouraud: Usar o fillpoly interpolando as cores dos vértices que foram pré-calculadas;
         
             #       iii. Phong: Usar o fillpoly interpolando os vetores normais dos vértices que foram pré-calculados e, na sequência, calcular a iluminação total (cor) em cada pixel.

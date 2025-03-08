@@ -6,9 +6,10 @@ class FillPoly:
     lista_intersecoess = {}
     vertices_poliginos = []
 
-    def __init__(self, poligino, tela, corPreenchimento):          
+    def __init__(self, poligino, tela, corPreenchimento, sobreamento):          
         self.tela = tela
-        self.cor = corPreenchimento       
+        cor_rgb = (sobreamento, sobreamento, sobreamento) 
+        self.cor  = self.rgb_para_hex(cor_rgb)
         self.y_min = 10000
         self.y_max = -1
         self.num_Scanlines = 0
@@ -23,6 +24,9 @@ class FillPoly:
         self.FillPoly_pinta()                
         return
             
+    def rgb_para_hex(self, rgb):
+        return "#{:02X}{:02X}{:02X}".format(int(rgb[0]), int(rgb[1]), int(rgb[2]))
+    
     def scanlines(self):           
         
         FillPoly.lista_intersecoess = {}
