@@ -98,39 +98,30 @@ class Visibilidade_Normal:
     
 if __name__ == "__main__":
    
+    vertices = [[21.2, 34.1, 18.8, 5.9, 20],
+                [0.7,  3.4,  5.6,  2.9, 20.9],
+                [42.3, 27.2, 14.6, 29.7,31.6],
+                [  1,   1 ,   1,     1,  1]]
     
-    
-    indices_faces = [ [0,1,2,3]] #Os vertices de cada face, ex: Face ABE(Face 014)
+    indices_faces = [ [0,1,4],[1,2,4],[2,3,4],[3,0,4],[0,3,2,1] ] #Os vertices de cada face, ex: Face ABE(Face 014)
 
-    vertices =  [(147.65903385378255, 313.9165890311658, 30.326237147066724),
-                (114.1610657194264, 328.7452796783735, 42.542635931800135),
-                (179.57282438145648, 356.40754056424265, 66.76365340967062), 
-                (213.07079251581263, 347.49360951923575, 52.874307975415476)]
-    
-    vertices =  [(21.2, 0.7, 42.3),
-                 (5.9, 2.9, 29.7 ),
-                 (18.8, 5.6, 14.6),
-                 (34.1, 3.4, 27.2)
-                ]
-    
-    	
-
-    
     VRP = [25, 15, 80]   
 
-    visi = Visibilidade_Normal(vertices, indices_faces,VRP ,True) #instancia da classe, so funfa assim
+    visi = Visibilidade_Normal(vertices, indices_faces,VRP ,False) #instancia da classe, so funfa assim
+    
+    vets_normais = visi.Calcular_vet_normal_das_faces(vertices, indices_faces)
     visibilidade, centroide, vets_observacao , vets_normais = visi.main()
 
-    #print(np.array(vets_observacao))  #printa como uma matriz numpy (mais facil assim)
+    produtos_escalares = [np.dot(vn, vo) for vn, vo in zip(vets_normais, vets_observacao)] #gpt cantou
 
-    #print("\n")
-    print(f"Centroide da face : {centroide} ")
-    print(vets_observacao[0])
-    print(vets_normais[0])
-    
-    if visibilidade[0] >= 0:
-        print(f"Produto escalar da face : {visibilidade} --> A face é Visível!")
-    else:
-        print(f"Produto escalar da face : {visibilidade} --> A face não é visível!")
 
     print("\n")
+
+    for i, produto in enumerate(produtos_escalares):
+        if produto >= 0:
+            print(f"Produto escalar da face {i}: {produto:.3f} --> A face é Visível!")
+        else:
+            print(f"Produto escalar da face {i}: {produto:.3f} --> A face não é visível!")
+
+    print("\n")
+    

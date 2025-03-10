@@ -14,6 +14,7 @@ class Controle:
                 
         # Parâmetros de controle
         self.inp = inp
+       
         self.tela = tela
         self.pontos_controleX= pontos_controleX
         self.pontos_controleY= pontos_controleY
@@ -40,7 +41,7 @@ class Controle:
         self.kd = 0.7    
         self.ks = 0.5  
         self.n = 2.15     
-        self.luz_pos = [70, 20, 35]
+        self.luz_pos = [80, 80, 80]
         
 
     def converter_vertices_tradicional(self, lista_vertices):
@@ -63,9 +64,9 @@ class Controle:
             for j in range(self.RESOLUTIONJ):
                 indice = i * self.RESOLUTIONJ + j
                 elemento = [
-                    math.ceil(lista_vertices[0][indice] * 1000) / 1000,
-                    math.ceil(lista_vertices[1][indice] * 1000) / 1000,
-                    math.ceil(lista_vertices[2][indice] * 1000) / 1000,
+                    lista_vertices[0][indice],
+                    lista_vertices[1][indice],
+                    lista_vertices[2][indice],
                 ]
                 linha.append(elemento)
             saida.append(linha)
@@ -95,7 +96,7 @@ class Controle:
         if pontos:
             #vertices=[]
             #vertices = self.converter_vertices_tradicional(entrada)
-            projecao = ProjecaoAxonometrica(entrada, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+            projecao = ProjecaoAxonometrica(entrada, self.VRP, self.P, self.Y, self.windows, self.viewport)
             projecao = projecao.main() 
             self.inp_projetado = []
             if self.atualizarInp:
@@ -106,7 +107,7 @@ class Controle:
         else:
             #vertices=[]      
             #vertices = self.converter_vertices_tradicional(self.outp)                   
-            projecao = ProjecaoAxonometrica(entrada, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport)
+            projecao = ProjecaoAxonometrica(entrada, self.VRP, self.P, self.Y,  self.windows, self.viewport)
             projecao = projecao.main() 
             self.outp = []
             self.outp = self.converter_vertices_superfice(projecao)
@@ -180,8 +181,10 @@ class Controle:
                     self.recortou = recortou
                     
                 #Visibilidade
+                #print(vertices_face)
                 visi= Visibilidade_Normal(vertices_face,[[0,1,2,3]],self.VRP[:-1],True) 
                 visibilidade, centroide, vets_observacao , vets_normais = visi.main()
+                #print(visibilidade)
                 self.Faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
                 chave = ((i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j))
                 self.Faces_visi_centroide[chave] = []
@@ -285,41 +288,68 @@ class Controle:
                 
                 #visi= Visibilidade_Normal(pontos,[[0,1,2,3]],self.VRP[:-1],True)
                 #visibilidade , centroide= visi.main()
-                
-                if visibilidadeSRU[0] >= 0:
-                    color = self.cor_aresta_frente
-                else:
-                    color = self.cor_aresta_fundo
 
                 #   a. Recorte 2D
                 recorte = Recorte2D(self.viewport, pontos)
                 poligono_recortado = recorte.Recortar_total()
+
+               
+
+                if visibilidadeSRU[0] >= 0:
+                    sombreamento = self.Faces_visi_centroide[chave][0][4]
+                    FillPoly(poligono_recortado,self.tela,sombreamento[0], True)
+
+                    color = self.cor_aresta_frente
+                    if len(poligono_recortado) != 0:
+                        x1, y1, z1 = poligono_recortado[0]
+                        cond = True
+                        for i in reversed(poligono_recortado):
+                            if cond :
+                                x2, y2, z2 = i
+                                self.tela.create_line(x1, y1, x2, y2, fill=color, width=2)
+                                cond  = False
+                            else:
+                                x1, y1, z1 = i
+                                self.tela.create_line(x2, y2, x1, y1, fill=color, width=2)
+                                x2 = x1
+                                y2 = y1
+                    
+                    
+                else:
+                    FillPoly(poligono_recortado,self.tela,0, False)
+                    color = self.cor_aresta_fundo
+                    if len(poligono_recortado) != 0:
+                        x1, y1, z1 = poligono_recortado[0]
+                        cond = True
+                        for i in reversed(poligono_recortado):
+                            if cond :
+                                x2, y2, z2 = i
+                                self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
+                                cond  = False
+                            else:
+                                x1, y1, z1 = i
+                                self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
+                                x2 = x1
+                                y2 = y1
+                    
+                    
+                
+                
+                
             #print(poligono_recortado)
 
             #   b. Algoritmo da scanline (Associar neste algoritmo z-buffer e o algoritmo de rasterização – Fillpoly)
             #       i. Constante: Usar o fillpoly com a cor pré-computada anteriormente;
-                if visibilidadeSRU[0] >= 0:
-                    sombreamento = self.Faces_visi_centroide[chave][0][4]
-                    FillPoly(poligono_recortado,self.tela,"white",sombreamento[0])
+                
+                            
+                    
              #       ii. Gouraud: Usar o fillpoly interpolando as cores dos vértices que foram pré-calculadas;
         
             #       iii. Phong: Usar o fillpoly interpolando os vetores normais dos vértices que foram pré-calculados e, na sequência, calcular a iluminação total (cor) em cada pixel.
 
             # -- Desenhar a  superfice --             
 
-                if len(poligono_recortado) != 0:
-                    x1, y1, z1 = poligono_recortado[0]
-                    cond = True
-                    for i in reversed(poligono_recortado):
-                        if cond :
-                            x2, y2, z2 = i
-                            self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
-                            cond  = False
-                        else:
-                            x1, y1, z1 = i
-                            self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
-                            x2 = x1
-                            y2 = y1
+                
         #print(self.inp)
         #print("\n\n Fim \n\n", self.inp)
         #print("\n\n Fim \n\n", self.inp_projetado)

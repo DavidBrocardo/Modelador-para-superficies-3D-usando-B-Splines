@@ -2,7 +2,7 @@ import math
 
 class ProjecaoAxonometrica:
    
-    def __init__(self, vertices, VRP, P, Y, dp, windows, viewport):
+    def __init__(self, vertices, VRP, P, Y, windows, viewport):
         # Inicializando variaveis
         #self.vertices = vertices
         self.vertices = vertices
@@ -10,7 +10,6 @@ class ProjecaoAxonometrica:
         self.VRP = VRP
         self.P = P
         self.Y = Y
-        self.dp = dp
         self.windows = windows
         self.viewport = viewport
 
@@ -64,12 +63,14 @@ class ProjecaoAxonometrica:
         #Calculo realizado abaixo : N = VRP -P
         for i in range(3):
             N[i] = self.VRP[i] - self.P[i]
+            
             n_quadrado += N[i] **2
-
+        #print("N", N)
         #Calculo realizado abaixo : n = N/|N|
         n_quadrado = math.sqrt(n_quadrado)
         n_unitario = self.Unitario(N, n_quadrado )
-        
+        #print("n_unitario", n_unitario)
+        #print("|N|", n_quadrado)
         #Calculo realizado abaixo : V = Y - (Y.n).n
         mult_YN = 0
         v_quadrado= 0
@@ -81,10 +82,12 @@ class ProjecaoAxonometrica:
             v_quadrado += V[i] **2
         v_quadrado = math.sqrt(v_quadrado)
         v_unitario = self.Unitario(V, v_quadrado )    
-        
+        #print("V ", V)
+        #print("v_unitario", v_unitario)
+        #print("|V| ", v_quadrado)
         #Calculo realizado abaixo : u =  v x n 
         u = self.calcular_produto_vetorial(v_unitario, n_unitario)
-
+        #print("u:", u)
         #Calculo realizado abaixo : M(SRU, SRC) = R.T        
         matriz_R = [
             u + [0],
@@ -99,7 +102,9 @@ class ProjecaoAxonometrica:
             [0, 0 , 0, 1]
         ]
         matriz_SRC = self.calcula_Mult_Matriz(matriz_R,matriz_T) # Matriz SRC  = R * T
-                       
+        #print("\nMatriz R" , matriz_R)               
+        #print("\nMatriz T" , matriz_T)
+        #print("\nMatriz SRC" , matriz_SRC)  
         #Ultima etapa da PROJEÇÃO AXONOMÉTRICA
         M_proj = [
             [1, 0 , 0, 0],
@@ -113,7 +118,7 @@ class ProjecaoAxonometrica:
         [0,	0,	1,	0],
         [0,	0,	0,	1]
         ]
-
+        #print("\nMatriz Transformacao ", M_jp)
         #Calculo realizado abaixo : matriz_SRTSRU =  M_jp * (M_proj*matriz_SRC)
         matriz_SRT = self.calcula_Mult_Matriz(M_jp, self.calcula_Mult_Matriz(M_proj,matriz_SRC))  
                 
@@ -132,5 +137,21 @@ class ProjecaoAxonometrica:
             return projecao_axometrica
             # Desenhar a projeção
             #self.draw_projection(projecao_axometrica)
-    
+
+if __name__ == "__main__":
+    # Parâmetros da superfície
+    vertices =  [[21.2, 34.1, 18.8, 5.9, 20],
+                [0.7,  3.4,  5.6,  2.9, 20.9],
+                [42.3, 27.2, 14.6, 29.7,31.6],
+                [  1,   1 ,   1,     1,  1]]
+    VRP = [25,15,80,1]
+    P = [20, 10, 25, 1]
+    Y = [0, 1, 0]
+    windows = [-20, -15, 20, 15]
+    viewport = [0, 0, 319, 239]
+
+    projecao = ProjecaoAxonometrica(vertices, VRP, P, Y, windows, viewport)
+    projecao = projecao.main() 
+
+    print("\nProjecao Axonometrica\n" ,projecao[0],"\n",projecao[1],"\n",projecao[2])
 
