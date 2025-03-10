@@ -739,10 +739,10 @@ class Interface:
 if __name__ == "__main__":
     # Parâmetros da superfície
     pontos_controleX, pontos_controleY = 6, 6
-    TI, TJ = 5, 5
+    TI, TJ = 4,4
     RESOLUTIONI, RESOLUTIONJ = 20, 20  
     espacamento = 15
-    VRP = [80, 80, 80, 1]
+    VRP = [90, 90, 90, 1]
     P = [0, 0, 0, 1]
     Y = [0, 1, 0]
     dp = 40

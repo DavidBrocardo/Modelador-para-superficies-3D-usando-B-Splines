@@ -41,7 +41,7 @@ class Controle:
         self.kd = 0.7    
         self.ks = 0.5  
         self.n = 2.15     
-        self.luz_pos = [80, 80, 80]
+        self.luz_pos = [25, 15, 80]
         
 
     def converter_vertices_tradicional(self, lista_vertices):
