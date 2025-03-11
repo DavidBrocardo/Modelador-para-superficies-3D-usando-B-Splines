@@ -742,7 +742,7 @@ if __name__ == "__main__":
     TI, TJ = 4,4
     RESOLUTIONI, RESOLUTIONJ = 20, 20  
     espacamento = 15
-    VRP = [90, 90, 90, 1]
+    VRP = [90, 80, 90, 1]
     P = [0, 0, 0, 1]
     Y = [0, 1, 0]
     dp = 40
