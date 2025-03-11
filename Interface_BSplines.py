@@ -6,7 +6,7 @@ import copy
 from tkinter import simpledialog, messagebox
 from Controle import Controle
 from tkinter import colorchooser
-
+ 
 class Interface:
     def __init__(self, tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, espacamento, VRP, P, Y, dp, windows, viewport):
         self.tela = tela        
