@@ -369,7 +369,7 @@ class Interface:
             if 4 <=  int(entrada_x.get()) <= 100 and 4 <= int(entrada_y.get()) <= 100:               
                 
                 self.quantidadeSuperfice += 1
-                self.superficie_selecionada += 1                
+                self.superficie_selecionada =  self.quantidadeSuperfice-1                
                     
                 self.pontos_controleX[self.superficie_selecionada] = int(entrada_x.get())
                 self.pontos_controleY[self.superficie_selecionada] = int(entrada_y.get())
@@ -393,8 +393,7 @@ class Interface:
                 visibilidade = {}
                 for superfice in range(self.quantidadeSuperfice):   
                                    
-                        control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                        control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
                         _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
                         all_faces.append(faces)                
                 
