@@ -236,15 +236,18 @@ class Interface:
             janela.destroy()                      
             # Calcula a superfície B-Spline
             self.canvas.delete("all") 
-            '''control = Controle(self.canvas,
-                self.pontos_controleX[self.superficie_selecionada], self.pontos_controleY[self.superficie_selecionada], self.TI[self.superficie_selecionada], self.TJ[self.superficie_selecionada], self.RESOLUTIONI[self.superficie_selecionada], self.RESOLUTIONJ[self.superficie_selecionada],
-                self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice])
-            _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()'''
+           
+            self.outp = {}
+            all_faces = []
+            visibilidade = {}
             for superfice in range(self.quantidadeSuperfice):                    
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
-           
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                    _, self.inp_Axo[superfice], self.outp[superfice],faces , visibilidade[superfice]  = control.main()
+                    
+                    all_faces.append(faces)
+            faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+            control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
         tk.Button(janela, text="Salvar", command=Salvar).grid(row=2, columnspan=4)
         
 
@@ -254,10 +257,16 @@ class Interface:
             self.cor_aresta_frente[self.superficie_selecionada] = cor  
             
             self.canvas.delete("all") 
+            self.outp = {}
+            all_faces = []
+            visibilidade = {}
             for superfice in range(self.quantidadeSuperfice):                    
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                    _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                    all_faces.append(faces)
+            faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+            control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)         
 
     def cor_fundo(self):        
         cor = colorchooser.askcolor(title="Escolha a cor da aresta do fundo")[1]
@@ -265,25 +274,45 @@ class Interface:
             self.cor_aresta_fundo[self.superficie_selecionada] = cor  
                
             self.canvas.delete("all") 
+            self.outp = {}
+            all_faces = []
+            visibilidade = {}
             for superfice in range(self.quantidadeSuperfice):                    
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                    _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                    all_faces.append(faces)
+            faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+            control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
+                    
         
     def sobra_aplicar(self):
         
          self.sobreamento = True
+         self.outp = {}
+         all_faces = []
+         visibilidade = {}
          for superfice in range(self.quantidadeSuperfice):                    
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice) #AQUI
+                    _, self.inp_Axo[superfice], self.outp[superfice], faces,visibilidade[superfice] = control.main()
+                    all_faces.append(faces)
+         faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+         control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
+                    
     def sobra_remover(self):
          
          self.sobreamento = False
+         self.outp = {}
+         all_faces = []
+         visibilidade = {}
          for superfice in range(self.quantidadeSuperfice):                    
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()     
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                    _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()     
+                    all_faces.append(faces)
+         faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+         control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)           
     
     def sobra_parametros(self):
          print("Jacu2")
@@ -347,7 +376,7 @@ class Interface:
                 
                 self.RESOLUTIONI[self.superficie_selecionada] = int(entrada_ResoI.get())
                 self.RESOLUTIONJ[self.superficie_selecionada] = int(entrada_ResoJ.get())
-                #print(self.RESOLUTIONI[self.superficie_selecionada])
+                
                 self.ponto_inicial[self.superficie_selecionada]= [int(entrada_xponto.get()),int(entrada_yponto.get()),int(entrada_zponto.get())]
                 self.TI[self.superficie_selecionada] = int(entrada_ti.get())
                 self.TJ[self.superficie_selecionada] = int(entrada_ti.get())
@@ -357,17 +386,24 @@ class Interface:
 
                 janela.destroy()                      
                 # Calcula a superfície B-Spline
-                '''control = Controle(self.canvas,
-                    self.pontos_controleX[self.superficie_selecionada], self.pontos_controleY[self.superficie_selecionada],  self.TI[self.superficie_selecionada], self.TJ[self.superficie_selecionada], self.RESOLUTIONI[self.superficie_selecionada], self.RESOLUTIONJ[self.superficie_selecionada],
-                    self.inp[self.superficie_selecionada], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice])
-                _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()'''
+                
                 self.canvas.delete("all") 
+                self.outp = {}                
+                all_faces = []
+                visibilidade = {}
                 for superfice in range(self.quantidadeSuperfice):   
                                    
                         control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                        _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
+                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                        _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                        all_faces.append(faces)                
+                
+                faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+                control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
+   
+                self.superficie_selecionada -= 1 
                 self.atualizar_menu()
+                
             else:
                 
                  janela.destroy()
@@ -403,10 +439,17 @@ class Interface:
                 self.P =  [x, y , z, 1]
 
                 self.canvas.delete("all") 
+                self.outp = {}
+                all_faces = []
+                visibilidade = {}
                 for superfice in range(self.quantidadeSuperfice):                    
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                    _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                    all_faces.append(faces)
+                faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+                control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
+                    
                    
                
 
@@ -449,10 +492,16 @@ class Interface:
             janela.destroy()                      
             # Calcula a superfície B-Spline
             self.canvas.delete("all") 
+            self.outp = {}
+            all_faces = []
+            visibilidade = {}
             for superfice in range(self.quantidadeSuperfice):                    
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                    _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                    all_faces.append(faces)
+            faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+            control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)       
                    
             
 
@@ -494,10 +543,16 @@ class Interface:
             janela.destroy()                      
             # Calcula a superfície B-Spline
             self.canvas.delete("all") 
+            self.outp = {}
+            all_faces = []
+            visibilidade = {}
             for superfice in range(self.quantidadeSuperfice):                    
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                    _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                    all_faces.append(faces)
+            faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+            control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)        
                     
             
 
@@ -526,11 +581,17 @@ class Interface:
                 z = float(entrada_z.get())
                 self.VRP = [x, y, z, 1]
 
-                self.canvas.delete("all") 
+                self.canvas.delete("all")
+                self.outp = {}
+                all_faces = []
+                visibilidade = {}
                 for superfice in range(self.quantidadeSuperfice):                    
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0, self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                    _, self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0, self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                    _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                    all_faces.append(faces)
+                faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+                control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)    
                     
 
                 
@@ -565,17 +626,25 @@ class Interface:
                 valores_geo = []
                 valores_geo.append((x,y,z))
                 # Calcula a superfície B-Spline
-                self.canvas.delete("all") 
+                self.canvas.delete("all")
+                self.outp = {}
+                all_faces = [] 
+                visibilidade = {}
                 for superfice in range(self.quantidadeSuperfice):   
                     #print(self.inp[superfice])    
                     if superfice == self.superficie_selecionada:             
                         control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 2, valores_geo, self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                        self.inp[superfice], self.inp_Axo[superfice], self.outp[superfice] = control.main()
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 2, valores_geo, self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                        self.inp[superfice], self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                        all_faces.append(faces)
+                        
                     else:
                         control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0, 0, self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                        self.inp[superfice], self.inp_Axo[superfice], self.outp[superfice] = control.main()
+                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0, 0, self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                        self.inp[superfice], self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                        all_faces.append(faces)
+                faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+                control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)        
                     
               
 
@@ -592,17 +661,25 @@ class Interface:
         def Salvar():
                 x = float(entrada_x.get())
                 # Calcula a superfície B-Spline
-                self.canvas.delete("all") 
+                self.canvas.delete("all")
+                self.outp = {}
+                all_faces = [] 
+                visibilidade = {}
                 for superfice in range(self.quantidadeSuperfice):   
                     #print(self.inp[superfice])    
                     if superfice == self.superficie_selecionada:             
                         control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,1,x,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                        self.inp[superfice] , self.inp_Axo[superfice], self.outp[superfice] = control.main()
+                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,1,x,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                        self.inp[superfice] , self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                        all_faces.append(faces)
+                        
                     else:
                         control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0, 0, self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                        self.inp[superfice], self.inp_Axo[superfice], self.outp[superfice] = control.main()
+                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0, 0, self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                        self.inp[superfice], self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                        all_faces.append(faces)
+                faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+                control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)       
 
                     
                     
@@ -633,16 +710,24 @@ class Interface:
                 valores_geo = []
                 valores_geo.append((x,y,z))
                 # Calcula a superfície B-Spline
-                self.canvas.delete("all") 
+                self.canvas.delete("all")
+                self.outp = {}
+                all_faces = [] 
+                visibilidade = {}
                 for superfice in range(self.quantidadeSuperfice): 
                     if superfice == self.superficie_selecionada:                   
                         control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,3,valores_geo,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                        self.inp[superfice] ,self.inp_Axo[superfice], self.outp[superfice]= control.main()
+                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,3,valores_geo,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                        self.inp[superfice] ,self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice] = control.main()
+                        all_faces.append(faces)
+                        
                     else:
                         control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0, 0, self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento)
-                        self.inp[superfice], self.inp_Axo[superfice], self.outp[superfice] = control.main()
+                                    self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport, 0, 0, self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                        self.inp[superfice], self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                        all_faces.append(faces)
+                faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+                control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)       
                    
                
 
@@ -690,19 +775,27 @@ class Interface:
         self.inp_Axo[self.superficie_selecionada] = []  
         self.canvas.delete("all")
         self.criar_pontos_controle()
-        self.canvas.delete("all")                   
+        self.canvas.delete("all")
+        self.outp = {}
+        all_faces = []     
+        visibilidade = {}
+        visibilidade = {}              
         control = Controle(self.canvas, self.pontos_controleX[self.superficie_selecionada], self.pontos_controleY[self.superficie_selecionada], self.TI[self.superficie_selecionada], self.TJ[self.superficie_selecionada], self.RESOLUTIONI[self.superficie_selecionada], self.RESOLUTIONJ[self.superficie_selecionada], 
-                          self.inp[self.superficie_selecionada],self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[self.superficie_selecionada], self.cor_aresta_fundo[self.superficie_selecionada],self.sobreamento)
-        _ , self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada] = control.main()
+                          self.inp[self.superficie_selecionada],self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[self.superficie_selecionada], self.cor_aresta_fundo[self.superficie_selecionada],self.sobreamento,0)
+        _ , self.inp_Axo[self.superficie_selecionada], self.outp[self.superficie_selecionada],faces,visibilidade[self.superficie_selecionada]  = control.main()
+        all_faces.append(faces)
+        faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+        control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
+        
    
 
 if __name__ == "__main__":
     # Parâmetros da superfície
     pontos_controleX, pontos_controleY = 4, 4
     TI, TJ = 4,4
-    RESOLUTIONI, RESOLUTIONJ = 15, 15  
+    RESOLUTIONI, RESOLUTIONJ = 4, 4  
     espacamento = 15
-    VRP = [90, 90, 90, 1]
+    VRP = [100, 100, 100, 1]
     P = [0, 0, 0, 1]
     Y = [0, 1, 0]
     dp = 40

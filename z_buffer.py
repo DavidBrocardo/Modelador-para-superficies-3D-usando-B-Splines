@@ -1,130 +1,129 @@
-class RasterizadorScanline:
-    def __init__(self, largura, altura):
-        """Inicializa o rasterizador com um Z-Buffer e os parâmetros da tela."""
-        self.largura = largura
-        self.altura = altura
-        self.zbuffer = [[float('inf')] * altura for _ in range(largura)]  # Z-Buffer com infinito
-        self.pixels = {}  # Dicionário para armazenar pixels visíveis
+import numpy as np
+import matplotlib.pyplot as plt
 
-    def interpolar_valor(self, x1, y1, v1, x2, y2, v2, x):
-        """Interpola um valor entre dois pontos."""
-        if x1 == x2:
-            return v1  # Evita divisão por zero
-        return v1 + (v2 - v1) * (x - x1) / (x2 - x1)
+# Definições do tamanho da tela
+width, height = 200, 200
+framebuffer = np.zeros((height, width, 3), dtype=np.uint8)  # Imagem RGB
+zbuffer = np.full((height, width), np.inf)  # Inicializa com infinito
 
+# Função para rasterizar uma linha
+def draw_scanline(y, x1, z1, x2, z2, color):
+    if x1 > x2:
+        x1, x2, z1, z2 = x2, x1, z2, z1
+    
+    dz = (z2 - z1) / (x2 - x1) if x2 != x1 else 0
+    z = z1
+    
+    for x in range(int(x1), int(x2) + 1):
+        if 0 <= x < width and 0 <= y < height and z < zbuffer[y, x]:
+            zbuffer[y, x] = z
+            framebuffer[y, x] = color
+        z += dz
 
+class Sombreamento_constante:
+    def __init__(self, ila, il, ka, kd, ks, n, luz_pos, centroides, normais, vetores_s):
+        self.ila = np.array(ila)  # Luz ambiente (R, G, B)
+        self.il = np.array(il)    # Intensidade da lâmpada (R, G, B)
+        self.ka = np.array(ka)    # Coeficiente de reflexão ambiente (R, G, B)
+        self.kd = np.array(kd)    # Coeficiente de reflexão difusa (R, G, B)
+        self.ks = np.array(ks)    # Coeficiente de reflexão especular (R, G, B)
+        self.n = n                # Expoente especular
+        self.luz_pos = np.array(luz_pos)  # Posição da luz
+        self.centroides = np.array(centroides)  # Lista de centroides
+        self.normais = np.array(normais)        # Lista de vetores normais
+        self.vetores_s = np.array(vetores_s)    # Lista de vetores S (direção do observador)
 
-    def projetar_para_viewport(self, vertices, viewport):
-        """Aplica a transformação de projeção e mapeamento para a viewport."""
-        u_min, v_min, u_max, v_max = viewport
-        proj_vertices = []
-        for i in range(len(vertices[0])):
-            # Extração das coordenadas homogêneas
-            x, y, z, w = vertices[0][i], vertices[1][i], vertices[2][i], vertices[3][i]
-            
-            # Divisão para passar para coordenadas homogêneas (perspectiva)
-            x /= w
-            y /= w
-            z /= w
-            
-            # Mapeamento para a viewport 2D
-            u = int((x + 1) * (u_max - u_min) / 2 + u_min)
-            v = int((y + 1) * (v_max - v_min) / 2 + v_min)
-            
-            proj_vertices.append((u, v, z))  # Armazenamos a posição 2D e a profundidade
-        return proj_vertices
+    def Calcular_iluminacao_ambiente(self):  # Iluminação ambiente [Ia = Ila . Ka]
+        return self.ila * self.ka
 
-    def rasterizar_poligono(self, vertices, valores_z, indices_faces, viewport):
-        """Executa o algoritmo Scanline para rasterizar um polígono com Z-Buffer."""
-        # Limpa buffers
-        self.zbuffer = [[float('inf')] * self.altura for _ in range(self.largura)]
-        self.pixels.clear()
+    def Calcular_iluminacao_difusa(self):  # Iluminação difusa [Id = Il . Kd . (n.l)]
+        vetor_L = self.luz_pos - self.centroides  # Vetor L = (luz - centroide da face)
+        vetor_L = np.squeeze(vetor_L)  # Remover qualquer dimensão extra e garantir que seja 1D
+        vetor_L /= np.linalg.norm(vetor_L)  # Vetor L normalizado
 
-        # Projeção dos vértices para a viewport
-        vertices_projetados = self.projetar_para_viewport(vertices, viewport)
+        # Certifique-se de que `self.normais` seja um vetor 1D
+        norm = np.squeeze(self.normais)  # Remover dimensões extras, se necessário
 
-        # Rasterizar as faces
-        for face in indices_faces:
-            # Obtém os três vértices da face
-            v1 = vertices_projetados[face[0]]
-            v2 = vertices_projetados[face[1]]
-            v3 = vertices_projetados[face[2]]
-            
-            # Chamamos a função que irá rasterizar o triângulo com Z-Buffer
-            self.rasterizar_triangulo(v1, v2, v3)
+        n_dot_l = max(np.dot(norm, vetor_L), 0)  # Produto escalar (n . l)
 
-    def rasterizar_triangulo(self, v1, v2, v3):
-        """Rasteriza um triângulo usando o Z-Buffer."""
-        # Ordena os vértices pelo eixo Y
-        vertices = sorted([v1, v2, v3], key=lambda v: v[1])
+        return self.il * self.kd * n_dot_l
 
-        # Determina os limites do triângulo
-        min_y = max(min(v[1] for v in vertices), 0)
-        max_y = min(max(v[1] for v in vertices), self.altura - 1)
+    def Calcular_iluminacao_especular(self):  # Iluminação especular [Is = Il . Ks . (r.s)^n]
+        vetor_L = self.luz_pos - self.centroides   # Vetor L
+        vetor_L = np.squeeze(vetor_L)  # Remover qualquer dimensão extra para garantir que seja 1D
+        vetor_L /= np.linalg.norm(vetor_L)  # Vetor L normalizado
+    
+        # Remover qualquer dimensão extra de norm para garantir que seja 1D
+        norm = np.squeeze(self.normais)  # Certificar-se de que norm é 1D
 
-        # Varre cada linha horizontal (Scanline)
-        for y in range(min_y, max_y + 1):
-            intersecoes = []
+        n_dot_l = max(np.dot(norm, vetor_L), 0)  # Produto escalar (n . l)
+    
+        vetor_R = 2 * n_dot_l * norm - vetor_L
+        vetor_R /= np.linalg.norm(vetor_R)  # Vetor R normalizado
+    
+        # Garantir que self.vetores_s seja 1D
+        vetor_s = np.squeeze(self.vetores_s)  # Remover dimensões extras, se necessário
+    
+        r_dot_s = max(np.dot(vetor_R, vetor_s), 0)  # Produto escalar (r . s)
+        return self.il * self.ks * (r_dot_s ** self.n)
 
-            # Verifica interseção de scanline com as arestas do triângulo
-            for i in range(3):
-                (x1, y1, z1), (x2, y2, z2) = vertices[i], vertices[(i + 1) % 3]
+    def Calcular_iluminacao_total(self):  # Iluminação total [It = Ia + Id + Is]
+        iluminacoes = []
+        Ia = self.Calcular_iluminacao_ambiente()
 
-                if y1 <= y < y2 or y2 <= y < y1:
-                    # Calcula interseção no eixo X e Z para a linha scanline
-                    x_int = self.interpolar_valor(y1, x1, y1, y2, x2, y)  # Interpolação de X
-                    z_int = self.interpolar_valor(y1, z1, y2, z2, y)  # Interpolação de Z
+        # Chamada sem argumento
+        Id = self.Calcular_iluminacao_difusa()
+        Is = self.Calcular_iluminacao_especular()
+        Itotal = Ia + Id + Is
+        iluminacoes.append(Itotal)
 
-                    intersecoes.append((x_int, z_int))
+        return iluminacoes[0]  # Retorna a iluminação total corretamente
 
-            # Ordena interseções pelo X
-            intersecoes.sort()
+# Definindo parâmetros de iluminação
+ila = (120, 20, 30)  # Luz ambiente
+il = (150, 100, 20)  # Intensidade da lâmpada
+luz_pos = [70, 20, 35]  # Posição da lâmpada
+ka = (0.4, 0.4, 0.4)  # Coeficiente de reflexão ambiente
+kd = (0.7, 0.4, 0.4)  # Coeficiente de reflexão difusa
+ks = (0.5, 0.4, 0.4)  # Coeficiente de reflexão especular
+n = 2.15  # Expoente especular
 
-            # Preenche os pixels entre os pares de interseções
-            for i in range(0, len(intersecoes), 2):
-                if i + 1 >= len(intersecoes):
-                    continue  # Evita erro caso haja número ímpar de interseções
+# Centroides, normais e vetores S para o sombreamento
+centroides_faces_visiveis = np.array([[100, 50, 0.5]])  # Exemplo de centroide para a face visível
+vetores_normais_visiveis = np.array([[0.669, 0.378, 0.639]])  # Normal da face
+vetores_s = np.array([[-0.002, 0.143, 0.990]])  # Vetor S (direção do observador)
 
-                x_inicio, z_inicio = intersecoes[i]
-                x_fim, z_fim = intersecoes[i + 1]
+# Instanciando a classe de sombreamento constante
+sombrear = Sombreamento_constante(ila, il, ka, kd, ks, n, luz_pos, centroides_faces_visiveis, vetores_normais_visiveis, vetores_s)
 
-                if x_inicio > x_fim:
-                    x_inicio, x_fim = x_fim, x_inicio
-                    z_inicio, z_fim = z_fim, z_inicio
+# Calculando a iluminação total para a face
+iluminacao_total = sombrear.Calcular_iluminacao_total()
 
-                for x in range(x_inicio, x_fim + 1):
-                    z = self.interpolar_valor(x_inicio, y, z_inicio, x_fim, y, z_fim, x)
+# Simulação de um triângulo (exemplo)
+p1, p2, p3 = (50, 50, 0.5), (150, 50, 0.2), (100, 150, 0.8)
+vertices = sorted([p1, p2, p3], key=lambda p: p[1])  # Ordena por Y
 
-                    # Atualiza o Z-Buffer se o novo pixel estiver mais próximo
-                    if z < self.zbuffer[x][y]:
-                        self.zbuffer[x][y] = z
-                        self.pixels[(x, y)] = z  # Aqui poderia ser uma cor, se necessário
+(y1, y2, y3) = vertices[0][1], vertices[1][1], vertices[2][1]
+(x1, z1), (x2, z2), (x3, z3) = (vertices[0][0], vertices[0][2]), (vertices[1][0], vertices[1][2]), (vertices[2][0], vertices[2][2])
 
+# Preenchimento por scanlines com sombreamento
+for y in range(int(y1), int(y3) + 1):
+    if y < y2:
+        xa = x1 + (x3 - x1) * (y - y1) / (y3 - y1)
+        za = z1 + (z3 - z1) * (y - y1) / (y3 - y1)
+        xb = x1 + (x2 - x1) * (y - y1) / (y2 - y1) if y2 != y1 else x2
+        zb = z1 + (z2 - z1) * (y - y1) / (y2 - y1) if y2 != y1 else z2
+    else:
+        xa = x1 + (x3 - x1) * (y - y1) / (y3 - y1)
+        za = z1 + (z3 - z1) * (y - y1) / (y3 - y1)
+        xb = x2 + (x3 - x2) * (y - y2) / (y3 - y2)
+        zb = z2 + (z3 - z2) * (y - y2) / (y3 - y2)
+    
+    # Aplique a iluminação ao calcular a cor
+    color = iluminacao_total.astype(np.uint8)  # A iluminação total agora é o valor da cor
+    draw_scanline(y, xa, za, xb, zb, color)
 
-    def obter_pixels(self):
-        """Retorna os pixels renderizados com suas profundidades."""
-        return self.pixels
-
-
-# Exemplo de uso da classe com os dados fornecidos
-largura, altura = 400, 300
-rasterizador = RasterizadorScanline(largura, altura)
-
-# Dados fornecidos
-vertices = [
-    [93, 251, -22.807, 1],  # Coordenadas X
-    [198, 241, -20.129, 1],  # Coordenadas Y
-    [85, 192, -32.570, 1],   # Coordenadas Z
-    [125, 107, -21.815, 1]   # Coordenadas W (Homogêneas)
-]
-
-viewport = [0, 0, 399, 299]  # Definição da viewport
-indices_faces = [[0, 1, 3], [2, 1, 3]]  # Índices das faces
-
-# Rasterizar os polígonos
-rasterizador.rasterizar_poligono(vertices, [], indices_faces, viewport)
-
-# Exibir os pixels gerados
-pixels_resultantes = rasterizador.obter_pixels()
-for (x, y), z in pixels_resultantes.items():
-    print(f"Pixel: ({x}, {y}), Z: {z}")
+# Exibir a imagem
+plt.imshow(framebuffer)
+plt.axis('off')
+plt.show()

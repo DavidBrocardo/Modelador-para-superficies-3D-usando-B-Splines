@@ -10,7 +10,7 @@ from Recorte3D import Recorte3D
 from Sombreamento_constante import Sombreamento_constante
 
 class Controle:
-    def __init__(self,  tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P, Y, dp, windows, viewport,geometrica,valores_geo,corFrente,corFundo,constante):
+    def __init__(self,  tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P, Y, dp, windows, viewport,geometrica,valores_geo,corFrente,corFundo,constante,superfice):
                 
         # Parâmetros de controle
         self.inp = inp
@@ -34,7 +34,7 @@ class Controle:
         self.cor_aresta_frente = corFrente  
         self.cor_aresta_fundo = corFundo 
         #self.faces_ordenadas = faces
-        #self.superfice = superfice
+        self.superfice = superfice
 
         #---------Sombreamento--------------
         self.constante = constante  
@@ -172,11 +172,13 @@ class Controle:
                 vertices_face.append(vertice_superfice[i+1][j+1]) 
                 vertices_face.append(vertice_superfice[i+1][j]) 
                 
-                #Recorte 3D                    
-                recorte = Recorte3D(-100000, 100000, vertices_face)
+                #Recorte 3D       
+                recorte = Recorte3D(-100000, 1000000, vertices_face)
                 vertices,recortou = recorte.Recortar3D() 
                 if not(recortou):
                     self.recortou = recortou
+                    #return self.inp, [], [], [],self.Faces_visi_centroide
+                    
                     
                 #Visibilidade
                 
@@ -201,7 +203,71 @@ class Controle:
                 
         return  
 
+    def pintor(self,faces_ordenadas, visiblidade, vertices, cor_fundo, cor_frente):
+        self.tela.delete("all") 
+        
+        for i in faces_ordenadas:
+            for _, face, superfice in i:
+                    pontos = []            
+                    chave = tuple(face)
+                    
+                    for i in face:
+                        xi, yi = i
+                        #print(xi,yi)
+                        x = vertices[superfice][xi][yi][0]  # Coordenada X do vértice
+                        y = vertices[superfice][xi][yi][1]  # Coordenada Y do vértice
+                        z = vertices[superfice][xi][yi][2]  # Coordenada z do vértice
+                        pontos.append((x, y, z))
+                    
+                    
+                    visibilidadeSRU = visiblidade[superfice][chave][0][0]                               
 
+                    #   a. Recorte 2D
+                    recorte = Recorte2D(self.viewport, pontos)
+                    poligono_recortado = recorte.Recortar_total()
+
+                
+                    
+                    #   b. Algoritmo da scanline (Associar neste algoritmo z-buffer e o algoritmo de rasterização – Fillpoly)
+                    #       i. Constante: Usar o fillpoly com a cor pré-computada anteriormente;
+                    
+                    if visibilidadeSRU[0] >= 0:
+                        sombreamento = visiblidade[superfice][chave][0][4]
+                        FillPoly(poligono_recortado,self.tela,sombreamento[0],  self.constante)
+
+                        color = cor_frente[superfice]
+                        if len(poligono_recortado) != 0:
+                            x1, y1, z1 = poligono_recortado[0]
+                            cond = True
+                            for i in reversed(poligono_recortado):
+                                if cond :
+                                    x2, y2, z2 = i
+                                    self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
+                                    cond  = False
+                                else:
+                                    x1, y1, z1 = i
+                                    self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
+                                    x2 = x1
+                                    y2 = y1
+                        
+                        
+                    else:
+                        FillPoly(poligono_recortado,self.tela,0, False)
+                        color = cor_fundo[superfice]
+                        if len(poligono_recortado) != 0:
+                            x1, y1, z1 = poligono_recortado[0]
+                            cond = True
+                            for i in reversed(poligono_recortado):
+                                if cond :
+                                    x2, y2, z2 = i
+                                    self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
+                                    cond  = False
+                                else:
+                                    x1, y1, z1 = i
+                                    self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
+                                    x2 = x1
+                                    y2 = y1
+        return
                 
 
     def main(self):       
@@ -236,7 +302,8 @@ class Controle:
         
     
         if not(self.recortou):
-            pintor = Pintor_dist(self.converter_vertices_superfice(matriz_superfice), self.VRP, self.tela, self.viewport)           
+            #Pintor
+            pintor = Pintor_dist(self.converter_vertices_superfice(matriz_superfice), self.VRP, self.tela, self.viewport, self.superfice)           
             faces_ordenadas = (pintor.calcular_dists_e_ordenar_faces(self.Faces))
 
         #   c. Sombreamento constante
@@ -256,7 +323,9 @@ class Controle:
         # 4) Aplicar o teste de visibilidade pelo cálculo da normal para cada face de objeto restante.
         #self.tela.delete("all") 
         # -- Aplicando o Algoritmo do Pintor -- 
-            for _, face, _ in faces_ordenadas:
+            
+            #print(faces_ordenadas)
+            '''for _, face, _ in faces_ordenadas:
                 pontos = []            
                 chave = tuple(face)
                 
@@ -270,13 +339,17 @@ class Controle:
                 
                 
                 visibilidadeSRU = self.Faces_visi_centroide[chave][0][0]
-            
+                
+                
+                
+                # Modifica apenas as tuplas que possuem a face correta
+                
 
                 #   a. Recorte 2D
                 recorte = Recorte2D(self.viewport, pontos)
                 poligono_recortado = recorte.Recortar_total()
 
-               
+            
                 
                 #   b. Algoritmo da scanline (Associar neste algoritmo z-buffer e o algoritmo de rasterização – Fillpoly)
                 #       i. Constante: Usar o fillpoly com a cor pré-computada anteriormente;
@@ -316,16 +389,16 @@ class Controle:
                                 x1, y1, z1 = i
                                 self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
                                 x2 = x1
-                                y2 = y1
+                                y2 = y1'''
                     
-                    
+            
          
                 
                 
                 
 
       
-        return self.inp, self.inp_projetado, self.outp
+        return self.inp, self.inp_projetado, self.outp, faces_ordenadas, self.Faces_visi_centroide
         
         
         

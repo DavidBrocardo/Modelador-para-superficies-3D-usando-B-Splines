@@ -7,12 +7,12 @@ from FillPoly import FillPoly
 
 
 class Pintor_dist:
-    def __init__(self, vertices, VRP, canvas,viewport):
+    def __init__(self, vertices, VRP, canvas,viewport,superfice):
         self.vertices = vertices  
         self.VRP = VRP
         self.canvas = canvas
         self.viewport = viewport
-        self.superfice = 1
+        self.superfice = superfice
     
     def calcular_centroide_face(self, indice_face):
         v = len(indice_face)
