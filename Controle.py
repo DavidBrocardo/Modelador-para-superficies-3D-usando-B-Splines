@@ -231,7 +231,7 @@ class Controle:
                     #   b. Algoritmo da scanline (Associar neste algoritmo z-buffer e o algoritmo de rasterização – Fillpoly)
                     #       i. Constante: Usar o fillpoly com a cor pré-computada anteriormente;
                     
-                    if visibilidadeSRU[0] >= 0:
+                    if visibilidadeSRU[0] > 0:
                         sombreamento = visiblidade[superfice][chave][0][4]
                         FillPoly(poligono_recortado,self.tela,sombreamento[0],  self.constante)
 
