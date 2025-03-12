@@ -167,17 +167,4 @@ class Recorte2D:
         return resul4
 
         
-if __name__ == "__main__":
-    vertices = [(534.99580518315582, 246.41420410318733, 6.6326896907820485), (224.2473456234529, 259.08417406923695, 8.314729307055043), (239.25154044029708, 273.74727436494214, 11.517902506646458), (250.0, 262.22178897863574, 9.512153767453526)]   # x, y ,z
-                                    # Tirei o fator homogeneo, mas qlqr coisa adicionar de boa (da peido se add kkk)
 
-    viewport = [0, 0, 500, 500]  #[u_min, v_min, u_max, v_max]
-
-    recorte = Recorte2D(viewport, vertices)
-    poligono_recortado = recorte.Recortar_total()
-    print(poligono_recortado[0])
-    for i in reversed(poligono_recortado):
-        print(i)
-    
-   
-    #print("Polígono final Recortado:", poligono_recortado)

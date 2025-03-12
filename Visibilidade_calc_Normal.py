@@ -18,12 +18,12 @@ class Visibilidade_Normal:
                 vertices_covertido[0].append(x)
                 vertices_covertido[1].append(y)
                 vertices_covertido[2].append(z)
-        #print(vertices_covertido)
+        
         return vertices_covertido
     
     def Calcular_vet_normal_unitario_face(self, vertices, indice_face): #calcula de uma face
 
-        vertices = np.array(vertices) #s├│ funfa convertendo pra array pra manipular
+        vertices = np.array(vertices) 
 
         p0 = vertices[:3, indice_face[0]]
         p1 = vertices[:3, indice_face[1]] #pegando os vertices da face e seus x,y,z
@@ -43,14 +43,13 @@ class Visibilidade_Normal:
 
         normais_faces = []
        
-        #print("\n")
+        
         for i, face in enumerate(indices_faces): 
             
             normal_unitaria = self.Calcular_vet_normal_unitario_face(vertices, face)
             normais_faces.append(normal_unitaria)  #calculando e salvando todos os vets normais das faces
 
-            #print(f"Normal da face : {normal_unitaria}")
-        #print("\n")
+            
 
         return normais_faces
 
@@ -96,32 +95,5 @@ class Visibilidade_Normal:
         produtos_escalares = [np.dot(vn, vo) for vn, vo in zip(vets_normais, vets_observacao)] #gpt cantou
         return produtos_escalares, centroide, vets_observacao , vets_normais
     
-if __name__ == "__main__":
-   
-    vertices = [[21.2, 34.1, 18.8, 5.9, 20],
-                [0.7,  3.4,  5.6,  2.9, 20.9],
-                [42.3, 27.2, 14.6, 29.7,31.6],
-                [  1,   1 ,   1,     1,  1]]
-    
-    indices_faces = [ [0,1,4],[1,2,4],[2,3,4],[3,0,4],[0,3,2,1] ] #Os vertices de cada face, ex: Face ABE(Face 014)
 
-    VRP = [25, 15, 80]   
-
-    visi = Visibilidade_Normal(vertices, indices_faces,VRP ,False) #instancia da classe, so funfa assim
-    
-    vets_normais = visi.Calcular_vet_normal_das_faces(vertices, indices_faces)
-    visibilidade, centroide, vets_observacao , vets_normais = visi.main()
-
-    produtos_escalares = [np.dot(vn, vo) for vn, vo in zip(vets_normais, vets_observacao)] #gpt cantou
-
-
-    print("\n")
-
-    for i, produto in enumerate(produtos_escalares):
-        if produto >= 0:
-            print(f"Produto escalar da face {i}: {produto:.3f} --> A face é Visível!")
-        else:
-            print(f"Produto escalar da face {i}: {produto:.3f} --> A face não é visível!")
-
-    print("\n")
     

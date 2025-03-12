@@ -10,7 +10,7 @@ from Recorte3D import Recorte3D
 from Sombreamento_constante import Sombreamento_constante
 
 class Controle:
-    def __init__(self,  tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P, Y, dp, windows, viewport,geometrica,valores_geo,corFrente,corFundo):
+    def __init__(self,  tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P, Y, dp, windows, viewport,geometrica,valores_geo,corFrente,corFundo,constante):
                 
         # Parâmetros de controle
         self.inp = inp
@@ -33,15 +33,21 @@ class Controle:
         self.atualizarInp = False
         self.cor_aresta_frente = corFrente  
         self.cor_aresta_fundo = corFundo 
+        #self.faces_ordenadas = faces
+        #self.superfice = superfice
 
         #---------Sombreamento--------------
-        self.ila = 120 
-        self.il = 150    
-        self.ka = 0.4   
-        self.kd = 0.7    
-        self.ks = 0.5  
-        self.n = 2.15     
-        self.luz_pos = [25, 15, 80]
+        self.constante = constante  
+        
+        self.ila = (120,20,30)  # Luz ambiente
+        self.il = (150,100,20)  # Intensidade da lampada
+        self.luz_pos = [70, 20, 35]  # Posiçao da lampada
+
+        #Propriedades do material
+        self.ka = (0.4,0.4,0.4)  # Coeficiente de reflexao ambiente
+        self.kd = (0.0,0.4,0.4)  # Coeficiente de reflexao difusa
+        self.ks = (0.5,0.4,0.4)  # Coeficiente de reflexao especular
+        self.n = 2.15  # Expoente especular
         
 
     def converter_vertices_tradicional(self, lista_vertices):
@@ -79,7 +85,7 @@ class Controle:
             linha = []
             for j in range(self.pontos_controleY + 1):
                 indice = i * (self.pontos_controleY + 1) + j
-                # projecao[0], projecao[1], projecao[2] contêm as coordenadas projetadas (desconsiderando W)
+                
                 elemento = [
                     lista_vertices[0][indice],
                     lista_vertices[1][indice],
@@ -94,8 +100,6 @@ class Controle:
 
     def axonometrica(self,entrada,pontos):       
         if pontos:
-            #vertices=[]
-            #vertices = self.converter_vertices_tradicional(entrada)
             projecao = ProjecaoAxonometrica(entrada, self.VRP, self.P, self.Y, self.windows, self.viewport)
             projecao = projecao.main() 
             self.inp_projetado = []
@@ -104,9 +108,7 @@ class Controle:
             else:
                 self.inp_projetado= self.converter_pontos_superfice(projecao)   
             
-        else:
-            #vertices=[]      
-            #vertices = self.converter_vertices_tradicional(self.outp)                   
+        else:             
             projecao = ProjecaoAxonometrica(entrada, self.VRP, self.P, self.Y,  self.windows, self.viewport)
             projecao = projecao.main() 
             self.outp = []
@@ -123,9 +125,6 @@ class Controle:
 
                 operacao = Transformacoes_Geometricas(pontos) 
                 resul_escala_pontos = operacao.Escala(self.valores_geo)
-                #self.converter_pontos_superfice(resul_escala,True)
-                #print (vertices)
-                #print ("Escala em " , self.valores_geo)
                 return resul_escala_superfice, resul_escala_pontos
             else:
                 return vertices, pontos
@@ -144,7 +143,6 @@ class Controle:
             resul_rotacao_y = operacao.Rotacao_em_y(y)
             operacao = Transformacoes_Geometricas(resul_rotacao_y) 
             resul_rotacao_z_pontos = operacao.Rotacao_em_z(z)
-            #print("\n\n", resul_rotacao_z_superfice)
             return resul_rotacao_z_superfice, resul_rotacao_z_pontos
 
         if self.geometrica == 3: # TRANSLACAO
@@ -181,27 +179,26 @@ class Controle:
                     self.recortou = recortou
                     
                 #Visibilidade
-                #print(vertices_face)
+                
                 visi= Visibilidade_Normal(vertices_face,[[0,1,2,3]],self.VRP[:-1],True) 
                 visibilidade, centroide, vets_observacao , vets_normais = visi.main()
-                #print(visibilidade)
+                
                 self.Faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
                 chave = ((i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j))
                 self.Faces_visi_centroide[chave] = []
-                
-                
+                                
 
                 #Calculando o Sobreamento somente das faces visiveis
                 if visibilidade[0] >= 0:
                     sombrear = Sombreamento_constante(self.ila, self.il, self.ka, self.kd, self.ks, self.n, self.luz_pos,
-                                                      centroide[0], vets_normais[0], vets_observacao[0])
+                                                    centroide[0], vets_normais[0], vets_observacao[0])
                     
                     iluminacoes = sombrear.Calcular_iluminacao_total()  #Todas as iluminaçoes para serem aplicadas em cada face estão aqui, é uma lista
-                    #print("Lens jacu sombreado", iluminacoes[0])
+                   
                     self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(vets_observacao),(vets_normais),(iluminacoes)])
                 else:
                     self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(vets_observacao),(vets_normais)])
-               
+                
         return  
 
 
@@ -211,7 +208,6 @@ class Controle:
 
         #CRIAR A SUPERFICE 
         # Calcula a superfície B-Spline
-        #print("comeco \n\n", self.inp)
         bspline = BSplines(self.pontos_controleX, self.pontos_controleY ,self.TI, self.TJ, self.RESOLUTIONI, self.RESOLUTIONJ,
                            self.inp, self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0)
         
@@ -238,11 +234,10 @@ class Controle:
         #   b. Vetores normais das faces
         self.facePorFace(matriz_superfice)   
         
-        #recortou = False
-            #print(recortou)
+    
         if not(self.recortou):
             pintor = Pintor_dist(self.converter_vertices_superfice(matriz_superfice), self.VRP, self.tela, self.viewport)           
-            faces_ordenadas = pintor.calcular_dists_e_ordenar_faces(self.Faces)
+            faces_ordenadas = (pintor.calcular_dists_e_ordenar_faces(self.Faces))
 
         #   c. Sombreamento constante
         #       i. Computar o valor de iluminação total (cor) de cada face
@@ -261,16 +256,7 @@ class Controle:
         # 4) Aplicar o teste de visibilidade pelo cálculo da normal para cada face de objeto restante.
         #self.tela.delete("all") 
         # -- Aplicando o Algoritmo do Pintor -- 
-        #faces=[]
-        #for i in range(self.RESOLUTIONI - 1):
-        #    for j in range(self.RESOLUTIONJ - 1):
-        #        faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
-        
-        #pintor = Pintor_dist(self.outp, self.VRP, self.tela,self.viewport)           
-        #faces_ordenadas = pintor.calcular_dists_e_ordenar_faces(self.Faces)
-        #print("\n\n AQUI")
-
-            for _, face in faces_ordenadas:
+            for _, face, _ in faces_ordenadas:
                 pontos = []            
                 chave = tuple(face)
                 
@@ -285,19 +271,19 @@ class Controle:
                 
                 visibilidadeSRU = self.Faces_visi_centroide[chave][0][0]
             
-                
-                #visi= Visibilidade_Normal(pontos,[[0,1,2,3]],self.VRP[:-1],True)
-                #visibilidade , centroide= visi.main()
 
                 #   a. Recorte 2D
                 recorte = Recorte2D(self.viewport, pontos)
                 poligono_recortado = recorte.Recortar_total()
 
                
-
+                
+                #   b. Algoritmo da scanline (Associar neste algoritmo z-buffer e o algoritmo de rasterização – Fillpoly)
+                #       i. Constante: Usar o fillpoly com a cor pré-computada anteriormente;
+                
                 if visibilidadeSRU[0] >= 0:
                     sombreamento = self.Faces_visi_centroide[chave][0][4]
-                    FillPoly(poligono_recortado,self.tela,sombreamento[0], True)
+                    FillPoly(poligono_recortado,self.tela,sombreamento[0],  self.constante)
 
                     color = self.cor_aresta_frente
                     if len(poligono_recortado) != 0:
@@ -306,11 +292,11 @@ class Controle:
                         for i in reversed(poligono_recortado):
                             if cond :
                                 x2, y2, z2 = i
-                                self.tela.create_line(x1, y1, x2, y2, fill=color, width=2)
+                                self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
                                 cond  = False
                             else:
                                 x1, y1, z1 = i
-                                self.tela.create_line(x2, y2, x1, y1, fill=color, width=2)
+                                self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
                                 x2 = x1
                                 y2 = y1
                     
@@ -333,26 +319,12 @@ class Controle:
                                 y2 = y1
                     
                     
+         
                 
                 
                 
-            #print(poligono_recortado)
 
-            #   b. Algoritmo da scanline (Associar neste algoritmo z-buffer e o algoritmo de rasterização – Fillpoly)
-            #       i. Constante: Usar o fillpoly com a cor pré-computada anteriormente;
-                
-                            
-                    
-             #       ii. Gouraud: Usar o fillpoly interpolando as cores dos vértices que foram pré-calculadas;
-        
-            #       iii. Phong: Usar o fillpoly interpolando os vetores normais dos vértices que foram pré-calculados e, na sequência, calcular a iluminação total (cor) em cada pixel.
-
-            # -- Desenhar a  superfice --             
-
-                
-        #print(self.inp)
-        #print("\n\n Fim \n\n", self.inp)
-        #print("\n\n Fim \n\n", self.inp_projetado)
+      
         return self.inp, self.inp_projetado, self.outp
         
         

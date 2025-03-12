@@ -28,7 +28,7 @@ class Recorte3D:
             if self.znear <= z <= self.zfar:
                 nova_matriz[0].append(x)
                 nova_matriz[1].append(y)
-                nova_matriz[2].append(z)  #mantido
+                nova_matriz[2].append(z)  
                 nova_matriz[3].append(1)
             else: 
                 recortou = True

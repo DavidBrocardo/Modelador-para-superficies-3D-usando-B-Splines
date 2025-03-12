@@ -8,10 +8,11 @@ from FillPoly import FillPoly
 
 class Pintor_dist:
     def __init__(self, vertices, VRP, canvas,viewport):
-        self.vertices = vertices  # Lista de listas de vértices
+        self.vertices = vertices  
         self.VRP = VRP
         self.canvas = canvas
         self.viewport = viewport
+        self.superfice = 1
     
     def calcular_centroide_face(self, indice_face):
         v = len(indice_face)
@@ -37,10 +38,10 @@ class Pintor_dist:
 
     def calcular_dists_e_ordenar_faces(self, indices_faces):
         
-        face_e_distancia = [(self.calcular_distancia_VRP_face(self.calcular_centroide_face(face)), face) for face in indices_faces]
+        face_e_distancia = [(self.calcular_distancia_VRP_face(self.calcular_centroide_face(face)), face, self.superfice) for face in indices_faces]
         
         faces_ordenadas = sorted(face_e_distancia, key=lambda x: x[0], reverse=True)
-        
+        #print(faces_ordenadas)
         return  faces_ordenadas
 
     def controle(self, indices_faces):
@@ -54,10 +55,10 @@ class Pintor_dist:
                 y = self.vertices[xi][yi][1]  # Coordenada Y do vértice
                 z = self.vertices[xi][yi][2]  # Coordenada z do vértice
                 pontos.append((x, y, z))
-            #print(pontos)
-            visi = Visibilidade_Normal(pontos,[[0,1,2,3]],self.VRP[:-1] ,True) #instancia da classe, so funfa assim
+            
+            visi = Visibilidade_Normal(pontos,[[0,1,2,3]],self.VRP[:-1] ,True) 
             produtos_escalares = visi.main()
-            #print(produtos_escalares)
+            
             if produtos_escalares[0] >= 0: 
                 color = "Green"
             else:
@@ -85,17 +86,4 @@ class Pintor_dist:
 
         
 
-if __name__ == "__main__":
-    vertices = [
-        [21.2, 0.7, 42.3],
-        [34.1, 3.4, 27.2],
-        [18.8, 5.6, 14.6],
-        [5.9, 2.9, 29.7],
-        [20, 20.9, 31.6]
-    ]
-    
-    indices_faces = [[0,1,4], [1,2,4], [2,3,4], [3,0,4], [0,3,2,1]]
-    VRP = [25, 15, 80]    
 
-    pintor = Pintor_dist(vertices, VRP)
-    pintor.controle(indices_faces)

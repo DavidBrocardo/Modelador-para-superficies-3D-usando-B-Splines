@@ -12,7 +12,7 @@ i.	Vetores normais médios unitários nos vértices
 ii.	Gouraud: Calcular a iluminação total nos vértices
 
 """
-
+#DEPOIS APAGAR
 class Sombreamento_Gouraud:
     def __init__(self, ila, il, ka, kd, ks, n, luz_pos, vertices, faces):
         self.ila = ila  

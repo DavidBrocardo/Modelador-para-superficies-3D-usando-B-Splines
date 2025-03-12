@@ -12,16 +12,16 @@ Já vai ter todas as infos calculadas tbm! evitar recalculos
 
 class Sombreamento_constante:
     def __init__(self, ila, il, ka, kd, ks, n, luz_pos, centroides, normais, vetores_s):
-        self.ila = ila 
-        self.il = il    
-        self.ka = ka   
-        self.kd = kd    
-        self.ks = ks   
-        self.n = n     
-        self.luz_pos = np.array(luz_pos)  
-        self.centroides = np.array(centroides) 
-        self.normais = np.array(normais)  
-        self.vetores_s = np.array(vetores_s) 
+        self.ila = np.array(ila)  # Luz ambiente (R, G, B)
+        self.il = np.array(il)    # Intensidade da lâmpada (R, G, B)
+        self.ka = np.array(ka)    # Coeficiente de reflexão ambiente (R, G, B)
+        self.kd = np.array(kd)    # Coeficiente de reflexão difusa (R, G, B)
+        self.ks = np.array(ks)    # Coeficiente de reflexão especular (R, G, B)
+        self.n = n                # Expoente especular
+        self.luz_pos = np.array(luz_pos)  # Posição da luz
+        self.centroides = np.array(centroides)  # Lista de centroides
+        self.normais = np.array(normais)        # Lista de vetores normais
+        self.vetores_s = np.array(vetores_s)    # Lista de vetores S (direção do observador)
 
     def Calcular_iluminacao_ambiente(self): # Iluminação ambiente [Ia = Ila . Ka]	
         return self.ila * self.ka
@@ -54,7 +54,7 @@ class Sombreamento_constante:
         iluminacoes = []
         Ia = self.Calcular_iluminacao_ambiente()
 
-        #for i in range(len(self.centroides)):
+        
         Id = self.Calcular_iluminacao_difusa(self.centroides)
         Is = self.Calcular_iluminacao_especular(self.centroides)
         Itotal = Ia + Id + Is
@@ -62,17 +62,24 @@ class Sombreamento_constante:
 
         return iluminacoes
 
-
+# NAO APAGAR AINDA ESSE MAIN
 if __name__ == "__main__":
+    '''
+    Ila = (IlaR, IlaG, IlaB)  Luz ambiente
+    Il = (IlR,IlG,IlB) Luzes pontuais
+    Ka = (KaR,KaG,KaB)
+    Kd = (KdR,KdG,KdB) Materiais
+    Ks = (KsR,KsG,KsB,n)
+    '''
 
-    ila = 120  # Luz ambiente
-    il = 150  # Intensidade da lampada
+    ila = (120,20,30)  # Luz ambiente
+    il = (150,100,20)  # Intensidade da lampada
     luz_pos = [70, 20, 35]  # Posiçao da lampada
 
     #Propriedades do material
-    ka = 0.4  # Coeficiente de reflexao ambiente
-    kd = 0.7  # Coeficiente de reflexao difusa
-    ks = 0.5  # Coeficiente de reflexao especular
+    ka = (0.4,0.4,0.4)  # Coeficiente de reflexao ambiente
+    kd = (0.7,0.4,0.4)  # Coeficiente de reflexao difusa
+    ks = (0.5,0.4,0.4)  # Coeficiente de reflexao especular
     n = 2.15  # Expoente especular
 
     centroides_faces_visiveis = [
@@ -91,4 +98,4 @@ if __name__ == "__main__":
     iluminacoes = sombrear.Calcular_iluminacao_total()  #Todas as iluminaçoes para serem aplicadas em cada face estão aqui, é uma lista
 
     for i, ilum in enumerate(iluminacoes):
-        print(f"Iluminação total da face {i}: {ilum:.3f}")
+        print(f"Iluminação total da face {i}: {ilum}")

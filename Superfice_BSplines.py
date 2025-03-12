@@ -32,7 +32,7 @@ class BSplines:
         self.outp = [[[0, 0, 0] for _ in range(self.RESOLUTIONJ)] for _ in range(self.RESOLUTIONI)]
 
     def calcular_nos(self, nos, n, t):
-        """ Calcula os nós da spline com base no número de pontos de controle e no grau da spline """
+        # Calcula os nós da spline com base no número de pontos de controle e no grau da spline 
         for j in range(n + t + 1):
             if j < t:
                 nos[j] = 0
@@ -42,7 +42,7 @@ class BSplines:
                 nos[j] = n - t + 2
 
     def calcular_blend(self, k, t, u, v):
-        """ Calcula recursivamente o valor da função de base (blend) da B-Spline """
+        # Calcula recursivamente o valor da função de base (blend) da B-Spline 
         if t == 1:
             return 1 if u[k] <= v < u[k + 1] else 0
         valor = 0
@@ -53,7 +53,7 @@ class BSplines:
         return valor
 
     def calcular_superficie(self):
-        """ Calcula os pontos da superfície B-Spline, de forma a reproduzir o algoritmo C """
+        # Calcula os pontos da superfície B-Spline, de forma a reproduzir o algoritmo C 
         # Calcula os nós para as direções I e J
         self.calcular_nos(self.knotsI, self.NI, self.TI)
         self.calcular_nos(self.knotsJ, self.NJ, self.TJ)

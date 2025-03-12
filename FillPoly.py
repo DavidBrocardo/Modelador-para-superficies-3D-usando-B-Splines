@@ -1,5 +1,3 @@
-import tkinter as tk
-from tkinter import colorchooser
 from math import ceil, floor
 
 class FillPoly:
@@ -8,8 +6,9 @@ class FillPoly:
 
     def __init__(self, poligino, tela, sobreamento,visivel):          
         self.tela = tela
-        cor_rgb = (sobreamento, sobreamento, sobreamento) 
+         
         if visivel:
+            cor_rgb = (sobreamento[0], sobreamento[1], sobreamento[2])
             self.cor  = self.rgb_para_hex(cor_rgb)
         else:
             self.cor  = "white"
