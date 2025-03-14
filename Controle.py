@@ -8,9 +8,9 @@ from ProjecaoAxonometrica import ProjecaoAxonometrica
 from Transformacoes_Geometricas import Transformacoes_Geometricas
 from Recorte3D import Recorte3D
 from Sombreamento_constante import Sombreamento_constante
-
+from zbuffer_teste import ZBuffer
 class Controle:
-    def __init__(self,  tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P, Y, dp, windows, viewport,geometrica,valores_geo,corFrente,corFundo,constante,superfice):
+    def __init__(self,  tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P, Y, dp, windows, viewport,geometrica,valores_geo,corFrente,corFundo,constante,superfice,ila,il,luz_pos,ka,kd,ks,n):
                 
         # Parâmetros de controle
         self.inp = inp
@@ -38,16 +38,16 @@ class Controle:
 
         #---------Sombreamento--------------
         self.constante = constante  
-        
-        self.ila = (120,20,30)  # Luz ambiente
-        self.il = (150,100,20)  # Intensidade da lampada
-        self.luz_pos = [70, 20, 35]  # Posiçao da lampada
+        ila,il,luz_pos,ka,kd,ks,n
+        self.ila = ila  # Luz ambiente
+        self.il = il  # Intensidade da lampada
+        self.luz_pos = luz_pos  # Posiçao da lampada
 
         #Propriedades do material
-        self.ka = (0.4,0.4,0.4)  # Coeficiente de reflexao ambiente
-        self.kd = (0.0,0.4,0.4)  # Coeficiente de reflexao difusa
-        self.ks = (0.5,0.4,0.4)  # Coeficiente de reflexao especular
-        self.n = 2.15  # Expoente especular
+        self.ka = ka  # Coeficiente de reflexao ambiente
+        self.kd = kd  # Coeficiente de reflexao difusa
+        self.ks = ks  # Coeficiente de reflexao especular
+        self.n = n  # Expoente especular
         
 
     def converter_vertices_tradicional(self, lista_vertices):
@@ -174,6 +174,7 @@ class Controle:
                 
                 #Recorte 3D       
                 recorte = Recorte3D(-100000, 1000000, vertices_face)
+                
                 vertices,recortou = recorte.Recortar3D() 
                 if not(recortou):
                     self.recortou = recortou
@@ -181,6 +182,7 @@ class Controle:
                     
                     
                 #Visibilidade
+                #print(vertices_face)
                 
                 visi= Visibilidade_Normal(vertices_face,[[0,1,2,3]],self.VRP[:-1],True) 
                 visibilidade, centroide, vets_observacao , vets_normais = visi.main()
@@ -195,10 +197,13 @@ class Controle:
                     sombrear = Sombreamento_constante(self.ila, self.il, self.ka, self.kd, self.ks, self.n, self.luz_pos,
                                                     centroide[0], vets_normais[0], vets_observacao[0])
                     
-                    iluminacoes = sombrear.Calcular_iluminacao_total()  #Todas as iluminaçoes para serem aplicadas em cada face estão aqui, é uma lista
+                    iluminacoes = sombrear.Calcular_iluminacao_total() 
+
+                    
                    
                     self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(vets_observacao),(vets_normais),(iluminacoes)])
                 else:
+                    print(vertices_face)
                     self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(vets_observacao),(vets_normais)])
                 
         return  
@@ -231,10 +236,15 @@ class Controle:
                     #   b. Algoritmo da scanline (Associar neste algoritmo z-buffer e o algoritmo de rasterização – Fillpoly)
                     #       i. Constante: Usar o fillpoly com a cor pré-computada anteriormente;
                     
-                    if visibilidadeSRU[0] > 0:
+                    if visibilidadeSRU[0] >= 0:
                         sombreamento = visiblidade[superfice][chave][0][4]
-                        FillPoly(poligono_recortado,self.tela,sombreamento[0],  self.constante)
+                        
+                        #zbuffer = ZBuffer( self.viewport[2],  self.viewport[3])
+                        #framebuffer, zbuffer_tela = zbuffer.triangulate_and_render(poligono_recortado, sombreamento[0])
+                        #(zbuffer_tela)
 
+                        FillPoly(poligono_recortado,self.tela,sombreamento[0],self.constante)   
+     
                         color = cor_frente[superfice]
                         if len(poligono_recortado) != 0:
                             x1, y1, z1 = poligono_recortado[0]
@@ -252,7 +262,7 @@ class Controle:
                         
                         
                     else:
-                        FillPoly(poligono_recortado,self.tela,0, False)
+                        FillPoly(poligono_recortado,self.tela,0, False)       
                         color = cor_fundo[superfice]
                         if len(poligono_recortado) != 0:
                             x1, y1, z1 = poligono_recortado[0]

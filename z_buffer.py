@@ -122,6 +122,7 @@ for y in range(int(y1), int(y3) + 1):
     # Aplique a iluminação ao calcular a cor
     color = iluminacao_total.astype(np.uint8)  # A iluminação total agora é o valor da cor
     draw_scanline(y, xa, za, xb, zb, color)
+print(framebuffer)
 
 # Exibir a imagem
 plt.imshow(framebuffer)

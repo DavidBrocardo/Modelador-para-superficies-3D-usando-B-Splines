@@ -6,10 +6,16 @@ class FillPoly:
 
     def __init__(self, poligino, tela, sobreamento,visivel):          
         self.tela = tela
-         
+        #print(sobreamento)
+        limite_inferior = 0
+        limite_superior = 250 
         if visivel:
-            cor_rgb = (sobreamento[0], sobreamento[1], sobreamento[2])
+            red = max(limite_inferior, min(sobreamento[0], limite_superior))
+            green = max(limite_inferior, min(sobreamento[1], limite_superior))
+            blue = max(limite_inferior, min(sobreamento[2], limite_superior))
+            cor_rgb = (red, green, blue)
             self.cor  = self.rgb_para_hex(cor_rgb)
+            #print("Aqui", self.cor)
         else:
             self.cor  = "white"
         self.y_min = 10000
