@@ -21,8 +21,8 @@ class ZBuffer:
         blue = max(limite_inferior, min(color[2], limite_superior))
         cor_rgb = (red, green, blue)
         color_rgb  = self.rgb_para_hex(cor_rgb)
-        #print(color_rgb)
         
+
         if x1 > x2:
             x1, x2, z1, z2 = x2, x1, z2, z1
         
@@ -33,15 +33,14 @@ class ZBuffer:
             if 0 <= x < self.width and 0 <= y < self.height and z < self.zbuffer[y, x]:
                 self.zbuffer[y, x] = z
                 self.framebuffer[y, x] = color
-                self.canvas.create_oval(x - 1, y - 1, x + 1, y + 1, fill=color_rgb, outline=color_rgb
-        )
+                self.canvas.create_oval(x - 1, y - 1, x + 1, y + 1, fill=color_rgb, outline=color_rgb )
             z += dz
 
     def render_triangle(self, p1, p2, p3, color):
         vertices = sorted([p1, p2, p3], key=lambda p: p[1])
         (y1, y2, y3) = vertices[0][1], vertices[1][1], vertices[2][1]
         
-        # Verificar triângulo degenerado
+        
         if y1 == y2 == y3:
             return
         
@@ -91,4 +90,4 @@ class ZBuffer:
             p2 = vertices[i + 1]
             self.render_triangle(p0, p1, p2, color)
         
-        return self.framebuffer, self.zbuffer
+        return 

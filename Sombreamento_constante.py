@@ -57,6 +57,7 @@ class Sombreamento_constante:
         
         Id = self.Calcular_iluminacao_difusa(self.centroides)
         Is = self.Calcular_iluminacao_especular(self.centroides)
+        
         Itotal = Ia + Id + Is
         iluminacoes.append(Itotal)
 
@@ -96,6 +97,6 @@ if __name__ == "__main__":
     sombrear = Sombreamento_constante(ila, il, ka, kd, ks, n, luz_pos,centroides_faces_visiveis, vetores_normais_visiveis, vetores_s)
 
     iluminacoes = sombrear.Calcular_iluminacao_total()  #Todas as iluminaçoes para serem aplicadas em cada face estão aqui, é uma lista
-
+    
     for i, ilum in enumerate(iluminacoes):
         print(f"Iluminação total da face {i}: {ilum}")
