@@ -349,12 +349,13 @@ class Interface:
         self.outp = {}
         all_faces = []
         visibilidade = {}
+        self.canvas.delete("all") 
         for superfice in range(self.quantidadeSuperfice):                    
                 control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice], 
                             self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice,self.ila,self.il,self.Luz,self.ka[superfice],self.kd[superfice],self.ks[superfice],self.n[superfice])
                 _, self.inp_Axo[superfice], self.outp[superfice], faces,visibilidade[superfice] = control.main()
                 all_faces.append(faces)
-                print(visibilidade[superfice])
+                
         if (self.sobreamento):
             for superfice in range(self.quantidadeSuperfice):
                 
@@ -371,6 +372,7 @@ class Interface:
          self.outp = {}
          all_faces = []
          visibilidade = {}
+         self.canvas.delete("all") 
          for superfice in range(self.quantidadeSuperfice):                    
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice], 
                                 self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice,self.ila,self.il,self.Luz,self.ka[superfice],self.kd[superfice],self.ks[superfice],self.n[superfice])
@@ -526,7 +528,7 @@ class Interface:
                 all_faces = []
                 visibilidade = {}
                 for superfice in range(self.quantidadeSuperfice):  
-                    print(self.ks[superfice])                  
+                                    
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice], 
                                 self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice,self.ila,self.il,self.Luz,self.ka[superfice],self.kd[superfice],self.ks[superfice],self.n[superfice])
                     _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
@@ -625,7 +627,7 @@ class Interface:
                 visibilidade = {}
                 
                 self.ka[self.superficie_selecionada] = (0.2,0.5,0.8)
-                #self.kd = {}  
+                #self.kd = {}   
                 self.kd[self.superficie_selecionada] = (0.1,0.2,0.5) 
                 #self.ks = {} 
                 self.ks[self.superficie_selecionada] = (0.3,0.1,0.8) 

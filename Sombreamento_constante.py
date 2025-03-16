@@ -11,7 +11,7 @@ Já vai ter todas as infos calculadas tbm! evitar recalculos
 """
 
 class Sombreamento_constante:
-    def __init__(self, ila, il, ka, kd, ks, n, luz_pos, centroides, normais, vetores_s):
+    def __init__(self, ila, il, ka, kd, ks, n, luz_pos, centroides, normais, vetores_s, visibilidade):
         self.ila = np.array(ila)  # Luz ambiente (R, G, B)
         self.il = np.array(il)    # Intensidade da lâmpada (R, G, B)
         self.ka = np.array(ka)    # Coeficiente de reflexão ambiente (R, G, B)
@@ -22,6 +22,7 @@ class Sombreamento_constante:
         self.centroides = np.array(centroides)  # Lista de centroides
         self.normais = np.array(normais)        # Lista de vetores normais
         self.vetores_s = np.array(vetores_s)    # Lista de vetores S (direção do observador)
+        self.visibilidade = visibilidade
 
     def Calcular_iluminacao_ambiente(self): # Iluminação ambiente [Ia = Ila . Ka]	
         return self.ila * self.ka
@@ -58,45 +59,10 @@ class Sombreamento_constante:
         Id = self.Calcular_iluminacao_difusa(self.centroides)
         Is = self.Calcular_iluminacao_especular(self.centroides)
         
-        Itotal = Ia + Id + Is
+        Itotal = Ia + Id + Is        
+        if (self.visibilidade[0] < 0):
+            Itotal = Ia 
         iluminacoes.append(Itotal)
-
         return iluminacoes
 
-# NAO APAGAR AINDA ESSE MAIN
-if __name__ == "__main__":
-    '''
-    Ila = (IlaR, IlaG, IlaB)  Luz ambiente
-    Il = (IlR,IlG,IlB) Luzes pontuais
-    Ka = (KaR,KaG,KaB)
-    Kd = (KdR,KdG,KdB) Materiais
-    Ks = (KsR,KsG,KsB,n)
-    '''
 
-    ila = (120,20,30)  # Luz ambiente
-    il = (150,100,20)  # Intensidade da lampada
-    luz_pos = [70, 20, 35]  # Posiçao da lampada
-
-    #Propriedades do material
-    ka = (0.4,0.4,0.4)  # Coeficiente de reflexao ambiente
-    kd = (0.7,0.4,0.4)  # Coeficiente de reflexao difusa
-    ks = (0.5,0.4,0.4)  # Coeficiente de reflexao especular
-    n = 2.15  # Expoente especular
-
-    centroides_faces_visiveis = [
-        25.100, 8.333, 33.700   # Face 1
-    ]
-
-    vetores_normais_visiveis = [0.669, 0.378, 0.639]
-
-    vetores_s = [   # Vetor s que é o Vetor O da visibilidade lá
-        -0.002, 0.143, 0.990
-    ]
-
-    #instancia da classe
-    sombrear = Sombreamento_constante(ila, il, ka, kd, ks, n, luz_pos,centroides_faces_visiveis, vetores_normais_visiveis, vetores_s)
-
-    iluminacoes = sombrear.Calcular_iluminacao_total()  #Todas as iluminaçoes para serem aplicadas em cada face estão aqui, é uma lista
-    
-    for i, ilum in enumerate(iluminacoes):
-        print(f"Iluminação total da face {i}: {ilum}")

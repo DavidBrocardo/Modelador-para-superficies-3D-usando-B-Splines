@@ -192,7 +192,7 @@ class Controle:
                 self.Faces_visi_centroide[chave] = []
                 
                 sombrear = Sombreamento_constante(self.ila, self.il, self.ka, self.kd, self.ks, self.n, self.luz_pos,
-                                                    centroide[0], vets_normais[0], vets_observacao[0])
+                                                    centroide[0], vets_normais[0], vets_observacao[0],visibilidade)
                     
                 iluminacoes = sombrear.Calcular_iluminacao_total()                 
                 self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(vets_observacao),(vets_normais),(iluminacoes)])
