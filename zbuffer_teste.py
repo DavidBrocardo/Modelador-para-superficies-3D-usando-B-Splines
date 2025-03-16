@@ -3,13 +3,26 @@ import matplotlib.pyplot as plt
 import math
 
 class ZBuffer:
-    def __init__(self, width, height):
+    def __init__(self, width, height, canvas):
         self.width = width
         self.height = height
         self.framebuffer = np.zeros((height, width, 3), dtype=np.uint8)
         self.zbuffer = np.full((height, width), np.inf)
+        self.canvas = canvas
+
+    def rgb_para_hex(self, rgb):
+        return "#{:02X}{:02X}{:02X}".format(int(rgb[0]), int(rgb[1]), int(rgb[2]))
     
     def draw_scanline(self, y, x1, z1, x2, z2, color):
+        limite_inferior = 0
+        limite_superior = 250 
+        red = max(limite_inferior, min(color[0], limite_superior))
+        green = max(limite_inferior, min(color[1], limite_superior))
+        blue = max(limite_inferior, min(color[2], limite_superior))
+        cor_rgb = (red, green, blue)
+        color_rgb  = self.rgb_para_hex(cor_rgb)
+        #print(color_rgb)
+        
         if x1 > x2:
             x1, x2, z1, z2 = x2, x1, z2, z1
         
@@ -20,6 +33,8 @@ class ZBuffer:
             if 0 <= x < self.width and 0 <= y < self.height and z < self.zbuffer[y, x]:
                 self.zbuffer[y, x] = z
                 self.framebuffer[y, x] = color
+                self.canvas.create_oval(x - 1, y - 1, x + 1, y + 1, fill=color_rgb, outline=color_rgb
+        )
             z += dz
 
     def render_triangle(self, p1, p2, p3, color):

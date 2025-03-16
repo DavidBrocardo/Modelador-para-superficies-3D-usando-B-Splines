@@ -238,27 +238,28 @@ class Controle:
                     
                     if visibilidadeSRU[0] >= 0:
                         sombreamento = visiblidade[superfice][chave][0][4]
-                        
-                        #zbuffer = ZBuffer( self.viewport[2],  self.viewport[3])
-                        #framebuffer, zbuffer_tela = zbuffer.triangulate_and_render(poligono_recortado, sombreamento[0])
+                        if(self.constante):
+                            zbuffer = ZBuffer( self.viewport[2],  self.viewport[3],self.tela)
+                            framebuffer, zbuffer_tela = zbuffer.triangulate_and_render(poligono_recortado, sombreamento[0])
                         #(zbuffer_tela)
+                        else:
 
-                        FillPoly(poligono_recortado,self.tela,sombreamento[0],self.constante)   
-     
-                        color = cor_frente[superfice]
-                        if len(poligono_recortado) != 0:
-                            x1, y1, z1 = poligono_recortado[0]
-                            cond = True
-                            for i in reversed(poligono_recortado):
-                                if cond :
-                                    x2, y2, z2 = i
-                                    self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
-                                    cond  = False
-                                else:
-                                    x1, y1, z1 = i
-                                    self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
-                                    x2 = x1
-                                    y2 = y1
+                            FillPoly(poligono_recortado,self.tela,sombreamento[0],self.constante)   
+        
+                            color = cor_frente[superfice]
+                            if len(poligono_recortado) != 0:
+                                x1, y1, z1 = poligono_recortado[0]
+                                cond = True
+                                for i in reversed(poligono_recortado):
+                                    if cond :
+                                        x2, y2, z2 = i
+                                        self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
+                                        cond  = False
+                                    else:
+                                        x1, y1, z1 = i
+                                        self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
+                                        x2 = x1
+                                        y2 = y1
                         
                         
                     else:

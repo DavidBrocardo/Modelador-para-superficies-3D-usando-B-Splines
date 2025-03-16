@@ -1,12 +1,12 @@
 import tkinter as tk
 import math
 import random
-import numpy as np
-import copy
-import pickle
+import ast
+import re
 from tkinter import simpledialog, messagebox
 from Controle import Controle
 from tkinter import colorchooser
+
  
 class Interface:
     def __init__(self, tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, espacamento, VRP, P, Y, dp, windows, viewport):
@@ -100,6 +100,9 @@ class Interface:
         menu_principal.add_cascade(label="Transformações Geometricas", menu=menu_geometrico)
 
         # Menu Arquivo
+        # Exemplo de uso:
+
+
         menu_arquivo = tk.Menu(menu_principal, tearoff=0)
         menu_arquivo.add_command(label="Abrir", command=self.abrir_arquivo)
         menu_arquivo.add_command(label="Salvar", command=self.salvar_arquivo)
@@ -142,25 +145,66 @@ class Interface:
         self.menu = tk.Menu(self.menu_button, tearoff=0)
         self.menu_button["menu"] = self.menu
       
-    def salvar_arquivo(self, filename="dados_superficie.pkl"):
-        messagebox.showinfo("Salvar", "Salvando arquivo...")
-        dados_para_salvar = copy.deepcopy(self.__dict__)
-        dados_para_salvar.pop("canvas", None)
-        dados_para_salvar.pop("viewport", None)
-        with open(filename, "wb") as f:
-            pickle.dump(dados_para_salvar, f)
-        
+    def salvar_arquivo(self, arquivo="superfices.txt"):
+        with open(arquivo, 'w') as f:
+            for atributo, valor in self.__dict__.items():                
+                if(atributo != "tela" and atributo != "canvas" ):
+                   
+                    tipo = type(valor)
+                    #if isinstance(valor, (list, tuple)):                      
+                     #   valor = ','.join(map(str, valor))  # transforma tudo em  string
+                    f.write(f"{tipo};{atributo};{valor}\n")
+        messagebox.showinfo("Salvando", "Superfices salvas no arquivo: "+arquivo)   
 
-    def abrir_arquivo(self, filename="dados_superficie.pkl"):
-        messagebox.showinfo("Abrir", "Abrindo arquivo...")
-        try:
-            with open(filename, "rb") as f:
-                self.__dict__ = pickle.load(f)
-            
-        except FileNotFoundError:
-            print(f"Arquivo {filename} não encontrado.")    
+    def abrir_arquivo(self, arquivo="superfices.txt"):
+        with open(arquivo, 'r') as arquivo:
+            for linha in arquivo:
+                linha = linha.strip()
+                if not linha:
+                    continue  # Ignora linhas vazias
+                
+                # Divide a linha em três partes: tipo, variável, conteúdo
+                tipo_str, var_nome, conteudo_str = linha.split(';', 2)
+                
+                # Extrai o nome do tipo (ex: 'int' de "<class 'int'>")
+                match = re.search(r"'(\w+)'", tipo_str)
+                if not match:
+                    continue  # Formato inválido
+                tipo_nome = match.group(1)
+                
+                # Converte o conteúdo para o tipo correto
+                try:
+                    if tipo_nome == 'int':
+                        valor = int(conteudo_str)
+                    elif tipo_nome == 'float':
+                        valor = float(conteudo_str)
+                    elif tipo_nome == 'str':
+                        valor = conteudo_str  # String direta
+                    elif tipo_nome in ('dict', 'list'):
+                        valor = ast.literal_eval(conteudo_str)  # Converte dicionários/listas
+                    else:
+                        continue  # Tipo não suportado
+                except (ValueError, SyntaxError):
+                    continue  # Erro na conversão
+                
+                # Atribui o valor à variável em self
+                setattr(self, var_nome, valor)        
+                    
+                
+        print(self.cor_aresta_frente)                    
+        self.canvas.delete("all") 
+        self.outp = {}
+        all_faces = []
+        visibilidade = {}
+        for superfice in range(self.quantidadeSuperfice):                    
+                control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice], 
+                            self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice,self.ila,self.il,self.Luz,self.ka[superfice],self.kd[superfice],self.ks[superfice],self.n[superfice])
+                _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
+                all_faces.append(faces)
+        faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
+        control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
 
-  
+
         
 
     def sair(self):
@@ -278,8 +322,8 @@ class Interface:
             all_faces = []
             visibilidade = {}
             for superfice in range(self.quantidadeSuperfice):                    
-                    control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                    control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice], 
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice,self.ila,self.il,self.Luz,self.ka[superfice],self.kd[superfice],self.ks[superfice],self.n[superfice])
                     _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
                     all_faces.append(faces)
             faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
@@ -553,14 +597,14 @@ class Interface:
                 visibilidade = {}
                 
                 self.ka[self.superficie_selecionada] = (0.2,0.5,0.8)
-                self.kd = {}  
+                #self.kd = {}  
                 self.kd[self.superficie_selecionada] = (0.1,0.2,0.5) 
-                self.ks = {} 
+                #self.ks = {} 
                 self.ks[self.superficie_selecionada] = (0.3,0.1,0.8) 
-                self.n = {}
+                #self.n = {}
                 self.n[self.superficie_selecionada] = 3    
                 for superfice in range(self.quantidadeSuperfice):   
-                                   
+                        print(self.kd[superfice])           
                         control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] ,  self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice], 
                                 self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice,self.ila,self.il,self.Luz,self.ka[superfice],self.kd[superfice],self.ks[superfice],self.n[superfice])
                         _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
