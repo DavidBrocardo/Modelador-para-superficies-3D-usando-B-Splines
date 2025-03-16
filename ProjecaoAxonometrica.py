@@ -3,7 +3,7 @@ import math
 class ProjecaoAxonometrica:
    
     def __init__(self, vertices, VRP, P, Y, windows, viewport):
-        # Inicializando variaveis
+        #Inicializando vars
         #self.vertices = vertices
         self.vertices = vertices
         #print(self.vertices)
@@ -13,29 +13,28 @@ class ProjecaoAxonometrica:
         self.windows = windows
         self.viewport = viewport
 
-
-    # Recebe um vetor e o retorna o unitario
+    #Recebe um vetor e retorna o unitario
     def Unitario (self, Vetor , Vetor_normalizado):    
         unitario = [0] * 3
         for i in range(3):
             unitario[i] = Vetor[i] / Vetor_normalizado 
         return unitario
 
-    # Recebe dois vetores e retorna o produto vetorial
+    #Recebe dois vetores e retorna o produto vetorial
     def calcular_produto_vetorial(self, v, n):        
         matriz = [
             ["i", "j", "k"],
             v,
             n
         ]    
-        # Componentes do produto vetorial
+
         u = [0] * (3)
         u[0] = v[1] * n[2] - v[2] * n[1]
         u[1] = -(v[0] * n[2] - v[2] * n[0])
         u[2] = v[0] * n[1] - v[1] * n[0]  
         return u
 
-    # Recebe duas matrizes e as multiplica
+    #Recebe duas matrizes e as multiplica
     def calcula_Mult_Matriz(self, A, B):
         if len(A[0]) != len(B):
             raise ValueError("Número de colunas de A deve ser igual ao número de linhas de B.")
@@ -119,12 +118,9 @@ class ProjecaoAxonometrica:
         return objeto_projetado
         
 
-
     def main(self):
-            # Calcular a projeção
+            #Calcular a proj
             projecao_axometrica = self.Axometrica()
             #print(projecao_axometrica)
             return projecao_axometrica
-            # Desenhar a projeção
-            
-
+            # Desenhar a proj

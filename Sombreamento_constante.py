@@ -12,19 +12,19 @@ Já vai ter todas as infos calculadas tbm! evitar recalculos
 
 class Sombreamento_constante:
     def __init__(self, ila, il, ka, kd, ks, n, luz_pos, centroides, normais, vetores_s, visibilidade):
-        self.ila = np.array(ila)  # Luz ambiente (R, G, B)
-        self.il = np.array(il)    # Intensidade da lâmpada (R, G, B)
-        self.ka = np.array(ka)    # Coeficiente de reflexão ambiente (R, G, B)
-        self.kd = np.array(kd)    # Coeficiente de reflexão difusa (R, G, B)
-        self.ks = np.array(ks)    # Coeficiente de reflexão especular (R, G, B)
-        self.n = n                # Expoente especular
-        self.luz_pos = np.array(luz_pos)  # Posição da luz
-        self.centroides = np.array(centroides)  # Lista de centroides
-        self.normais = np.array(normais)        # Lista de vetores normais
-        self.vetores_s = np.array(vetores_s)    # Lista de vetores S (direção do observador)
+        self.ila = np.array(ila)  #Luz ambiente (R, G, B)
+        self.il = np.array(il)    #Intensidade da lâmpada (R, G, B)
+        self.ka = np.array(ka)    #Coeficiente de reflexão ambiente (R, G, B)
+        self.kd = np.array(kd)    #Coeficiente de reflexão difusa (R, G, B)
+        self.ks = np.array(ks)    #Coeficiente de reflexão especular (R, G, B)
+        self.n = n                #Expoente especular
+        self.luz_pos = np.array(luz_pos)  #Posição da luz
+        self.centroides = np.array(centroides)  #Lista de centroides
+        self.normais = np.array(normais)        #Lista de vetores normais
+        self.vetores_s = np.array(vetores_s)    #Lista de vetores S (direção do observador)
         self.visibilidade = visibilidade
 
-    def Calcular_iluminacao_ambiente(self): # Iluminação ambiente [Ia = Ila . Ka]	
+    def Calcular_iluminacao_ambiente(self): #Iluminação ambiente [Ia = Ila . Ka]	
         return self.ila * self.ka
 
     def Calcular_iluminacao_difusa(self, i): #Iluminação difusa [Id = Il . Kd . (n.l)]	

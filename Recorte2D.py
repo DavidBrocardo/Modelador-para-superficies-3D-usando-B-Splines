@@ -1,6 +1,6 @@
 import numpy as np
 
-## Basicamente são as mesmas estruturas nos recortes, só muda as fórmulas!!
+##Basicamente são as mesmas estruturas nos recortes, só muda as fórmulas!!
 
 
 class Recorte2D:
@@ -32,7 +32,7 @@ class Recorte2D:
                 z = p1[2] + u * (p2[2] - p1[2])
                 
                 novo_vertice = (xmin, y, z)
-                novo_poligono.append(novo_vertice)  # Sala a Intersecao
+                novo_poligono.append(novo_vertice)  # Salva a Intersecao
                 novo_poligono.append(p2)  #e o vertice interno
 
             elif p1[0] >= xmin and p2[0] >= xmin:  #Ambos dentro
@@ -152,19 +152,12 @@ class Recorte2D:
         return novo_poligono
 
    
-
     #chama todos os recortes e executa o recorte total
     def Recortar_total(self): 
         
         resul1 = self.Recortar_esquerda()
-        
         resul2 = self.Recortar_direita(resul1)
-        
         resul3 = self.Recortar_embaixo(resul2)
-        
         resul4 = self.Recortar_topo(resul3)
         
         return resul4
-
-        
-

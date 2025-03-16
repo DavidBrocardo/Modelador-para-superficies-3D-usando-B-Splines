@@ -6,7 +6,7 @@ from Recorte3D import Recorte3D
 class BSplines:
     def __init__(self,NI, NJ, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P,V,dp,windows,viewport,geometrica,valores_geo):
             
-        # Parâmetros de controle
+        #Parametros de controle
         self.NI = NI
         self.NJ = NJ
         self.TI = TI
@@ -25,7 +25,7 @@ class BSplines:
         self.valores_geo = valores_geo
  
 
-        # Vetores de nós para as direções I e J
+        #Vetores de nós para as direções I e J
         self.knotsI = [0] * (self.NI + self.TI + 1)
         self.knotsJ = [0] * (self.NJ + self.TJ + 1)
         #pontos da superfície calculada: dimensão (RESOLUTIONI)x(RESOLUTIONJ)
@@ -62,7 +62,7 @@ class BSplines:
         incrementoI = (self.NI - self.TI + 2) / (self.RESOLUTIONI - 1)
         incrementoJ = (self.NJ - self.TJ + 2) / (self.RESOLUTIONJ - 1)
 
-        # Cálculo dos pontos internos da superfície:
+        #Calculo dos pontos internos da superfície:
         intervaloI = 0
         for i in range(self.RESOLUTIONI - 1):
             intervaloJ = 0
@@ -81,7 +81,7 @@ class BSplines:
                 intervaloJ += incrementoJ
             intervaloI += incrementoI
 
-        # Cálculo dos pontos na coluna final (j = RESOLUTIONJ - 1) para i de 0 a RESOLUTIONI-2:
+        # Calculo dos pontos na coluna final (j = RESOLUTIONJ - 1) para i de 0 a RESOLUTIONI-2:
         intervaloI = 0
         for i in range(self.RESOLUTIONI - 1):
             x, y, z = 0.0, 0.0, 0.0
@@ -110,16 +110,8 @@ class BSplines:
         # O último ponto da superfície é igual ao último ponto de controle
         self.outp[self.RESOLUTIONI - 1][self.RESOLUTIONJ - 1] = self.inp[self.NI][self.NJ]
 
-    
-                
-
-
-                
+           
     def main(self):       
         
         self.calcular_superficie()
         return self.inp, self.outp 
-
-
-
-

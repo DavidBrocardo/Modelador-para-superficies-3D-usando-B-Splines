@@ -51,9 +51,9 @@ class Pintor_dist:
             pontos = []
             for i in face:
                 xi, yi = i
-                x = self.vertices[xi][yi][0]  # Coordenada X do vértice
-                y = self.vertices[xi][yi][1]  # Coordenada Y do vértice
-                z = self.vertices[xi][yi][2]  # Coordenada z do vértice
+                x = self.vertices[xi][yi][0]  #X do vertice
+                y = self.vertices[xi][yi][1]  #Y do vertice
+                z = self.vertices[xi][yi][2]  #z do vertice
                 pontos.append((x, y, z))
             
             visi = Visibilidade_Normal(pontos,[[0,1,2,3]],self.VRP[:-1] ,True) 
@@ -83,7 +83,3 @@ class Pintor_dist:
 
         
         return
-
-        
-
-

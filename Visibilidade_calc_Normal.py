@@ -48,9 +48,7 @@ class Visibilidade_Normal:
             
             normal_unitaria = self.Calcular_vet_normal_unitario_face(vertices, face)
             normais_faces.append(normal_unitaria)  #calculando e salvando todos os vets normais das faces
-
-            
-
+     
         return normais_faces
 
     def Calcular_centroide_face(self, vertices, indice_face):
@@ -94,6 +92,3 @@ class Visibilidade_Normal:
         vets_observacao , centroide = self.Calcular_vet_observacao_face(self.VRP, self.vertices, self.indices_faces)
         produtos_escalares = [np.dot(vn, vo) for vn, vo in zip(vets_normais, vets_observacao)] #gpt cantou
         return produtos_escalares, centroide, vets_observacao , vets_normais
-    
-
-    

@@ -96,7 +96,7 @@ class Interface:
         menu_geometrico = tk.Menu(menu_principal, tearoff=0)
         menu_geometrico.add_command(label="Escala", command=self.escala)
         menu_geometrico.add_command(label="Rotação", command=self.rotacao)
-        menu_geometrico.add_command(label="Translacao", command=self.translacao)
+        menu_geometrico.add_command(label="Translação", command=self.translacao)
         menu_principal.add_cascade(label="Transformações Geometricas", menu=menu_geometrico)
 
         # Menu Arquivo
@@ -120,7 +120,7 @@ class Interface:
         # Menu Sobreamento
         menu_sobra = tk.Menu(menu_principal, tearoff=0)
         menu_sobra.add_command(label="Aplicar Sombreamento Constante", command=self.sobra_aplicar)
-        menu_sobra.add_command(label="Alterar Paramêtros", command=self.sobra_parametros)     
+        menu_sobra.add_command(label="Alterar Parâmetros", command=self.sobra_parametros)     
         menu_principal.add_cascade(label="Sombreamento", menu=menu_sobra)
 
         self.tela.config(menu=menu_principal)
@@ -133,7 +133,7 @@ class Interface:
         btn_pontos.grid(row=0, column=0, padx=5)
 
         # Botão para atualizar a lista de superfícies
-        self.botao_atualizar = tk.Button(frame_botoes, text="Selecione a Superfície", command=self.atualizar_menu)
+        self.botao_atualizar = tk.Button(frame_botoes, text="Selecionar Superfície", command=self.atualizar_menu)
         self.botao_atualizar.grid(row=0, column=1, padx=5)
 
         self.var_superficie = tk.StringVar()
@@ -226,7 +226,7 @@ class Interface:
         
 
     def definir_ponto_controle(self):
-        messagebox.showinfo("", "Clique proximo ao ponto que deseja altera")
+        messagebox.showinfo("", "Clique proximo ao ponto que deseja alterar")
         self.desenhar_pontoControle()
         self.atualizar_menu()
         self.tela.wait_variable(self.click_x)  # Espera um clique
@@ -360,12 +360,8 @@ class Interface:
             for superfice in range(self.quantidadeSuperfice):
                 
                 control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
-        
 
-       
-        
-         
-                    
+
     def sobra_remover(self):
          
          self.sobreamento = False
@@ -542,11 +538,6 @@ class Interface:
                     faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                     control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
                     
-                   
-               
-
-            
-
         tk.Button(janela, text="Atualizar", command=Salvar).grid(row=20, columnspan=3)
 
 
@@ -659,8 +650,6 @@ class Interface:
         tk.Button(janela, text="Salvar", command=Salvar).grid(row=12, column=0, columnspan=3)
         
 
-        
-
     def ponto_focal(self):
         janela = tk.Toplevel(self.tela)
         janela.title("Definir Nova Camera")
@@ -763,8 +752,6 @@ class Interface:
             
 
         tk.Button(janela, text="Salvar", command=Salvar).grid(row=2, columnspan=4)
-
-        
 
 
     def definir_viewport(self):
@@ -926,7 +913,7 @@ class Interface:
         janela = tk.Toplevel(self.tela)
         janela.title("Escala")       
 
-        tk.Label(janela, text="Aumentar em:").grid(row=0, column=0)
+        tk.Label(janela, text="Escala em:").grid(row=0, column=0)
         entrada_x = tk.Spinbox(janela, from_=2, to=500, increment=1, width=10)
         entrada_x.grid(row=1, column=0)
 
@@ -957,13 +944,9 @@ class Interface:
                 else:
                         faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                         control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)       
-
                     
-                    
-
-                
-            
         tk.Button(janela, text="Atualizar", command=Salvar).grid(row=2, columnspan=3)
+
     def translacao(self):
         janela = tk.Toplevel(self.tela)
         janela.title("Translacao")       

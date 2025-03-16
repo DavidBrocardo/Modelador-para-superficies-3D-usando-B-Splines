@@ -12,9 +12,8 @@ from zbuffer_teste import ZBuffer
 class Controle:
     def __init__(self,  tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P, Y, dp, windows, viewport,geometrica,valores_geo,corFrente,corFundo,constante,superfice,ila,il,luz_pos,ka,kd,ks,n):
                 
-        # Parâmetros de controle
+        #Parâmetros de controle
         self.inp = inp
-       
         self.tela = tela
         self.pontos_controleX= pontos_controleX
         self.pontos_controleY= pontos_controleY
@@ -181,7 +180,7 @@ class Controle:
                     #return self.inp, [], [], [],self.Faces_visi_centroide
                     
                     
-                #Visibilidade
+                #=========Visibilidade==========
                 
                 
                 visi= Visibilidade_Normal(vertices_face,[[0,1,2,3]],self.VRP[:-1],True) 
@@ -197,8 +196,7 @@ class Controle:
                 iluminacoes = sombrear.Calcular_iluminacao_total()                 
                 self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(vets_observacao),(vets_normais),(iluminacoes)])
                 
-                
-                
+                       
         return  
     
     def zbuffeConstante(self, output, visiblidade):        
@@ -233,9 +231,9 @@ class Controle:
                     for i in face:
                         xi, yi = i
                         
-                        x = vertices[superfice][xi][yi][0]  # Coordenada X do vértice
-                        y = vertices[superfice][xi][yi][1]  # Coordenada Y do vértice
-                        z = vertices[superfice][xi][yi][2]  # Coordenada z do vértice
+                        x = vertices[superfice][xi][yi][0]  #X do vertice
+                        y = vertices[superfice][xi][yi][1]  #Y do vertice
+                        z = vertices[superfice][xi][yi][2]  #z do vertice
                         pontos.append((x, y, z))
                     
                     

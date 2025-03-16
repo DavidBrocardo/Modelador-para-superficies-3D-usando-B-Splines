@@ -31,9 +31,7 @@ class Recorte3D:
                 nova_matriz[2].append(z)  
                 nova_matriz[3].append(1)
             else: 
-                recortou = True
-                
-        
+                recortou = True   
 
         return nova_matriz,recortou
 
@@ -50,8 +48,3 @@ if __name__ == "__main__":
     vertices_visiveis = recorte.Recortar3D()
 
     print("Vértices após o recorte:", vertices_visiveis)
-
-
-##
-##   Ver com o professor se o nosso z do que é visivel é negativo???
-##
