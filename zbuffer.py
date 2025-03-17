@@ -13,16 +13,15 @@ class ZBuffer:
     def rgb_para_hex(self, rgb):
         return "#{:02X}{:02X}{:02X}".format(int(rgb[0]), int(rgb[1]), int(rgb[2]))
     
-    def draw_scanline(self, y, x1, z1, x2, z2, color):
+    def desenha_scanline(self, y, x1, z1, x2, z2, color):
         limite_inferior = 0
         limite_superior = 250 
         red = max(limite_inferior, min(color[0], limite_superior))
         green = max(limite_inferior, min(color[1], limite_superior))
         blue = max(limite_inferior, min(color[2], limite_superior))
         cor_rgb = (red, green, blue)
-        color_rgb  = self.rgb_para_hex(cor_rgb)
+        color_rgb  = self.rgb_para_hex(cor_rgb)       
         
-
         if x1 > x2:
             x1, x2, z1, z2 = x2, x1, z2, z1
         
@@ -36,14 +35,12 @@ class ZBuffer:
                 self.canvas.create_oval(x - 1, y - 1, x + 1, y + 1, fill=color_rgb, outline=color_rgb )
             z += dz
 
-    def render_triangle(self, p1, p2, p3, color):
+    def renderizar_triangulo(self, p1, p2, p3, color):
         vertices = sorted([p1, p2, p3], key=lambda p: p[1])
-        (y1, y2, y3) = vertices[0][1], vertices[1][1], vertices[2][1]
-        
+        (y1, y2, y3) = vertices[0][1], vertices[1][1], vertices[2][1]        
         
         if y1 == y2 == y3:
-            return
-        
+            return        
         (x1, z1), (x2, z2), (x3, z3) = (vertices[0][0], vertices[0][2]), (vertices[1][0], vertices[1][2]), (vertices[2][0], vertices[2][2])
 
         y_start = math.ceil(y1)
@@ -78,9 +75,9 @@ class ZBuffer:
                 else:
                     xb, zb = x3, z3
             
-            self.draw_scanline(y, xa, za, xb, zb, color)
+            self.desenha_scanline(y, xa, za, xb, zb, color)
 
-    def triangulate_and_render(self, vertices, color):
+    def triangular_renderizar(self, vertices, color):
         if len(vertices) < 3:
             return
         
@@ -88,6 +85,6 @@ class ZBuffer:
         for i in range(1, len(vertices) - 1):
             p1 = vertices[i]
             p2 = vertices[i + 1]
-            self.render_triangle(p0, p1, p2, color)
+            self.renderizar_triangulo(p0, p1, p2, color)
         
         return 

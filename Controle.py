@@ -8,7 +8,7 @@ from ProjecaoAxonometrica import ProjecaoAxonometrica
 from Transformacoes_Geometricas import Transformacoes_Geometricas
 from Recorte3D import Recorte3D
 from Sombreamento_constante import Sombreamento_constante
-from zbuffer_teste import ZBuffer
+from zbuffer import ZBuffer
 class Controle:
     def __init__(self,  tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P, Y, dp, windows, viewport,geometrica,valores_geo,corFrente,corFundo,constante,superfice,ila,il,luz_pos,ka,kd,ks,n):
                 
@@ -119,14 +119,15 @@ class Controle:
         operacao = Transformacoes_Geometricas(vertices) 
         self.atualizarInp = True
         if self.geometrica == 1:     # ESCALA       
-            if self.valores_geo != 1.0 and self.valores_geo  != 0:
+            if self.valores_geo <= 0 :
+                return vertices, pontos
+            else:
                 resul_escala_superfice = operacao.Escala(self.valores_geo)
 
                 operacao = Transformacoes_Geometricas(pontos) 
                 resul_escala_pontos = operacao.Escala(self.valores_geo)
                 return resul_escala_superfice, resul_escala_pontos
-            else:
-                return vertices, pontos
+                
 
         if self.geometrica  == 2:    # ROTACAO
             x,y,z = self.valores_geo[0]   
@@ -171,22 +172,23 @@ class Controle:
                 vertices_face.append(vertice_superfice[i+1][j+1]) 
                 vertices_face.append(vertice_superfice[i+1][j]) 
                 
-                #Recorte 3D       
-                recorte = Recorte3D(-100000, 1000000, vertices_face)
                 
-                vertices,recortou = recorte.Recortar3D() 
-                if not(recortou):
-                    self.recortou = recortou
-                    #return self.inp, [], [], [],self.Faces_visi_centroide
+                #Recorte 3D      
+                recorte = Recorte3D(10, 2000, vertices_face)                
+                recortou = recorte.Recortar3D() 
+                
+                self.recortou = recortou
+                    
                     
                     
                 #=========Visibilidade==========
                 
                 
+                self.Faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
                 visi= Visibilidade_Normal(vertices_face,[[0,1,2,3]],self.VRP[:-1],True) 
                 visibilidade, centroide, vets_observacao , vets_normais = visi.main()
                 
-                self.Faces.append([(i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j)])
+                
                 chave = ((i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j))
                 self.Faces_visi_centroide[chave] = []
                 
@@ -195,94 +197,96 @@ class Controle:
                     
                 iluminacoes = sombrear.Calcular_iluminacao_total()                 
                 self.Faces_visi_centroide[chave].append([(visibilidade),(centroide),(vets_observacao),(vets_normais),(iluminacoes)])
-                
+         
                        
         return  
     
-    def zbuffeConstante(self, output, visiblidade):        
-        for i in range(self.RESOLUTIONI - 1):           
-            for j in range(self.RESOLUTIONJ - 1):
-                vertices_face = []
-                vertices_face.append(output[i][j])
-                vertices_face.append(output[i][j+1]) 
-                vertices_face.append(output[i+1][j+1]) 
-                vertices_face.append(output[i+1][j])
-                chave = ((i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j))
+    def zbuffeConstante(self, output, visiblidade,RESOLUTIONI,RESOLUTIONJ):       
+        if not(self.recortou): 
+            for i in range(RESOLUTIONI - 1):           
+                for j in range(RESOLUTIONJ - 1):
+                    vertices_face = []
+                    vertices_face.append(output[i][j])
+                    vertices_face.append(output[i][j+1]) 
+                    vertices_face.append(output[i+1][j+1]) 
+                    vertices_face.append(output[i+1][j])
+                    chave = ((i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j))
 
-                # a. Recorte 2D
-                recorte = Recorte2D(self.viewport, vertices_face)
-                poligono_recortado = recorte.Recortar_total()
+                    # a. Recorte 2D
+                    recorte = Recorte2D(self.viewport, vertices_face)
+                    poligono_recortado = recorte.Recortar_total()
+                    
+
+                    visibilidadeSRU = visiblidade[chave][0][0]
+                    sombreamento = visiblidade[chave][0][4]
                 
-
-                visibilidadeSRU = visiblidade[chave][0][0]
-                sombreamento = visiblidade[chave][0][4]
-               
-                self.zbuffer.triangulate_and_render(poligono_recortado, sombreamento[0])
+                    self.zbuffer.triangular_renderizar(poligono_recortado, sombreamento[0])
 
         return
     def pintor(self,faces_ordenadas, visiblidade, vertices, cor_fundo, cor_frente):
-        self.tela.delete("all") 
-        
-        for i in faces_ordenadas:
-            for _, face, superfice in i:
-                    pontos = []            
-                    chave = tuple(face)
-                    
-                    for i in face:
-                        xi, yi = i
+        if not(self.recortou):
+            self.tela.delete("all") 
+            
+            for i in faces_ordenadas:
+                for _, face, superfice in i:
+                        pontos = []            
+                        chave = tuple(face)
                         
-                        x = vertices[superfice][xi][yi][0]  #X do vertice
-                        y = vertices[superfice][xi][yi][1]  #Y do vertice
-                        z = vertices[superfice][xi][yi][2]  #z do vertice
-                        pontos.append((x, y, z))
-                    
-                    
-                    visibilidadeSRU = visiblidade[superfice][chave][0][0]                               
+                        for i in face:
+                            xi, yi = i
+                            
+                            x = vertices[superfice][xi][yi][0]  #X do vertice
+                            y = vertices[superfice][xi][yi][1]  #Y do vertice
+                            z = vertices[superfice][xi][yi][2]  #z do vertice
+                            pontos.append((x, y, z))
+                        
+                        
+                        visibilidadeSRU = visiblidade[superfice][chave][0][0]                               
 
-                    #   a. Recorte 2D
-                    recorte = Recorte2D(self.viewport, pontos)
-                    poligono_recortado = recorte.Recortar_total()
+                        #   a. Recorte 2D
+                        recorte = Recorte2D(self.viewport, pontos)
+                        poligono_recortado = recorte.Recortar_total()
 
-                
                     
-                    #   b. Algoritmo da scanline (Associar neste algoritmo z-buffer e o algoritmo de rasterização – Fillpoly)
-                    #       i. Constante: Usar o fillpoly com a cor pré-computada anteriormente;
-                    
-                    if visibilidadeSRU[0] >= 0:
-                        sombreamento = visiblidade[superfice][chave][0][4]                     
-                        FillPoly(poligono_recortado,self.tela,sombreamento[0],self.constante)  
-                        color = cor_frente[superfice]
-                        if len(poligono_recortado) != 0:
-                            x1, y1, z1 = poligono_recortado[0]
-                            cond = True
-                            for i in reversed(poligono_recortado):
-                                if cond :
-                                    x2, y2, z2 = i
-                                    self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
-                                    cond  = False
-                                else:
-                                    x1, y1, z1 = i
-                                    self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
-                                    x2 = x1
-                                    y2 = y1
                         
+                        #   b. Algoritmo da scanline (Associar neste algoritmo z-buffer e o algoritmo de rasterização – Fillpoly)
+                        #       i. Constante: Usar o fillpoly com a cor pré-computada anteriormente;
                         
-                    else:
-                        FillPoly(poligono_recortado,self.tela,0, False)       
-                        color = cor_fundo[superfice]
-                        if len(poligono_recortado) != 0:
-                            x1, y1, z1 = poligono_recortado[0]
-                            cond = True
-                            for i in reversed(poligono_recortado):
-                                if cond :
-                                    x2, y2, z2 = i
-                                    self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
-                                    cond  = False
-                                else:
-                                    x1, y1, z1 = i
-                                    self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
-                                    x2 = x1
-                                    y2 = y1
+                        if visibilidadeSRU[0] >= 0:
+                            sombreamento = visiblidade[superfice][chave][0][4]                     
+                            FillPoly(poligono_recortado,self.tela,sombreamento[0],self.constante)  
+                            color = cor_frente[superfice]
+                            if len(poligono_recortado) != 0:
+                                x1, y1, z1 = poligono_recortado[0]
+                                cond = True
+                                for i in reversed(poligono_recortado):
+                                    if cond :
+                                        x2, y2, z2 = i
+                                        self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
+                                        cond  = False
+                                    else:
+                                        x1, y1, z1 = i
+                                        self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
+                                        x2 = x1
+                                        y2 = y1
+                            
+                            
+                        else:
+                            FillPoly(poligono_recortado,self.tela,0, False)       
+                            color = cor_fundo[superfice]
+                            if len(poligono_recortado) != 0:
+                                x1, y1, z1 = poligono_recortado[0]
+                                cond = True
+                                for i in reversed(poligono_recortado):
+                                    if cond :
+                                        x2, y2, z2 = i
+                                        self.tela.create_line(x1, y1, x2, y2, fill=color, width=1)
+                                        cond  = False
+                                    else:
+                                        x1, y1, z1 = i
+                                        self.tela.create_line(x2, y2, x1, y1, fill=color, width=1)
+                                        x2 = x1
+                                        y2 = y1
         return
                 
 
@@ -338,8 +342,11 @@ class Controle:
 
         #é realizado por meio de chamada posterior
         # 4) Aplicar o teste de visibilidade pelo cálculo da normal para cada face de objeto restante.
-
-        return self.inp, self.inp_projetado, self.outp, faces_ordenadas, self.Faces_visi_centroide
+        if self.recortou:  
+                
+            return self.inp, self.inp, self.inp, self.Faces, self.Faces_visi_centroide   
+        else:
+            return self.inp, self.inp_projetado, self.outp, faces_ordenadas, self.Faces_visi_centroide
         
         
         

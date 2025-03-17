@@ -129,11 +129,11 @@ class Interface:
         frame_botoes = tk.Frame(self.tela)
         frame_botoes.pack(pady=10)
 
-        btn_pontos = tk.Button(frame_botoes, text="Nova Superfície", command=self.definir_nova_superfice, width=25, bg="blue")
+        btn_pontos = tk.Button(frame_botoes, text="Nova Superfície", command=self.definir_nova_superfice, width=25, bg="Gray")
         btn_pontos.grid(row=0, column=0, padx=5)
 
         # Botão para atualizar a lista de superfícies
-        self.botao_atualizar = tk.Button(frame_botoes, text="Selecionar Superfície", command=self.atualizar_menu)
+        self.botao_atualizar = tk.Button(frame_botoes, text="Selecionar Superfície", command=self.atualizar_menu, width=25, bg="Gray")
         self.botao_atualizar.grid(row=0, column=1, padx=5)
 
         self.var_superficie = tk.StringVar()
@@ -199,7 +199,7 @@ class Interface:
         if (self.sobreamento):
             for superfice in range(self.quantidadeSuperfice):
                 
-                control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
         else:
             faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
             control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
@@ -290,7 +290,7 @@ class Interface:
             if (self.sobreamento):
                 for superfice in range(self.quantidadeSuperfice):
                     
-                    control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                    control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
             else:
                 faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                 control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
@@ -314,7 +314,7 @@ class Interface:
             if (self.sobreamento):
                 for superfice in range(self.quantidadeSuperfice):
                     
-                    control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                    control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
             else:
                 faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                 control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)         
@@ -337,7 +337,7 @@ class Interface:
             if (self.sobreamento):
                 for superfice in range(self.quantidadeSuperfice):
                     
-                    control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                    control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
             else:
                 faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                 control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
@@ -359,7 +359,7 @@ class Interface:
         if (self.sobreamento):
             for superfice in range(self.quantidadeSuperfice):
                 
-                control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
 
 
     def sobra_remover(self):
@@ -533,7 +533,7 @@ class Interface:
                 if (self.sobreamento):
                     for superfice in range(self.quantidadeSuperfice):
                         
-                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
                 else:
                     faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                     control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
@@ -634,7 +634,7 @@ class Interface:
                 if (self.sobreamento):
                     for superfice in range(self.quantidadeSuperfice):
                         
-                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
                 else:
                         faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                         control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
@@ -686,7 +686,7 @@ class Interface:
                 if (self.sobreamento):
                     for superfice in range(self.quantidadeSuperfice):
                         
-                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
                 else:
                         faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                         control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)
@@ -744,7 +744,7 @@ class Interface:
             if (self.sobreamento):
                 for superfice in range(self.quantidadeSuperfice):
                     
-                    control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                    control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
             else:
                 faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                 control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)       
@@ -792,13 +792,13 @@ class Interface:
             visibilidade = {}
             for superfice in range(self.quantidadeSuperfice):                    
                     control = Controle(self.canvas,self.pontos_controleX[superfice],self.pontos_controleY[superfice] , self.TI[superfice], self.TJ[superfice], self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice],
-                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice)
+                                self.inp[superfice], self.VRP, self.P, self.Y, self.dp, self.windows, self.viewport,0,0,self.cor_aresta_frente[superfice], self.cor_aresta_fundo[superfice],self.sobreamento,superfice,self.ila,self.il,self.Luz,self.ka[superfice],self.kd[superfice],self.ks[superfice],self.n[superfice])
                     _, self.inp_Axo[superfice], self.outp[superfice],faces,visibilidade[superfice]  = control.main()
                     all_faces.append(faces)
             if (self.sobreamento):
                 for superfice in range(self.quantidadeSuperfice):
                     
-                    control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                    control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
             else:
                 faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                 control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)        
@@ -842,7 +842,7 @@ class Interface:
                 if (self.sobreamento):
                     for superfice in range(self.quantidadeSuperfice):
                         
-                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
                 else:
                         faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                         control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)    
@@ -900,7 +900,7 @@ class Interface:
                 if (self.sobreamento):
                     for superfice in range(self.quantidadeSuperfice):
                         
-                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
                 else:
                         faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                         control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)        
@@ -914,7 +914,7 @@ class Interface:
         janela.title("Escala")       
 
         tk.Label(janela, text="Escala em:").grid(row=0, column=0)
-        entrada_x = tk.Spinbox(janela, from_=2, to=500, increment=1, width=10)
+        entrada_x = tk.Spinbox(janela, from_=0, to=500, increment=0.1, width=10)
         entrada_x.grid(row=1, column=0)
 
         def Salvar():
@@ -940,7 +940,7 @@ class Interface:
                 if (self.sobreamento):
                     for superfice in range(self.quantidadeSuperfice):
                         
-                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
                 else:
                         faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                         control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)       
@@ -989,7 +989,7 @@ class Interface:
                 if (self.sobreamento):
                     for superfice in range(self.quantidadeSuperfice):
                        
-                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice])
+                        control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
                 else:
                         faces_ordenadas = sorted(all_faces, key=lambda x: x[0], reverse=True)                
                         control.pintor(faces_ordenadas, visibilidade, self.outp,self.cor_aresta_fundo, self.cor_aresta_frente)       
