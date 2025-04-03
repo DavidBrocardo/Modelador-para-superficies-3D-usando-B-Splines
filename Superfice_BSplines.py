@@ -26,6 +26,7 @@ class BSplines:
  
 
         #Vetores de nós para as direções I e J
+        
         self.knotsI = [0] * (self.NI + self.TI + 1)
         self.knotsJ = [0] * (self.NJ + self.TJ + 1)
         #pontos da superfície calculada: dimensão (RESOLUTIONI)x(RESOLUTIONJ)

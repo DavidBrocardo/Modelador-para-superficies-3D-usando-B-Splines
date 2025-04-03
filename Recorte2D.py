@@ -104,7 +104,7 @@ class Recorte2D:
 
             elif p1[1] <= ymax and p2[1] <= ymax:  #Ambos dentro
                 novo_poligono.append(p2) 
-
+            
             elif p1[1] <= ymax and p2[1] > ymax:  #Saindo da area de recorte
 
                 u = (ymax - p1[1]) / (p2[1] - p1[1])

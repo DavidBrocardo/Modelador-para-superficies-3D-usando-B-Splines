@@ -9,6 +9,7 @@ from Transformacoes_Geometricas import Transformacoes_Geometricas
 from Recorte3D import Recorte3D
 from Sombreamento_constante import Sombreamento_constante
 from zbuffer import ZBuffer
+
 class Controle:
     def __init__(self,  tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, inp, VRP, P, Y, dp, windows, viewport,geometrica,valores_geo,corFrente,corFundo,constante,superfice,ila,il,luz_pos,ka,kd,ks,n):
                 
@@ -111,6 +112,7 @@ class Controle:
             projecao = ProjecaoAxonometrica(entrada, self.VRP, self.P, self.Y,  self.windows, self.viewport)
             projecao = projecao.main() 
             self.outp = []
+            print(projecao)
             self.outp = self.converter_vertices_superfice(projecao)
 
     def transformacoes_Geometricas(self,vertices,pontos):
@@ -174,7 +176,7 @@ class Controle:
                 
                 
                 #Recorte 3D      
-                recorte = Recorte3D(10, 2000, vertices_face)                
+                recorte = Recorte3D(-200, 10000, vertices_face)                
                 recortou = recorte.Recortar3D() 
                 
                 self.recortou = recortou
@@ -207,22 +209,24 @@ class Controle:
                 for j in range(RESOLUTIONJ - 1):
                     vertices_face = []
                     vertices_face.append(output[i][j])
-                    vertices_face.append(output[i][j+1]) 
-                    vertices_face.append(output[i+1][j+1]) 
+                    vertices_face.append(output[i][j+1])
+                    vertices_face.append(output[i+1][j+1])
                     vertices_face.append(output[i+1][j])
                     chave = ((i, j), (i, j + 1), (i + 1, j + 1), (i + 1, j))
 
                     # a. Recorte 2D
+                    
                     recorte = Recorte2D(self.viewport, vertices_face)
                     poligono_recortado = recorte.Recortar_total()
                     
 
                     visibilidadeSRU = visiblidade[chave][0][0]
                     sombreamento = visiblidade[chave][0][4]
-                
-                    self.zbuffer.triangular_renderizar(poligono_recortado, sombreamento[0])
+                    
+                    self.zbuffer.zbuffer_face(poligono_recortado, sombreamento[0])
 
         return
+        
     def pintor(self,faces_ordenadas, visiblidade, vertices, cor_fundo, cor_frente):
         if not(self.recortou):
             self.tela.delete("all") 
@@ -318,6 +322,8 @@ class Controle:
         #   a. Centróides de faces e de objetos
         #       i. Recorte (3D) dos objetos que estejam antes do plano Near e depois do plano Far.
         #   b. Vetores normais das faces
+        #   c. Sombreamento constante
+        #       i. Computar o valor de iluminação total (cor) de cada face
         self.facePorFace(matriz_superfice)   
         
     
@@ -329,8 +335,7 @@ class Controle:
             else:
                 self.zbuffer = ZBuffer( self.viewport[2],  self.viewport[3], self.tela)
                 faces_ordenadas = self.Faces
-        #   c. Sombreamento constante
-        #       i. Computar o valor de iluminação total (cor) de cada face
+        
 
 
 
@@ -338,6 +343,7 @@ class Controle:
             #PONTOS
             self.axonometrica(matriz_pontos,True)          
                 #SUPERFICE
+            
             self.axonometrica(matriz_superfice,False)    
 
         #é realizado por meio de chamada posterior

@@ -35,7 +35,7 @@ class ZBuffer:
                 self.canvas.create_oval(x - 1, y - 1, x + 1, y + 1, fill=color_rgb, outline=color_rgb )
             z += dz
 
-    def renderizar_triangulo(self, p1, p2, p3, color):
+    def calc_intersecoes(self, p1, p2, p3, color):
         vertices = sorted([p1, p2, p3], key=lambda p: p[1])
         (y1, y2, y3) = vertices[0][1], vertices[1][1], vertices[2][1]        
         
@@ -76,8 +76,9 @@ class ZBuffer:
                     xb, zb = x3, z3
             
             self.desenha_scanline(y, xa, za, xb, zb, color)
-
-    def triangular_renderizar(self, vertices, color):
+    
+    #Divide a Face em Dois Triâgulos
+    def zbuffer_face(self, vertices, color):
         if len(vertices) < 3:
             return
         
@@ -85,6 +86,6 @@ class ZBuffer:
         for i in range(1, len(vertices) - 1):
             p1 = vertices[i]
             p2 = vertices[i + 1]
-            self.renderizar_triangulo(p0, p1, p2, color)
+            self.calc_intersecoes(p0, p1, p2, color)
         
         return 

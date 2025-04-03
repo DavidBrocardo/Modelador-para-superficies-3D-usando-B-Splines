@@ -110,7 +110,7 @@ class ProjecaoAxonometrica:
         [0,	0,	0,	1]
         ]
         
-        matriz_SRT = self.calcula_Mult_Matriz(M_jp, self.calcula_Mult_Matriz(M_proj,matriz_SRC))  
+        matriz_SRT = self.calcula_Mult_Matriz(M_jp, matriz_SRC)  
                 
         
         objeto_projetado = self.calcula_Mult_Matriz(matriz_SRT, self.vertices)      

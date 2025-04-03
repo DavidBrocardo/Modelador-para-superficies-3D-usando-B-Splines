@@ -90,5 +90,5 @@ class Visibilidade_Normal:
 
         vets_normais = self.Calcular_vet_normal_das_faces(self.vertices, self.indices_faces)
         vets_observacao , centroide = self.Calcular_vet_observacao_face(self.VRP, self.vertices, self.indices_faces)
-        produtos_escalares = [np.dot(vn, vo) for vn, vo in zip(vets_normais, vets_observacao)] #gpt cantou
+        produtos_escalares = [np.dot(vn, vo) for vn, vo in zip(vets_normais, vets_observacao)] 
         return produtos_escalares, centroide, vets_observacao , vets_normais

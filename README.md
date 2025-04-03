@@ -17,7 +17,7 @@
      python --version
      
 
-### Dependências
+### Biblioteca
 - **Tkinter**: Biblioteca padrão do Python. Caso não esteja instalada, execute:
     pip install tk
 
@@ -28,5 +28,5 @@
 
 
 ### Informações Importantes
-1. Para alterar os parâmetros de sombreamento, é necessário alterar todas as informações correspondentes.
+1. Para alterar os parâmetros de variavés/superfice/sombreamento, é necessário alterar todas as informações correspondentes.
 2. Ao salvar um arquivo, ele será salvo por padrão como superficies.txt.

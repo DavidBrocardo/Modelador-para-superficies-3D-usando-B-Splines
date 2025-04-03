@@ -13,7 +13,7 @@ class Pintor_dist:
         self.canvas = canvas
         self.viewport = viewport
         self.superfice = superfice
-    
+     
     def calcular_centroide_face(self, indice_face):
         v = len(indice_face)
         soma_x = soma_y = soma_z = 0
@@ -44,7 +44,7 @@ class Pintor_dist:
         #print(faces_ordenadas)
         return  faces_ordenadas
 
-    def controle(self, indices_faces):
+    """def controle(self, indices_faces):
         faces_ordenadas = self.calcular_dists_e_ordenar_faces(indices_faces)
 
         for _, face in faces_ordenadas:
@@ -82,4 +82,4 @@ class Pintor_dist:
                         y2 = y1
 
         
-        return
+        return"""

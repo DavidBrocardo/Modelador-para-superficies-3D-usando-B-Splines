@@ -39,7 +39,6 @@ class Sombreamento_constante:
       
         vetor_L = self.luz_pos - self.centroides   # Vetor L
         vetor_L /= np.linalg.norm(vetor_L)  # Vetor L normalizado
-
         # Vetor R = 2(n . l) * n - l
         n_dot_l = np.dot(self.normais, vetor_L)
         vetor_R = 2 * n_dot_l * self.normais - vetor_L

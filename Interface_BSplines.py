@@ -10,7 +10,7 @@ from tkinter import colorchooser
  
 class Interface:
     def __init__(self, tela, pontos_controleX, pontos_controleY, TI, TJ, RESOLUTIONI, RESOLUTIONJ, espacamento, VRP, P, Y, dp, windows, viewport):
-        self.tela = tela        
+        self.tela = tela
         self.tela.title("Superfície Spline")
         self.tela.geometry("700x700")
         self.canvas = tk.Canvas(self.tela, width=viewport[2], height=viewport[3], bg="white")
@@ -357,7 +357,9 @@ class Interface:
                 all_faces.append(faces)
                 
         if (self.sobreamento):
+            
             for superfice in range(self.quantidadeSuperfice):
+
                 
                 control.zbuffeConstante(self.outp[superfice],visibilidade[superfice],self.RESOLUTIONI[superfice], self.RESOLUTIONJ[superfice])
 
@@ -1009,9 +1011,9 @@ class Interface:
             linha = []
             for j in range(self.pontos_controleY[self.superficie_selecionada] + 1):
                 #z =(random.randint(0, 9999) / 5000.0) - 1
-                x = (self.ponto_inicial[self.superficie_selecionada][0] + i) * self.espacamento
+                x = (self.ponto_inicial[self.superficie_selecionada][0] + i) * self.espacamento - (self.pontos_controleX[self.superficie_selecionada]* self.espacamento)/2
                 y = random.uniform(-10, 10)  # Altura aleatória 
-                z = (self.ponto_inicial[self.superficie_selecionada][2] + j) * self.espacamento
+                z = (self.ponto_inicial[self.superficie_selecionada][2] + j) * self.espacamento - (self.pontos_controleY[self.superficie_selecionada]* self.espacamento)/2
                 
                 linha.append([x, y, z])
 
@@ -1038,7 +1040,6 @@ class Interface:
         self.inp[self.superficie_selecionada] = []
         self.inp_Axo = {}
         self.inp_Axo[self.superficie_selecionada] = []  
-        self.canvas.delete("all")
         self.criar_pontos_controle()
         self.canvas.delete("all")
         self.outp = {}
