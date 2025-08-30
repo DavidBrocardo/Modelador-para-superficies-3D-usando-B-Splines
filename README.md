@@ -30,3 +30,11 @@
 ### Informações Importantes
 1. Para alterar os parâmetros de variavés/superfice/sombreamento, é necessário alterar todas as informações correspondentes.
 2. Ao salvar um arquivo, ele será salvo por padrão como superficies.txt.
+
+
+<div align="center">
+
+<img src="/modelador.png" width="600"/>  
+
+
+</div>
