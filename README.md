@@ -21,13 +21,15 @@ O sistema conta com uma interface gráfica  construída em **Tkinter**, permitin
 - **Leonardo Bednarczuk Balan de Oliveira**  
 
 ---
-## Aplicação com uma superfície criada
+
+## 🏞️ Aplicação com uma superfície criada
 <div align="center">
    <img src="/modelador.png" width="600"/>  
 </div>
+
 ---
+
 ## 🖥️ Requisitos do Sistema  
-- **Sistema Operacional**: Windows
 - **Linguagem de Programação**: Python
 
 ### Instalação do Python
