@@ -1,11 +1,32 @@
-# Modelador de Superfícies 3D usando B-Splines
+#  Modelador de Superfícies 3D com B-Splines  
 
-### Autores:
-- David Antonio Brocardo
-- Gabriel Santos da Silva
-- Leonardo Bednarczuk Balan de Oliveira
+Este projeto consiste em um **modelador de superfícies tridimensionais** desenvolvido em **Python**, utilizando **B-Splines** para gerar e manipular superfícies.  
+O sistema conta com uma interface gráfica  construída em **Tkinter**, permitindo a interação do usuário com os parâmetros de variáveis, superfícies e sombreamento.  
 
-### Requisitos do Sistema
+---
+
+## Funcionalidades  
+
+- 📌 Modelagem de superfícies 3D com B-Splines.  
+- 🖥️ Interface gráfica com **Tkinter**.  
+- ⚙️ Ajuste de parâmetros (variáveis, superfícies e sombreamento).  
+- 💾 Salvamento automático das superfícies em `superficies.txt`.  
+
+---
+
+## 👨‍💻 Autores  
+
+- **David Antonio Brocardo**  
+- **Gabriel Santos da Silva**  
+- **Leonardo Bednarczuk Balan de Oliveira**  
+
+---
+## Aplicação com uma superfície criada
+<div align="center">
+   <img src="/modelador.png" width="600"/>  
+</div>
+---
+## 🖥️ Requisitos do Sistema  
 - **Sistema Operacional**: Windows
 - **Linguagem de Programação**: Python
 
@@ -32,9 +53,4 @@
 2. Ao salvar um arquivo, ele será salvo por padrão como superficies.txt.
 
 
-<div align="center">
 
-<img src="/modelador.png" width="600"/>  
-
-
-</div>
